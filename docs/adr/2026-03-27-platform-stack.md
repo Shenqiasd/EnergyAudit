@@ -31,6 +31,21 @@ Why:
 - React 生态适合后续集成 SpreadJS 一类在线表格组件
 - 便于将鉴权、路由分区、静态资产和管理台统一到单个前端应用中
 
+### Monorepo workspace and build tooling
+
+- Use `pnpm 10` as the package manager
+- Use `pnpm workspaces` for repository package boundaries
+- Use `Turborepo` for task orchestration, caching, and scoped builds
+- Use a root `tsconfig.base.json` for shared TypeScript compiler settings
+
+Why:
+
+- `pnpm` 对 monorepo 的 workspace 支持成熟，安装速度和磁盘复用更适合长期工程
+- `pnpm workspaces` 足够直接，不会把当前阶段复杂度抬高到 Nx 一类更重的工具层
+- `Turborepo` 能为 Task 2 之后的 `build`、`test`、`lint`、`type-check` 提供可执行基线
+- 根级 TypeScript 配置能让共享包、API、Web 在一开始就使用一致的路径和编译约束
+- 该组合对 Next.js 和 NestJS 都是低摩擦方案，适合先搭稳平台骨架再逐步扩展
+
 ### Backend framework
 
 - Use `NestJS` with the `Fastify` adapter and `TypeScript`
@@ -131,3 +146,5 @@ This stack honors the approved design constraints:
   - Rejected because it weakens auditability, history control, and integration boundaries
 - Backend-in-frontend-only architecture
   - Rejected because long-running jobs, integrations, and domain boundaries warrant a dedicated API service
+- Heavy integrated monorepo tooling such as Nx at project start
+  - Rejected because current repository is greenfield and needs an executable but low-friction baseline before introducing heavier orchestration

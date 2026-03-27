@@ -12,6 +12,10 @@
 ## Top-Level Layout
 
 ```text
+package.json
+pnpm-workspace.yaml
+turbo.json
+tsconfig.base.json
 apps/
   api/
   web/
@@ -25,6 +29,21 @@ infra/
 docs/
 scripts/
 ```
+
+## Workspace And Tooling Baseline
+
+Root-level workspace files should be created in the first scaffolding pass:
+
+- `package.json`
+  - root scripts for `dev`, `build`, `test`, `lint`, and `type-check`
+- `pnpm-workspace.yaml`
+  - workspace package registration for `apps/*` and `packages/*`
+- `turbo.json`
+  - pipeline definitions for `build`, `test`, `lint`, `type-check`, and app-specific dev tasks
+- `tsconfig.base.json`
+  - shared TypeScript compiler options and path alias foundations
+
+This gives Task 2 and later tasks an executable monorepo baseline instead of a documentation-only layout.
 
 ## Directory Responsibilities
 
@@ -209,13 +228,13 @@ Forbidden dependency patterns:
 
 ## Initial Build-Out Order
 
-1. `apps/api`
-2. `apps/web`
-3. `packages/domain`
-4. `packages/shared`
-5. `packages/config-engine`
-6. `packages/reporting`
-7. `packages/integrations`
+1. `packages/shared`
+2. `packages/domain`
+3. `packages/config-engine`
+4. `packages/reporting`
+5. `packages/integrations`
+6. `apps/api`
+7. `apps/web`
 8. `infra`
 
-This order matches the current implementation plan and keeps platform core work first.
+This order aligns with the dependency graph: shared and domain foundations come first, configuration and reporting layers follow, integration adapters stay outside core workflow packages, and apps are scaffolded only after their dependent packages exist.
