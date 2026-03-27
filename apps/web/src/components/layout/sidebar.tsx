@@ -15,7 +15,6 @@ import {
   ListChecks,
   Settings,
   Shield,
-  Users,
   Wrench,
   BarChart3,
 } from "lucide-react";
