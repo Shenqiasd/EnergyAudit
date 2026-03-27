@@ -10,7 +10,8 @@ create table enterprise_external_bindings (
   enterprise_id text not null references enterprises (id) on delete cascade,
   external_system text not null,
   external_id text not null,
-  sync_status text not null
+  sync_status text not null,
+  unique (external_system, external_id)
 );
 
 create table user_accounts (
@@ -33,7 +34,8 @@ create table audit_projects (
   id text primary key,
   enterprise_id text not null references enterprises (id) on delete cascade,
   batch_id text not null references audit_batches (id) on delete cascade,
-  status text not null
+  status text not null,
+  unique (enterprise_id, batch_id)
 );
 
 create table reports (
