@@ -1,0 +1,543 @@
+import {
+  bigint,
+  boolean,
+  index,
+  integer,
+  numeric,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  unique,
+} from 'drizzle-orm/pg-core';
+
+// ==================== Platform Core Objects ====================
+
+export const roles = pgTable('roles', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description'),
+  isBuiltin: boolean('is_builtin').notNull().default(false),
+});
+
+export const permissions = pgTable('permissions', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  group: text('group').notNull(),
+});
+
+export const rolePermissions = pgTable(
+  'role_permissions',
+  {
+    roleId: text('role_id')
+      .notNull()
+      .references(() => roles.id, { onDelete: 'cascade' }),
+    permissionId: text('permission_id')
+      .notNull()
+      .references(() => permissions.id, { onDelete: 'cascade' }),
+  },
+  (table) => [primaryKey({ columns: [table.roleId, table.permissionId] })],
+);
+
+export const dictionaries = pgTable(
+  'dictionaries',
+  {
+    id: text('id').primaryKey(),
+    category: text('category').notNull(),
+    code: text('code').notNull(),
+    name: text('name').notNull(),
+    parentCode: text('parent_code'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+    metadata: text('metadata'),
+  },
+  (table) => [unique().on(table.category, table.code)],
+);
+
+export const templates = pgTable('templates', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description'),
+  activeVersionId: text('active_version_id'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const templateVersions = pgTable(
+  'template_versions',
+  {
+    id: text('id').primaryKey(),
+    templateId: text('template_id')
+      .notNull()
+      .references(() => templates.id, { onDelete: 'cascade' }),
+    versionNumber: integer('version_number').notNull(),
+    versionLabel: text('version_label'),
+    isActive: boolean('is_active').notNull().default(false),
+    moduleConfigSnapshot: text('module_config_snapshot'),
+    publishedAt: timestamp('published_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.templateId, table.versionNumber)],
+);
+
+export const attachments = pgTable(
+  'attachments',
+  {
+    id: text('id').primaryKey(),
+    ownerType: text('owner_type').notNull(),
+    ownerId: text('owner_id').notNull(),
+    fileName: text('file_name').notNull(),
+    fileSize: bigint('file_size', { mode: 'number' }).notNull(),
+    mimeType: text('mime_type').notNull(),
+    storagePath: text('storage_path').notNull(),
+    uploadedBy: text('uploaded_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_attachments_owner').on(table.ownerType, table.ownerId)],
+);
+
+export const auditLogs = pgTable(
+  'audit_logs',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    userRole: text('user_role').notNull(),
+    action: text('action').notNull(),
+    targetType: text('target_type'),
+    targetId: text('target_id'),
+    detail: text('detail'),
+    ipAddress: text('ip_address'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_audit_logs_user').on(table.userId),
+    index('idx_audit_logs_target').on(table.targetType, table.targetId),
+    index('idx_audit_logs_created').on(table.createdAt),
+  ],
+);
+
+// ==================== Enterprises & Users ====================
+
+export const enterprises = pgTable('enterprises', {
+  id: text('id').primaryKey(),
+  unifiedSocialCreditCode: text('unified_social_credit_code').notNull().unique(),
+  name: text('name').notNull(),
+  admissionStatus: text('admission_status').notNull().default('pending_review'),
+  industryCode: text('industry_code'),
+  contactPerson: text('contact_person'),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  address: text('address'),
+  notes: text('notes'),
+  expiryDate: timestamp('expiry_date', { withTimezone: true }),
+  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
+  sortOrder: integer('sort_order').default(0),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const enterpriseExternalBindings = pgTable(
+  'enterprise_external_bindings',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    externalSystem: text('external_system').notNull(),
+    externalId: text('external_id').notNull(),
+    syncStatus: text('sync_status').notNull().default('pending'),
+    lastSyncedAt: timestamp('last_synced_at', { withTimezone: true }),
+    lastSuccessfulSnapshot: text('last_successful_snapshot'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.externalSystem, table.externalId)],
+);
+
+export const userAccounts = pgTable('user_accounts', {
+  id: text('id').primaryKey(),
+  enterpriseId: text('enterprise_id').references(() => enterprises.id, {
+    onDelete: 'set null',
+  }),
+  email: text('email').notNull().unique(),
+  name: text('name').notNull(),
+  phone: text('phone'),
+  role: text('role').notNull(),
+  status: text('status').notNull().default('active'),
+  externalIdentityId: text('external_identity_id'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ==================== Business Runtime Objects ====================
+
+export const auditBatches = pgTable('audit_batches', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  year: integer('year').notNull(),
+  status: text('status').notNull().default('draft'),
+  templateVersionId: text('template_version_id').references(
+    () => templateVersions.id,
+    { onDelete: 'set null' },
+  ),
+  description: text('description'),
+  filingDeadline: timestamp('filing_deadline', { withTimezone: true }),
+  reviewDeadline: timestamp('review_deadline', { withTimezone: true }),
+  createdBy: text('created_by').references(() => userAccounts.id, {
+    onDelete: 'set null',
+  }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const auditProjects = pgTable(
+  'audit_projects',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    batchId: text('batch_id')
+      .notNull()
+      .references(() => auditBatches.id, { onDelete: 'cascade' }),
+    status: text('status').notNull().default('pending_start'),
+    templateVersionId: text('template_version_id').references(
+      () => templateVersions.id,
+      { onDelete: 'set null' },
+    ),
+    deadline: timestamp('deadline', { withTimezone: true }),
+    isOverdue: boolean('is_overdue').notNull().default(false),
+    configComplete: boolean('config_complete').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.enterpriseId, table.batchId)],
+);
+
+export const projectMembers = pgTable(
+  'project_members',
+  {
+    id: text('id').primaryKey(),
+    auditProjectId: text('audit_project_id')
+      .notNull()
+      .references(() => auditProjects.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => userAccounts.id, { onDelete: 'cascade' }),
+    role: text('role').notNull(),
+    joinedAt: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.auditProjectId, table.userId, table.role)],
+);
+
+export const enterpriseProfiles = pgTable('enterprise_profiles', {
+  id: text('id').primaryKey(),
+  auditProjectId: text('audit_project_id')
+    .notNull()
+    .references(() => auditProjects.id, { onDelete: 'cascade' }),
+  enterpriseId: text('enterprise_id')
+    .notNull()
+    .references(() => enterprises.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  unifiedSocialCreditCode: text('unified_social_credit_code').notNull(),
+  industryCode: text('industry_code'),
+  contactPerson: text('contact_person'),
+  contactPhone: text('contact_phone'),
+  contactEmail: text('contact_email'),
+  address: text('address'),
+  snapshotAt: timestamp('snapshot_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const energyDefinitions = pgTable(
+  'energy_definitions',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    energyCode: text('energy_code').notNull(),
+    name: text('name').notNull(),
+    energyType: text('energy_type').notNull(),
+    conversionFactor: numeric('conversion_factor').notNull(),
+    measurementUnit: text('measurement_unit').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    sortOrder: integer('sort_order').default(0),
+  },
+  (table) => [unique().on(table.enterpriseId, table.energyCode)],
+);
+
+export const productDefinitions = pgTable(
+  'product_definitions',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    productCode: text('product_code').notNull(),
+    name: text('name').notNull(),
+    measurementUnit: text('measurement_unit').notNull(),
+    unitDefinitionId: text('unit_definition_id'),
+    processDescription: text('process_description'),
+    isActive: boolean('is_active').notNull().default(true),
+    sortOrder: integer('sort_order').default(0),
+  },
+  (table) => [unique().on(table.enterpriseId, table.productCode)],
+);
+
+export const unitDefinitions = pgTable(
+  'unit_definitions',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    unitCode: text('unit_code').notNull(),
+    name: text('name').notNull(),
+    unitType: text('unit_type').notNull(),
+    energyBoundaryDescription: text('energy_boundary_description'),
+    associatedEnergyCodes: text('associated_energy_codes'),
+    isActive: boolean('is_active').notNull().default(true),
+    sortOrder: integer('sort_order').default(0),
+  },
+  (table) => [unique().on(table.enterpriseId, table.unitCode)],
+);
+
+export const carbonEmissionFactors = pgTable('carbon_emission_factors', {
+  id: text('id').primaryKey(),
+  energyCode: text('energy_code').notNull(),
+  name: text('name').notNull(),
+  emissionFactor: numeric('emission_factor').notNull(),
+  oxidationRate: numeric('oxidation_rate').notNull().default('1.0'),
+  standardSource: text('standard_source'),
+  applicableYear: integer('applicable_year'),
+  measurementUnit: text('measurement_unit').notNull(),
+  isDefault: boolean('is_default').notNull().default(false),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const dataRecords = pgTable(
+  'data_records',
+  {
+    id: text('id').primaryKey(),
+    auditProjectId: text('audit_project_id')
+      .notNull()
+      .references(() => auditProjects.id, { onDelete: 'cascade' }),
+    moduleCode: text('module_code').notNull(),
+    status: text('status').notNull().default('draft'),
+    templateVersionId: text('template_version_id').references(
+      () => templateVersions.id,
+      { onDelete: 'set null' },
+    ),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }),
+    returnReason: text('return_reason'),
+    lockHolderId: text('lock_holder_id').references(() => userAccounts.id, {
+      onDelete: 'set null',
+    }),
+    lockAcquiredAt: timestamp('lock_acquired_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [unique().on(table.auditProjectId, table.moduleCode)],
+);
+
+export const dataItems = pgTable(
+  'data_items',
+  {
+    id: text('id').primaryKey(),
+    dataRecordId: text('data_record_id')
+      .notNull()
+      .references(() => dataRecords.id, { onDelete: 'cascade' }),
+    fieldCode: text('field_code').notNull(),
+    rawValue: text('raw_value'),
+    calculatedValue: text('calculated_value'),
+    manualOverrideValue: text('manual_override_value'),
+    finalValue: text('final_value'),
+    unit: text('unit'),
+  },
+  (table) => [unique().on(table.dataRecordId, table.fieldCode)],
+);
+
+export const importJobs = pgTable('import_jobs', {
+  id: text('id').primaryKey(),
+  auditProjectId: text('audit_project_id')
+    .notNull()
+    .references(() => auditProjects.id, { onDelete: 'cascade' }),
+  moduleCode: text('module_code').notNull(),
+  fileAttachmentId: text('file_attachment_id')
+    .notNull()
+    .references(() => attachments.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('pending'),
+  totalRows: integer('total_rows'),
+  successRows: integer('success_rows'),
+  failedRows: integer('failed_rows'),
+  errors: text('errors'),
+  startedAt: timestamp('started_at', { withTimezone: true }),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const validationResults = pgTable(
+  'validation_results',
+  {
+    id: text('id').primaryKey(),
+    dataRecordId: text('data_record_id')
+      .notNull()
+      .references(() => dataRecords.id, { onDelete: 'cascade' }),
+    ruleCode: text('rule_code').notNull(),
+    ruleType: text('rule_type').notNull(),
+    moduleCode: text('module_code').notNull(),
+    fieldCode: text('field_code'),
+    severity: text('severity').notNull(),
+    message: text('message').notNull(),
+    fixSuggestion: text('fix_suggestion'),
+    blocksSubmission: boolean('blocks_submission').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_validation_results_record').on(table.dataRecordId)],
+);
+
+export const calculationSnapshots = pgTable(
+  'calculation_snapshots',
+  {
+    id: text('id').primaryKey(),
+    auditProjectId: text('audit_project_id')
+      .notNull()
+      .references(() => auditProjects.id, { onDelete: 'cascade' }),
+    calculationType: text('calculation_type').notNull(),
+    result: text('result').notNull(),
+    ruleVersionId: text('rule_version_id'),
+    parametersSnapshot: text('parameters_snapshot'),
+    calculatedAt: timestamp('calculated_at', { withTimezone: true }).notNull().defaultNow(),
+    isLatest: boolean('is_latest').notNull().default(true),
+  },
+  (table) => [index('idx_calc_snapshots_project').on(table.auditProjectId)],
+);
+
+// ==================== Result Output Objects ====================
+
+export const reports = pgTable('reports', {
+  id: text('id').primaryKey(),
+  auditProjectId: text('audit_project_id')
+    .notNull()
+    .references(() => auditProjects.id, { onDelete: 'cascade' }),
+  version: integer('version').notNull(),
+  versionType: text('version_type').notNull(),
+  status: text('status').notNull().default('not_generated'),
+  templateVersionId: text('template_version_id').references(
+    () => templateVersions.id,
+    { onDelete: 'set null' },
+  ),
+  fileAttachmentId: text('file_attachment_id').references(() => attachments.id, {
+    onDelete: 'set null',
+  }),
+  generatedAt: timestamp('generated_at', { withTimezone: true }),
+  submittedAt: timestamp('submitted_at', { withTimezone: true }),
+  archivedAt: timestamp('archived_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const chartOutputs = pgTable('chart_outputs', {
+  id: text('id').primaryKey(),
+  auditProjectId: text('audit_project_id')
+    .notNull()
+    .references(() => auditProjects.id, { onDelete: 'cascade' }),
+  chartConfigCode: text('chart_config_code').notNull(),
+  chartType: text('chart_type').notNull(),
+  title: text('title').notNull(),
+  data: text('data').notNull(),
+  calculationSnapshotId: text('calculation_snapshot_id').references(
+    () => calculationSnapshots.id,
+    { onDelete: 'set null' },
+  ),
+  isMandatory: boolean('is_mandatory').notNull().default(false),
+  embeddedInReport: boolean('embedded_in_report').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const reviewTasks = pgTable('review_tasks', {
+  id: text('id').primaryKey(),
+  auditProjectId: text('audit_project_id')
+    .notNull()
+    .references(() => auditProjects.id, { onDelete: 'cascade' }),
+  reportId: text('report_id')
+    .notNull()
+    .references(() => reports.id, { onDelete: 'cascade' }),
+  reviewerId: text('reviewer_id')
+    .notNull()
+    .references(() => userAccounts.id, { onDelete: 'restrict' }),
+  status: text('status').notNull().default('pending_assignment'),
+  conclusion: text('conclusion'),
+  totalScore: numeric('total_score'),
+  assignedAt: timestamp('assigned_at', { withTimezone: true }),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const reviewScores = pgTable('review_scores', {
+  id: text('id').primaryKey(),
+  reviewTaskId: text('review_task_id')
+    .notNull()
+    .references(() => reviewTasks.id, { onDelete: 'cascade' }),
+  category: text('category').notNull(),
+  score: numeric('score').notNull(),
+  maxScore: numeric('max_score').notNull(),
+  comment: text('comment'),
+});
+
+export const reviewIssues = pgTable('review_issues', {
+  id: text('id').primaryKey(),
+  reviewTaskId: text('review_task_id')
+    .notNull()
+    .references(() => reviewTasks.id, { onDelete: 'cascade' }),
+  description: text('description').notNull(),
+  severity: text('severity').notNull(),
+  moduleCode: text('module_code'),
+  fieldCode: text('field_code'),
+  suggestion: text('suggestion'),
+  requiresRectification: boolean('requires_rectification').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const rectificationTasks = pgTable('rectification_tasks', {
+  id: text('id').primaryKey(),
+  auditProjectId: text('audit_project_id')
+    .notNull()
+    .references(() => auditProjects.id, { onDelete: 'cascade' }),
+  reviewTaskId: text('review_task_id')
+    .notNull()
+    .references(() => reviewTasks.id, { onDelete: 'cascade' }),
+  sourceIssueId: text('source_issue_id').references(() => reviewIssues.id, {
+    onDelete: 'set null',
+  }),
+  title: text('title').notNull(),
+  description: text('description'),
+  status: text('status').notNull().default('pending_issue'),
+  deadline: timestamp('deadline', { withTimezone: true }),
+  isOverdue: boolean('is_overdue').notNull().default(false),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const rectificationProgress = pgTable('rectification_progress', {
+  id: text('id').primaryKey(),
+  rectificationTaskId: text('rectification_task_id')
+    .notNull()
+    .references(() => rectificationTasks.id, { onDelete: 'cascade' }),
+  progressPercent: integer('progress_percent').notNull().default(0),
+  note: text('note').notNull(),
+  attachmentIds: text('attachment_ids'),
+  recordedBy: text('recorded_by')
+    .notNull()
+    .references(() => userAccounts.id, { onDelete: 'restrict' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
