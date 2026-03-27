@@ -136,6 +136,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                 <button
                   onClick={() => {
                     logout();
+                    router.push("/");
                     setShowRoleSwitcher(false);
                   }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-gray-50"
