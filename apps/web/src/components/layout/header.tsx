@@ -64,7 +64,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuToggle}
-          className="rounded-lg p-2 text-[var(--color-text-secondary)] hover:bg-gray-100 lg:hidden"
+          className="rounded-lg p-2 text-[var(--color-text-secondary)] hover:bg-gray-100"
         >
           <Menu size={20} />
         </button>
