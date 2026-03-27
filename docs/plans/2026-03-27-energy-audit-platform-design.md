@@ -780,3 +780,8 @@
 2. 形成正式实施计划并进入开发
 3. 尽早补充企业基本信息接口的字段清单和同步规则
 4. 将原始在线文档中的表格项进一步拆解为字段级清单
+
+当前已补充的技术基线文档：
+
+- `docs/adr/2026-03-27-platform-stack.md`
+- `docs/architecture/repository-layout.md`
