@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ElementType } from "react";
+import { useEffect, useState, type ElementType } from "react";
 import type { UserRole } from "@/lib/auth/auth-provider";
 
 interface MenuItem {
@@ -110,6 +110,14 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       return initial;
     },
   );
+
+  useEffect(() => {
+    const initial: Record<string, boolean> = {};
+    menus.forEach((group) => {
+      initial[group.label] = true;
+    });
+    setExpandedGroups(initial);
+  }, [role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));

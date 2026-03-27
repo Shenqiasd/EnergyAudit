@@ -9,7 +9,7 @@ import {
   Menu,
   User,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -49,7 +49,14 @@ const breadcrumbMap: Record<string, string> = {
 export function Header({ onMenuToggle }: HeaderProps) {
   const { user, logout, switchRole } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+
+  const roleDashboards: Record<UserRole, string> = {
+    enterprise_user: "/enterprise/dashboard",
+    manager: "/manager/dashboard",
+    reviewer: "/reviewer/tasks",
+  };
 
   const segments = pathname.split("/").filter(Boolean);
   const breadcrumbs = segments.map(
@@ -113,6 +120,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                   key={role}
                   onClick={() => {
                     switchRole(role);
+                    router.push(roleDashboards[role]);
                     setShowRoleSwitcher(false);
                   }}
                   className={`flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 ${
