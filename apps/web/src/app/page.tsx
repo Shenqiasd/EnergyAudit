@@ -30,7 +30,7 @@ const roleCards: RoleCard[] = [
     icon: Building2,
     color: "text-blue-600",
     bgColor: "bg-blue-50 hover:bg-blue-100 border-blue-200",
-    dashboard: "/dashboard",
+    dashboard: "/enterprise/dashboard",
   },
   {
     role: "manager",
@@ -39,7 +39,7 @@ const roleCards: RoleCard[] = [
     icon: Shield,
     color: "text-green-600",
     bgColor: "bg-green-50 hover:bg-green-100 border-green-200",
-    dashboard: "/dashboard",
+    dashboard: "/manager/dashboard",
   },
   {
     role: "reviewer",
@@ -48,7 +48,7 @@ const roleCards: RoleCard[] = [
     icon: ListChecks,
     color: "text-orange-600",
     bgColor: "bg-orange-50 hover:bg-orange-100 border-orange-200",
-    dashboard: "/tasks",
+    dashboard: "/reviewer/tasks",
   },
 ];
 

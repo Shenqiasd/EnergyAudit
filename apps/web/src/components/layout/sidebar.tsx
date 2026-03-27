@@ -39,16 +39,16 @@ const enterpriseMenus: MenuGroup[] = [
   {
     label: "工作台",
     items: [
-      { label: "工作台", href: "/dashboard", icon: LayoutDashboard },
+      { label: "工作台", href: "/enterprise/dashboard", icon: LayoutDashboard },
     ],
   },
   {
     label: "业务管理",
     items: [
-      { label: "企业配置", href: "/config", icon: Settings },
-      { label: "数据填报", href: "/filing", icon: Database },
-      { label: "报告管理", href: "/reports", icon: FileText },
-      { label: "整改任务", href: "/rectification", icon: Wrench },
+      { label: "企业配置", href: "/enterprise/config", icon: Settings },
+      { label: "数据填报", href: "/enterprise/filing", icon: Database },
+      { label: "报告管理", href: "/enterprise/reports", icon: FileText },
+      { label: "整改任务", href: "/enterprise/rectification", icon: Wrench },
     ],
   },
 ];
@@ -57,22 +57,22 @@ const managerMenus: MenuGroup[] = [
   {
     label: "工作台",
     items: [
-      { label: "工作台", href: "/dashboard", icon: Home },
+      { label: "工作台", href: "/manager/dashboard", icon: Home },
     ],
   },
   {
     label: "业务管理",
     items: [
-      { label: "企业管理", href: "/enterprises", icon: Building2 },
-      { label: "批次管理", href: "/batches", icon: Layers },
-      { label: "项目管理", href: "/projects", icon: ClipboardCheck },
+      { label: "企业管理", href: "/manager/enterprises", icon: Building2 },
+      { label: "批次管理", href: "/manager/batches", icon: Layers },
+      { label: "项目管理", href: "/manager/projects", icon: ClipboardCheck },
     ],
   },
   {
     label: "审核与监管",
     items: [
-      { label: "审核管理", href: "/reviews", icon: Shield },
-      { label: "统计分析", href: "/statistics", icon: BarChart3 },
+      { label: "审核管理", href: "/manager/reviews", icon: Shield },
+      { label: "统计分析", href: "/manager/statistics", icon: BarChart3 },
     ],
   },
 ];
@@ -81,8 +81,8 @@ const reviewerMenus: MenuGroup[] = [
   {
     label: "审核工作",
     items: [
-      { label: "我的审核", href: "/tasks", icon: ListChecks },
-      { label: "审核历史", href: "/history", icon: History },
+      { label: "我的审核", href: "/reviewer/tasks", icon: ListChecks },
+      { label: "审核历史", href: "/reviewer/history", icon: History },
     ],
   },
 ];
@@ -164,7 +164,7 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
             {(collapsed || expandedGroups[group.label]) && (
               <ul className="space-y-0.5">
                 {group.items.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                   const Icon = item.icon;
                   return (
                     <li key={item.href}>

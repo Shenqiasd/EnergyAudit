@@ -29,6 +29,9 @@ const roleBadgeVariants: Record<UserRole, "primary" | "success" | "warning"> = {
 };
 
 const breadcrumbMap: Record<string, string> = {
+  enterprise: "企业端",
+  manager: "管理端",
+  reviewer: "审核端",
   dashboard: "工作台",
   config: "企业配置",
   filing: "数据填报",
