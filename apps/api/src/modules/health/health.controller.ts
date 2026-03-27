@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
@@ -29,12 +29,15 @@ export class HealthController {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
-      return {
-        status: 'error',
-        database: 'disconnected',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      };
+      throw new HttpException(
+        {
+          status: 'error',
+          database: 'disconnected',
+          message: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date().toISOString(),
+        },
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
     }
   }
 }

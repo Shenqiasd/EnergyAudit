@@ -41,8 +41,10 @@ async function migrate() {
 
       console.log(`Applying migration: ${file}`);
       const content = readFileSync(resolve(migrationsDir, file), 'utf8');
-      await sql.unsafe(content);
-      await sql`INSERT INTO _migrations (name) VALUES (${file})`;
+      await sql.begin(async (tx) => {
+        await tx.unsafe(content);
+        await tx.unsafe('INSERT INTO _migrations (name) VALUES ($1)', [file]);
+      });
       console.log(`Applied: ${file}`);
     }
 
