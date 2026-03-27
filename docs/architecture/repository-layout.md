@@ -25,6 +25,7 @@ packages/
   integrations/
   reporting/
   shared/
+  spreadsheet/
 infra/
 docs/
 scripts/
@@ -120,6 +121,21 @@ Owns:
 
 This package should stay free of framework-specific runtime code when possible.
 
+### `packages/spreadsheet`
+
+SpreadJS adapter and abstraction layer.
+
+Owns:
+
+- SpreadJS instance lifecycle management
+- workbook template initialization
+- business data ↔ SpreadJS cell bidirectional binding
+- formula registration and calculation bridge
+- SpreadJS events → business events conversion
+- Excel/PDF export capabilities
+
+This package isolates all SpreadJS-specific code behind a stable adapter interface so that business modules remain spreadsheet-engine agnostic.
+
 ### `packages/config-engine`
 
 Configuration-driven building blocks.
@@ -132,6 +148,7 @@ Owns:
 - calculation rule definitions
 - chart configuration definitions
 - template version loaders
+- module visibility rules (per business type)
 
 This package does not own the primary workflow; it supports code-controlled workflow.
 
@@ -211,11 +228,12 @@ Owns:
 Required dependency direction:
 
 ```text
-apps/web -> packages/domain | packages/shared | packages/config-engine | packages/reporting
+apps/web -> packages/domain | packages/shared | packages/config-engine | packages/reporting | packages/spreadsheet
 apps/api -> packages/domain | packages/shared | packages/config-engine | packages/reporting | packages/integrations
 packages/integrations -> packages/shared
 packages/config-engine -> packages/domain | packages/shared
 packages/reporting -> packages/domain | packages/shared
+packages/spreadsheet -> packages/domain | packages/shared
 packages/domain -> packages/shared
 ```
 
@@ -232,9 +250,10 @@ Forbidden dependency patterns:
 2. `packages/domain`
 3. `packages/config-engine`
 4. `packages/reporting`
-5. `packages/integrations`
-6. `apps/api`
-7. `apps/web`
-8. `infra`
+5. `packages/spreadsheet`
+6. `packages/integrations`
+7. `apps/api`
+8. `apps/web`
+9. `infra`
 
 This order aligns with the dependency graph: shared and domain foundations come first, configuration and reporting layers follow, integration adapters stay outside core workflow packages, and apps are scaffolded only after their dependent packages exist.

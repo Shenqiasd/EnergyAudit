@@ -136,14 +136,43 @@ git commit -m "feat: bootstrap platform core skeleton"
 
 ### Task 3: Implement Core Domain Model And Database Schema
 
+**Scope:** Complete domain model covering all platform core objects, business runtime objects, and result output objects, with enriched state machines and field definitions aligned to the business design document.
+
 **Files:**
-- Create: `packages/domain/src/entities/enterprise.ts`
-- Create: `packages/domain/src/entities/audit-batch.ts`
-- Create: `packages/domain/src/entities/audit-project.ts`
-- Create: `packages/domain/src/entities/report.ts`
-- Create: `packages/domain/src/entities/review-task.ts`
-- Create: `packages/domain/src/entities/rectification-task.ts`
-- Create: `apps/api/src/db/migrations/001_init_core_schema.sql`
+
+平台核心对象：
+- Create: `packages/domain/src/entities/role-permission.ts` — 角色、权限、角色权限关联
+- Create: `packages/domain/src/entities/dictionary.ts` — 字典项
+- Create: `packages/domain/src/entities/template.ts` — 模板与模板版本
+- Create: `packages/domain/src/entities/attachment.ts` — 统一附件
+- Create: `packages/domain/src/entities/audit-log.ts` — 审计日志
+
+业务运行对象：
+- Create: `packages/domain/src/entities/enterprise.ts` — 企业（6 状态准入）
+- Create: `packages/domain/src/entities/audit-batch.ts` — 审计批次
+- Create: `packages/domain/src/entities/audit-project.ts` — 审计项目（12 状态）
+- Create: `packages/domain/src/entities/project-member.ts` — 项目成员
+- Create: `packages/domain/src/entities/enterprise-profile.ts` — 企业信息快照
+- Create: `packages/domain/src/entities/energy-definition.ts` — 能源品种定义
+- Create: `packages/domain/src/entities/product-definition.ts` — 产品定义
+- Create: `packages/domain/src/entities/unit-definition.ts` — 单元定义
+- Create: `packages/domain/src/entities/carbon-emission-factor.ts` — 碳排放因子
+- Create: `packages/domain/src/entities/data-record.ts` — 填报记录（7 状态）与数据项
+- Create: `packages/domain/src/entities/import-job.ts` — 导入任务
+- Create: `packages/domain/src/entities/validation-result.ts` — 校验结果
+- Create: `packages/domain/src/entities/calculation-snapshot.ts` — 计算快照
+
+结果输出对象：
+- Create: `packages/domain/src/entities/report.ts` — 报告（8 状态）
+- Create: `packages/domain/src/entities/chart-output.ts` — 图表输出
+- Create: `packages/domain/src/entities/review-task.ts` — 审核任务（7 状态）
+- Create: `packages/domain/src/entities/review-score.ts` — 审核评分
+- Create: `packages/domain/src/entities/review-issue.ts` — 审核问题
+- Create: `packages/domain/src/entities/rectification-task.ts` — 整改任务（7 状态）
+- Create: `packages/domain/src/entities/rectification-progress.ts` — 整改进度
+
+Schema:
+- Create: `apps/api/src/db/migrations/001_init_core_schema.sql` — 全量初始 DDL（含 30+ 表）
 - Test: `apps/api/tests/domain/core-entities.test.ts`
 
 **Step 1: Write the failing entity test**
@@ -161,22 +190,60 @@ it("connects enterprise, project, report, review, and rectification entities", (
 Run: `pnpm test apps/api/tests/domain/core-entities.test.ts`
 Expected: FAIL because entity factories and schema do not exist
 
-**Step 3: Write minimal implementation**
+**Step 3: Write implementation**
 
-Create typed entities for:
+Create typed entities with factory functions organized into three categories:
 
-- Enterprise
-- EnterpriseExternalBinding
-- UserAccount
-- AuditBatch
-- AuditProject
-- Report
-- ReviewTask
-- RectificationTask
+**平台核心对象（Platform Core）：**
+- Role / Permission / RolePermission — RBAC 权限模型
+- DictionaryItem — 主数据字典（行业分类、能源品种等）
+- Template / TemplateVersion — 模板版本化管理
+- Attachment — 统一附件存储
+- AuditLog — 审计日志
+
+**业务运行对象（Business Runtime）：**
+- Enterprise — 6 状态准入：pending_review → approved / rejected / suspended / locked / expired
+- EnterpriseExternalBinding — 外部系统绑定（含 degraded 状态）
+- UserAccount — 含 name、phone、externalIdentityId
+- AuditBatch — 含 description、filingDeadline、reviewDeadline、createdBy
+- AuditProject — 12 状态：pending_start → configuring → filing → pending_submit → pending_report → report_processing → pending_review → in_review → pending_rectification → in_rectification → completed → closed
+- ProjectMember — 角色：enterprise_contact / enterprise_filler / assigned_reviewer / project_manager
+- EnterpriseProfile — 项目创建时企业信息快照
+- EnergyDefinition / ProductDefinition / UnitDefinition — 企业级基础配置
+- CarbonEmissionFactor — 碳排放因子（含氧化率、来源标准、适用年份）
+- DataRecord — 7 状态：draft → saved → validation_failed → pending_submit → submitted → returned → archived
+- DataItem — 字段级数据（raw/calculated/manual_override/final value）
+- ImportJob — 导入任务（5 状态）
+- ValidationResult — 校验结果（error/warning/info 三级）
+- CalculationSnapshot — 计算快照（含规则版本和参数快照）
+
+**结果输出对象（Result Output）：**
+- Report — 8 状态：not_generated → draft_generated → enterprise_revising → pending_final_upload → final_uploaded → in_review → archived → voided
+- ChartOutput — 图表输出（含嵌入报告标记）
+- ReviewTask — 7 状态：pending_assignment → assigned → in_review → pending_confirmation → returned → completed → closed
+- ReviewScore — 分类评分
+- ReviewIssue — 问题登记（4 级严重程度：critical/major/minor/suggestion）
+- RectificationTask — 7 状态：pending_issue → pending_claim → in_progress → pending_acceptance → completed → delayed → closed
+- RectificationProgress — 进度时间线
 
 **Step 4: Add database migration**
 
-Create the initial schema for core tables and foreign keys.
+Create `001_init_core_schema.sql` with全量初始 DDL，包含：
+- 角色与权限表（roles, permissions, role_permissions）
+- 字典表（dictionaries）
+- 模板与版本表（templates, template_versions）
+- 附件表（attachments）
+- 审计日志表（audit_logs）
+- 企业与用户表（enterprises, enterprise_external_bindings, user_accounts）
+- 审计批次与项目表（audit_batches, audit_projects, project_members, enterprise_profiles）
+- 基础配置表（energy_definitions, product_definitions, unit_definitions）
+- 碳排放因子表（carbon_emission_factors）
+- 填报与校验表（data_records, data_items, import_jobs, validation_results）
+- 计算快照表（calculation_snapshots）
+- 报告与图表表（reports, chart_outputs）
+- 审核表（review_tasks, review_scores, review_issues）
+- 整改表（rectification_tasks, rectification_progress）
+- 必要索引和外键约束
 
 **Step 5: Run test to verify it passes**
 
@@ -187,7 +254,7 @@ Expected: PASS
 
 ```bash
 git add packages/domain/src/entities apps/api/src/db/migrations/001_init_core_schema.sql apps/api/tests/domain/core-entities.test.ts
-git commit -m "feat: add core domain schema"
+git commit -m "feat: add complete domain schema with enriched state machines"
 ```
 
 ### Task 4: Build Enterprise Management And External Binding
@@ -322,12 +389,15 @@ git commit -m "feat: enterprise admission, external binding, and user provisioni
 - Test: `apps/api/tests/audit-project/project-lifecycle.test.ts`
 
 **Requirements Coverage:**
-- 审计批次管理（如"2026年度审计"）
+- 审计批次管理（如"2026年度审计"），含批次描述、填报截止日期、审核截止日期
 - 企业范围选择与项目批量创建
 - 项目状态机：待启动 → 配置中 → 填报中 → 待提交 → 待生成报告 → 报告处理中 → 待审核 → 审核中 → 待整改 → 整改中 → 已完成 → 已关闭
 - 状态转换规则与阻断条件
-- 项目成员关系（企业联系人、审核员）
-- 截止日期与提醒
+- 项目成员关系（企业联系人、填报人、审核员、项目经理）
+- 截止日期管理与超期预警（详见设计文档第17章）
+- 超期定时扫描（BullMQ 调度，每日检查）
+- 超期前 N 天提醒（7天/3天/1天可配置）
+- 超期标记（isOverdue）与管理端延期操作
 - 项目快照与模板版本绑定
 
 **Step 1: Write the failing tests**
@@ -407,27 +477,31 @@ git commit -m "feat: audit batch and project lifecycle with status machine"
 
 ### Task 6: Build Master Data And Configuration Center
 
-**Scope:** Platform dictionaries, enterprise-level energy/product/unit definitions, and configuration validation framework.
+**Scope:** Platform dictionaries, enterprise-level energy/product/unit definitions, carbon emission factor management, and configuration validation framework.
 
 **Files:**
 - Create: `apps/api/src/modules/master-data/dictionary.service.ts`
 - Create: `apps/api/src/modules/master-data/energy-definition.service.ts`
 - Create: `apps/api/src/modules/master-data/product-definition.service.ts`
 - Create: `apps/api/src/modules/master-data/unit-definition.service.ts`
+- Create: `apps/api/src/modules/master-data/carbon-emission-factor.service.ts`
 - Create: `apps/api/src/modules/master-data/master-data.controller.ts`
 - Create: `apps/web/src/modules/master-data/pages/config-center.tsx`
 - Create: `apps/web/src/modules/master-data/pages/energy-config.tsx`
 - Create: `apps/web/src/modules/master-data/pages/product-config.tsx`
 - Create: `apps/web/src/modules/master-data/pages/unit-config.tsx`
+- Create: `apps/web/src/modules/master-data/pages/carbon-factor-config.tsx`
 - Create: `apps/api/src/db/migrations/004_master_data.sql`
 - Test: `apps/api/tests/master-data/master-data-validation.test.ts`
 - Test: `apps/api/tests/master-data/config-completeness.test.ts`
+- Test: `apps/api/tests/master-data/carbon-emission-factor.test.ts`
 
 **Requirements Coverage:**
 - 平台字典（行业分类、能源品种、计量单位、产品类型等）
 - 企业级能源品种定义（名称、类型、折标系数、计量单位）
 - 企业级产品定义（产品名称、单位、工序关联）
 - 企业级单元定义（单元名称、类型、能源消耗边界）
+- 碳排放因子管理（因子值、氧化率、来源标准、适用年份、默认值管理）
 - 配置完整性校验（填报前置条件）
 - 配置版本快照（项目绑定）
 
@@ -496,7 +570,7 @@ git commit -m "feat: master data and enterprise config center"
 
 ### Task 7: Build Data Collection Framework (24 Modules)
 
-**Scope:** Configurable data entry framework supporting 24 filing modules with validation, calculation, and multi-format input (forms, tables, imports).
+**Scope:** Configurable data entry framework supporting 24 filing modules with validation, calculation, SpreadJS integration, collaborative locking, data rollback, and multi-format input (forms, tables, imports).
 
 **Files:**
 - Create: `packages/config-engine/src/module-config.ts`
@@ -507,17 +581,26 @@ git commit -m "feat: master data and enterprise config center"
 - Create: `apps/api/src/modules/data-entry/data-validation.service.ts`
 - Create: `apps/api/src/modules/data-entry/data-calculation.service.ts`
 - Create: `apps/api/src/modules/data-entry/data-import.service.ts`
+- Create: `apps/api/src/modules/data-entry/data-lock.service.ts`
 - Create: `apps/api/src/modules/data-entry/data-entry.controller.ts`
 - Create: `apps/web/src/modules/data-entry/pages/module-runner.tsx`
 - Create: `apps/web/src/modules/data-entry/components/form-renderer.tsx`
 - Create: `apps/web/src/modules/data-entry/components/table-renderer.tsx`
+- Create: `apps/web/src/modules/data-entry/components/spreadsheet-adapter/spreadsheet-host.tsx`
+- Create: `apps/web/src/modules/data-entry/components/spreadsheet-adapter/data-binder.ts`
+- Create: `apps/web/src/modules/data-entry/components/spreadsheet-adapter/workbook-initializer.ts`
+- Create: `apps/web/src/modules/data-entry/components/spreadsheet-adapter/formula-bridge.ts`
+- Create: `apps/web/src/modules/data-entry/components/spreadsheet-adapter/event-handler.ts`
+- Create: `apps/web/src/modules/data-entry/components/spreadsheet-adapter/export-handler.ts`
 - Create: `apps/api/src/db/migrations/005_data_collection.sql`
 - Create: `docs/modules/filing-modules-spec.md`
 - Test: `apps/api/tests/data-entry/data-record-submit.test.ts`
 - Test: `apps/api/tests/data-entry/validation-execution.test.ts`
+- Test: `apps/api/tests/data-entry/data-lock.test.ts`
 
 **Requirements Coverage:**
 - 24个填报子模块框架（企业概况、经营指标、设备管理、能效分析、能源流、产品能耗、碳排放、节能措施等）
+- SpreadJS 在线表格集成（适配器隔离架构，详见设计文档第14章）
 - 模块启停配置
 - 字段定义与分组
 - 必填/显示/隐藏规则
@@ -527,6 +610,8 @@ git commit -m "feat: master data and enterprise config center"
 - 计算规则执行（字段级/模块级）
 - 导入模板支持
 - 数据记录状态（草稿/已保存/校验失败/待提交/已提交/已退回/已归档）
+- 协同填报锁机制（乐观锁 + 30分钟超时自动释放）
+- 数据退回与回滚（submitted → returned）
 
 **Step 1: Write the failing tests**
 
@@ -629,28 +714,36 @@ git commit -m "feat: configurable data collection framework with 24 modules"
 
 ### Task 8: Build Calculation, Chart, And Report Generation
 
-**Scope:** Calculation engine, chart generation, report template system, and draft report assembly with version management.
+**Scope:** Calculation engine, chart generation (including energy flow Sankey diagrams), report template system, draft report assembly with version management, and energy efficiency benchmarking.
 
 **Files:**
 - Create: `apps/api/src/modules/calculation/calculation.service.ts`
 - Create: `apps/api/src/modules/calculation/calculation-engine.ts`
+- Create: `apps/api/src/modules/calculation/carbon-calculation.service.ts`
 - Create: `apps/api/src/modules/chart/chart.service.ts`
 - Create: `apps/api/src/modules/chart/chart-config.ts`
+- Create: `apps/api/src/modules/chart/energy-flow.service.ts`
 - Create: `apps/api/src/modules/report/report.service.ts`
 - Create: `apps/api/src/modules/report/report-assembly.service.ts`
 - Create: `apps/api/src/modules/report/report.controller.ts`
 - Create: `packages/reporting/src/report-template.ts`
 - Create: `packages/reporting/src/chart-renderer.ts`
+- Create: `packages/reporting/src/energy-flow-renderer.ts`
 - Create: `apps/web/src/modules/report/pages/report-list.tsx`
 - Create: `apps/web/src/modules/report/pages/report-viewer.tsx`
+- Create: `apps/web/src/modules/report/components/energy-flow-diagram.tsx`
 - Create: `apps/api/src/db/migrations/006_reporting.sql`
 - Test: `apps/api/tests/report/report-draft-generation.test.ts`
 - Test: `apps/api/tests/calculation/calculation-snapshot.test.ts`
+- Test: `apps/api/tests/calculation/carbon-calculation.test.ts`
 
 **Requirements Coverage:**
 - 关键指标计算（综合能耗、当量值、等价值、单位产值能耗、产品单耗、碳排放、节能量等）
+- 碳排放计算（活动数据 × 排放因子 × 氧化率，集成碳排放因子表）
 - 计算结果快照保存
 - 图表配置与生成（规定图表+辅助图表）
+- 能源流程图 Sankey 图生成（详见设计文档第19章）
+- 能效对标分析（与行业标杆值对比）
 - 报告模板（章节结构、字段映射、图表嵌入）
 - 报告版本管理（系统初稿/企业修订稿/归档终稿）
 - 报告状态（未生成/已生成初稿/企业修订中/待提交终稿/终稿已上传/审核中/已归档/已作废）
@@ -1178,3 +1271,205 @@ Generate summary report:
 - Documentation (design, implementation, testing, deployment)
 - Sample data seed
 - Deployment guide
+
+### Task 12: Build Platform Statistics And Decision Support Dashboard
+
+**Scope:** Management-side statistics, dashboards, ledgers (台账), and data export capabilities for decision support.
+
+**Files:**
+- Create: `apps/api/src/modules/statistics/statistics.service.ts`
+- Create: `apps/api/src/modules/statistics/batch-statistics.service.ts`
+- Create: `apps/api/src/modules/statistics/industry-statistics.service.ts`
+- Create: `apps/api/src/modules/statistics/carbon-statistics.service.ts`
+- Create: `apps/api/src/modules/statistics/statistics.controller.ts`
+- Create: `apps/api/src/modules/ledger/enterprise-ledger.service.ts`
+- Create: `apps/api/src/modules/ledger/review-ledger.service.ts`
+- Create: `apps/api/src/modules/ledger/rectification-ledger.service.ts`
+- Create: `apps/api/src/modules/ledger/ledger.controller.ts`
+- Create: `apps/api/src/modules/export/excel-export.service.ts`
+- Create: `apps/web/src/modules/manager/pages/dashboard.tsx`
+- Create: `apps/web/src/modules/manager/components/progress-board.tsx`
+- Create: `apps/web/src/modules/manager/components/kpi-cards.tsx`
+- Create: `apps/web/src/modules/manager/components/alert-list.tsx`
+- Create: `apps/web/src/modules/manager/pages/enterprise-ledger.tsx`
+- Create: `apps/web/src/modules/manager/pages/review-ledger.tsx`
+- Create: `apps/web/src/modules/manager/pages/rectification-ledger.tsx`
+- Test: `apps/api/tests/statistics/batch-statistics.test.ts`
+- Test: `apps/api/tests/statistics/carbon-statistics.test.ts`
+- Test: `apps/api/tests/ledger/enterprise-ledger.test.ts`
+
+**Requirements Coverage (对齐设计文档第20章):**
+- 按批次统计：完成率、超期率、平均得分
+- 按行业统计：行业能耗分布、行业达标率
+- 按区域统计：区域能耗热力图
+- 按企业统计：企业能耗排名、历年趋势
+- 碳排放统计：总量、结构、趋势
+- 企业台账：全部企业的审计状态和关键指标汇总
+- 审核台账：审核任务完成情况和评分汇总
+- 整改台账：整改任务状态和完成情况汇总
+- Excel 导出
+- 管理端首页看板：进度看板、关键指标卡片、异常预警列表、最近操作时间线
+
+**Step 1: Write the failing tests**
+
+```ts
+// batch-statistics.test.ts
+it("calculates batch completion rate", async () => {
+  const stats = await getBatchStatistics("batch_1");
+  expect(stats.completionRate).toBeGreaterThanOrEqual(0);
+  expect(stats.completionRate).toBeLessThanOrEqual(1);
+  expect(stats.overdueRate).toBeDefined();
+  expect(stats.averageScore).toBeDefined();
+});
+
+// carbon-statistics.test.ts
+it("aggregates carbon emissions by energy type", async () => {
+  const stats = await getCarbonStatistics({ batchId: "batch_1" });
+  expect(stats.totalEmissions).toBeGreaterThan(0);
+  expect(stats.byEnergyType).toBeInstanceOf(Array);
+  expect(stats.trend).toBeDefined();
+});
+
+// enterprise-ledger.test.ts
+it("generates enterprise ledger with audit status", async () => {
+  const ledger = await getEnterpriseLedger({ batchId: "batch_1" });
+  expect(ledger.rows).toBeInstanceOf(Array);
+  expect(ledger.rows[0]).toHaveProperty("enterpriseName");
+  expect(ledger.rows[0]).toHaveProperty("projectStatus");
+  expect(ledger.rows[0]).toHaveProperty("totalEnergy");
+});
+```
+
+**Step 2: Implement statistics services**
+
+Implement:
+- Batch statistics aggregation (completion rate, overdue rate, average score)
+- Industry statistics with energy distribution
+- Carbon emission statistics with trend analysis
+- Enterprise ranking and historical comparison
+
+**Step 3: Implement ledger services**
+
+Implement:
+- Enterprise ledger (all enterprises with audit status and key metrics)
+- Review ledger (review task completion and scoring summary)
+- Rectification ledger (task status and completion summary)
+- Configurable column selection
+- Filtering and sorting
+
+**Step 4: Implement Excel export**
+
+Implement:
+- Generic Excel export service
+- Ledger-to-Excel mapping
+- Statistics report export
+
+**Step 5: Build UI**
+
+Create:
+- Manager dashboard with progress board, KPI cards, alert list
+- Enterprise ledger page with filters and export button
+- Review ledger page
+- Rectification ledger page
+- Chart components for statistics visualization
+
+**Step 6: Run tests**
+
+Run: `pnpm test apps/api/tests/statistics/ apps/api/tests/ledger/`
+Expected: PASS
+
+**Step 7: Commit**
+
+```bash
+git add apps/api/src/modules/statistics apps/api/src/modules/ledger apps/api/src/modules/export apps/web/src/modules/manager apps/api/tests/statistics/ apps/api/tests/ledger/
+git commit -m "feat: platform statistics, ledgers, and decision support dashboard"
+```
+
+### Task 13: Platform Merge Strategy (节能诊断 + 能源审计合并预留)
+
+**Scope:** Prepare the platform for merging energy diagnosis (节能诊断) and energy audit (能源审计) into a unified system by adding business type differentiation, template branching, and module visibility controls.
+
+**Files:**
+- Modify: `packages/domain/src/entities/audit-batch.ts` — add businessType field
+- Modify: `packages/domain/src/entities/audit-project.ts` — add businessType field
+- Create: `apps/api/src/modules/business-type/business-type.service.ts`
+- Create: `apps/api/src/modules/business-type/business-type.controller.ts`
+- Create: `packages/config-engine/src/module-visibility.ts`
+- Create: `apps/api/src/db/migrations/009_business_type.sql`
+- Test: `apps/api/tests/business-type/business-type-routing.test.ts`
+
+**Requirements Coverage (对齐设计文档第16章):**
+- 业务类型标识（energy_audit / energy_diagnosis）
+- 模板差异化（通过 TemplateVersion 区分不同业务类型的填报模板）
+- 模块启停控制（不同业务类型的模块可见性配置）
+- 流程差异支持（通过状态机配置支持不同的流程分支）
+- 报告差异支持（通过 ReportTemplate 区分不同业务类型的报告格式）
+- 数据隔离（同一企业可同时参与能源审计和节能诊断）
+- 统计分析按业务类型筛选或汇总
+
+**Step 1: Write the failing tests**
+
+```ts
+// business-type-routing.test.ts
+it("creates audit batch with business type", async () => {
+  const batch = await createAuditBatch({
+    name: "2026年度能源审计",
+    year: 2026,
+    businessType: "energy_audit",
+  });
+  expect(batch.businessType).toBe("energy_audit");
+});
+
+it("creates diagnosis batch with different template", async () => {
+  const batch = await createAuditBatch({
+    name: "2026年度节能诊断",
+    year: 2026,
+    businessType: "energy_diagnosis",
+  });
+  expect(batch.businessType).toBe("energy_diagnosis");
+  expect(batch.templateVersionId).not.toBe(auditBatch.templateVersionId);
+});
+
+it("controls module visibility by business type", async () => {
+  const auditModules = await getVisibleModules("energy_audit");
+  const diagModules = await getVisibleModules("energy_diagnosis");
+  expect(auditModules.length).toBeGreaterThan(0);
+  expect(diagModules.length).toBeGreaterThan(0);
+  expect(auditModules).not.toEqual(diagModules);
+});
+```
+
+**Step 2: Add database migration**
+
+Create `009_business_type.sql` with:
+- Add `business_type` column to `audit_batches` (default: 'energy_audit')
+- Add `business_type` column to `audit_projects` (default: 'energy_audit')
+- Add `module_visibility` table for business type module configuration
+- Add index on business_type
+
+**Step 3: Implement business type service**
+
+Implement:
+- Business type configuration
+- Template routing by business type
+- Module visibility rules by business type
+- Report template routing by business type
+
+**Step 4: Implement module visibility config**
+
+Implement in `packages/config-engine`:
+- Module visibility configuration per business type
+- Module enable/disable by business type
+- UI module filtering
+
+**Step 5: Run tests**
+
+Run: `pnpm test apps/api/tests/business-type/`
+Expected: PASS
+
+**Step 6: Commit**
+
+```bash
+git add packages/domain/src/entities packages/config-engine/src/module-visibility.ts apps/api/src/modules/business-type apps/api/src/db/migrations/009_business_type.sql apps/api/tests/business-type/
+git commit -m "feat: business type differentiation for platform merge readiness"
+```
