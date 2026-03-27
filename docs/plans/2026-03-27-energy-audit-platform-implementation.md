@@ -190,387 +190,991 @@ git add packages/domain/src/entities apps/api/src/db/migrations/001_init_core_sc
 git commit -m "feat: add core domain schema"
 ```
 
-### Task 4: Build Enterprise And External Binding Services
+### Task 4: Build Enterprise Management And External Binding
+
+**Scope:** Enterprise admission, archive management, external system binding, and user account provisioning for the three-end model.
 
 **Files:**
 - Create: `apps/api/src/modules/enterprise/enterprise.service.ts`
 - Create: `apps/api/src/modules/enterprise/external-binding.service.ts`
 - Create: `apps/api/src/modules/enterprise/enterprise.controller.ts`
+- Create: `apps/api/src/modules/enterprise/admission.service.ts`
+- Create: `apps/api/src/modules/user/user-account.service.ts`
+- Create: `apps/api/src/modules/user/user-account.controller.ts`
 - Create: `apps/web/src/modules/enterprise/pages/enterprise-list.tsx`
 - Create: `apps/web/src/modules/enterprise/pages/enterprise-detail.tsx`
+- Create: `apps/web/src/modules/enterprise/pages/admission-review.tsx`
+- Create: `apps/web/src/modules/user/pages/user-management.tsx`
+- Create: `apps/api/src/db/migrations/002_enterprise_admission.sql`
 - Test: `apps/api/tests/enterprise/external-binding.test.ts`
+- Test: `apps/api/tests/enterprise/admission-workflow.test.ts`
 
-**Step 1: Write the failing service test**
+**Requirements Coverage:**
+- 企业准入流程：申请 → 审核 → 建档 → 开通账号
+- 企业档案维护（业务侧）
+- 外部企业基本信息接口预留与绑定
+- 统一社会信用代码自动匹配
+- 同步状态与降级展示
+- 企业状态管理（待审核/已通过/已驳回/已停用/已锁定/已过期）
+- 用户账号与角色关联（企业用户/企业管理员/管理端/审核端）
+
+**Step 1: Write the failing tests**
 
 ```ts
-it("stores enterprise external binding metadata without overwriting project snapshots", async () => {
+// apps/api/tests/enterprise/external-binding.test.ts
+it("stores enterprise external binding without overwriting project snapshots", async () => {
   const binding = await bindEnterpriseToExternal({
     enterpriseId: "ent_1",
     externalSystem: "enterprise-info",
     externalId: "ext_1",
   });
   expect(binding.externalId).toBe("ext_1");
+  expect(binding.syncStatus).toBe("synced");
+});
+
+// apps/api/tests/enterprise/admission-workflow.test.ts
+it("transitions enterprise through admission states correctly", async () => {
+  const enterprise = await createEnterpriseApplication({
+    name: "测试企业",
+    creditCode: "91110000000000000X",
+  });
+  expect(enterprise.admissionStatus).toBe("待审核");
+
+  await approveAdmission(enterprise.id);
+  const approved = await getEnterprise(enterprise.id);
+  expect(approved.admissionStatus).toBe("已通过");
+});
+
+it("auto-matches enterprise by credit code when external binding exists", async () => {
+  const result = await matchEnterpriseByCode("91110000000000000X");
+  expect(result.matched).toBe(true);
+  expect(result.externalId).toBeDefined();
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/enterprise/external-binding.test.ts`
-Expected: FAIL because binding service does not exist
+Create `002_enterprise_admission.sql` with:
+- `enterprise_applications` table for admission workflow
+- `admission_status` enum
+- `sync_log` table for external sync history
+- indexes on `credit_code` and `external_id`
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement core services**
 
 Implement:
+- Enterprise CRUD with admission state machine
+- External binding with auto-match by credit code
+- Sync status tracking (synced/pending/failed/degraded)
+- Manual resync trigger
+- User account provisioning linked to enterprise
+- Role assignment (enterprise_user, enterprise_admin, manager, reviewer)
 
-- enterprise CRUD for business-side archive
-- external binding records
-- sync status fields
-- manual resync endpoint placeholder
+**Step 4: Implement API controllers**
 
-**Step 4: Add UI placeholders**
+Expose endpoints:
+- `POST /enterprises/applications` - submit admission
+- `PUT /enterprises/:id/admission/approve` - approve
+- `PUT /enterprises/:id/admission/reject` - reject
+- `GET /enterprises` - list with filters
+- `GET /enterprises/:id` - detail with binding status
+- `POST /enterprises/:id/sync` - manual sync trigger
+- `POST /users` - create user account
+- `PUT /users/:id/roles` - assign roles
 
-Create pages for:
+**Step 5: Build UI pages**
 
-- enterprise list
-- enterprise detail
-- external binding status
+Create:
+- Enterprise list with admission status filters
+- Enterprise detail with external binding indicator
+- Admission review page for managers
+- User management page with role assignment
 
-**Step 5: Run test to verify it passes**
+**Step 6: Run tests**
 
-Run: `pnpm test apps/api/tests/enterprise/external-binding.test.ts`
+Run: `pnpm test apps/api/tests/enterprise/`
 Expected: PASS
 
-**Step 6: Commit**
+**Step 7: Commit**
 
 ```bash
-git add apps/api/src/modules/enterprise apps/web/src/modules/enterprise apps/api/tests/enterprise/external-binding.test.ts
-git commit -m "feat: add enterprise archive and external binding flow"
+git add apps/api/src/modules/enterprise apps/api/src/modules/user apps/web/src/modules/enterprise apps/web/src/modules/user apps/api/src/db/migrations/002_enterprise_admission.sql apps/api/tests/enterprise/
+git commit -m "feat: enterprise admission, external binding, and user provisioning"
 ```
 
-### Task 5: Build Audit Batch And Project Management
+### Task 5: Build Audit Batch And Project Lifecycle Management
+
+**Scope:** Audit batch creation, enterprise project assignment, status machine, and project lifecycle tracking from setup to completion.
 
 **Files:**
 - Create: `apps/api/src/modules/audit-batch/audit-batch.service.ts`
+- Create: `apps/api/src/modules/audit-batch/audit-batch.controller.ts`
 - Create: `apps/api/src/modules/audit-project/audit-project.service.ts`
+- Create: `apps/api/src/modules/audit-project/audit-project.controller.ts`
 - Create: `apps/api/src/modules/audit-project/project-status-machine.ts`
+- Create: `apps/api/src/modules/audit-project/project-member.service.ts`
+- Create: `apps/web/src/modules/audit-batch/pages/batch-list.tsx`
+- Create: `apps/web/src/modules/audit-batch/pages/batch-detail.tsx`
 - Create: `apps/web/src/modules/audit-project/pages/project-board.tsx`
+- Create: `apps/web/src/modules/audit-project/pages/project-detail.tsx`
+- Create: `apps/api/src/db/migrations/003_project_lifecycle.sql`
 - Test: `apps/api/tests/audit-project/project-status-machine.test.ts`
+- Test: `apps/api/tests/audit-project/project-lifecycle.test.ts`
 
-**Step 1: Write the failing status test**
+**Requirements Coverage:**
+- 审计批次管理（如"2026年度审计"）
+- 企业范围选择与项目批量创建
+- 项目状态机：待启动 → 配置中 → 填报中 → 待提交 → 待生成报告 → 报告处理中 → 待审核 → 审核中 → 待整改 → 整改中 → 已完成 → 已关闭
+- 状态转换规则与阻断条件
+- 项目成员关系（企业联系人、审核员）
+- 截止日期与提醒
+- 项目快照与模板版本绑定
+
+**Step 1: Write the failing tests**
 
 ```ts
-it("moves an audit project from setup to filing to review states in order", () => {
+// project-status-machine.test.ts
+it("enforces valid state transitions", () => {
   expect(canTransition("配置中", "填报中")).toBe(true);
   expect(canTransition("填报中", "已完成")).toBe(false);
+  expect(canTransition("待审核", "审核中")).toBe(true);
+});
+
+it("blocks transitions when preconditions not met", () => {
+  const project = { status: "配置中", configComplete: false };
+  expect(canTransition(project, "填报中")).toBe(false);
+});
+
+// project-lifecycle.test.ts
+it("creates projects for selected enterprises in batch", async () => {
+  const batch = await createAuditBatch({ name: "2026年度审计", year: 2026 });
+  const projects = await assignEnterprisesToBatch(batch.id, ["ent_1", "ent_2"]);
+  expect(projects).toHaveLength(2);
+  expect(projects[0].status).toBe("待启动");
+});
+
+it("binds project to template version at creation", async () => {
+  const project = await createAuditProject({ batchId: "batch_1", enterpriseId: "ent_1" });
+  expect(project.templateVersionId).toBeDefined();
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/audit-project/project-status-machine.test.ts`
-Expected: FAIL because status machine does not exist
+Create `003_project_lifecycle.sql` with:
+- `project_status` enum with all 12 states
+- `project_members` table
+- `project_snapshots` table for config/data snapshots
+- `template_version_id` foreign key on projects
+- indexes on status and batch
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement status machine**
 
 Implement:
+- State transition validation with precondition checks
+- Transition guards (config complete, validation passed, report uploaded, etc.)
+- Automatic state progression triggers
+- Status history logging
 
-- audit batch entity service
-- enterprise project creation
-- status transition guards
-- due dates and assignee fields
+**Step 4: Implement services**
 
-**Step 4: Run test to verify it passes**
+Implement:
+- Batch CRUD with year/name/description
+- Batch-to-enterprise assignment (bulk project creation)
+- Project lifecycle operations (start, submit, complete, close)
+- Project member management
+- Template version binding at project creation
 
-Run: `pnpm test apps/api/tests/audit-project/project-status-machine.test.ts`
+**Step 5: Build UI**
+
+Create:
+- Batch list with year filter
+- Batch detail with enterprise selection and project overview
+- Project board (kanban by status)
+- Project detail with status timeline and member list
+
+**Step 6: Run tests**
+
+Run: `pnpm test apps/api/tests/audit-project/`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 7: Commit**
 
 ```bash
-git add apps/api/src/modules/audit-batch apps/api/src/modules/audit-project apps/web/src/modules/audit-project apps/api/tests/audit-project/project-status-machine.test.ts
-git commit -m "feat: add audit batch and project workflow"
+git add apps/api/src/modules/audit-batch apps/api/src/modules/audit-project apps/web/src/modules/audit-batch apps/web/src/modules/audit-project apps/api/src/db/migrations/003_project_lifecycle.sql apps/api/tests/audit-project/
+git commit -m "feat: audit batch and project lifecycle with status machine"
 ```
 
-### Task 6: Build Configuration And Master Data Modules
+### Task 6: Build Master Data And Configuration Center
+
+**Scope:** Platform dictionaries, enterprise-level energy/product/unit definitions, and configuration validation framework.
 
 **Files:**
 - Create: `apps/api/src/modules/master-data/dictionary.service.ts`
 - Create: `apps/api/src/modules/master-data/energy-definition.service.ts`
 - Create: `apps/api/src/modules/master-data/product-definition.service.ts`
 - Create: `apps/api/src/modules/master-data/unit-definition.service.ts`
+- Create: `apps/api/src/modules/master-data/master-data.controller.ts`
 - Create: `apps/web/src/modules/master-data/pages/config-center.tsx`
+- Create: `apps/web/src/modules/master-data/pages/energy-config.tsx`
+- Create: `apps/web/src/modules/master-data/pages/product-config.tsx`
+- Create: `apps/web/src/modules/master-data/pages/unit-config.tsx`
+- Create: `apps/api/src/db/migrations/004_master_data.sql`
 - Test: `apps/api/tests/master-data/master-data-validation.test.ts`
+- Test: `apps/api/tests/master-data/config-completeness.test.ts`
 
-**Step 1: Write the failing validation test**
+**Requirements Coverage:**
+- 平台字典（行业分类、能源品种、计量单位、产品类型等）
+- 企业级能源品种定义（名称、类型、折标系数、计量单位）
+- 企业级产品定义（产品名称、单位、工序关联）
+- 企业级单元定义（单元名称、类型、能源消耗边界）
+- 配置完整性校验（填报前置条件）
+- 配置版本快照（项目绑定）
+
+**Step 1: Write the failing tests**
 
 ```ts
-it("rejects project data rows that reference undefined energy items", async () => {
-  await expect(validateEnergyReference("unknown-energy")).rejects.toThrow();
+// master-data-validation.test.ts
+it("rejects data entry when energy reference is undefined", async () => {
+  await expect(validateEnergyReference("proj_1", "unknown-energy"))
+    .rejects.toThrow("能源品种未定义");
+});
+
+it("validates product-unit consistency", async () => {
+  await expect(validateProductReference("proj_1", { productId: "prod_1", unitId: "unit_999" }))
+    .rejects.toThrow("产品关联的单元不存在");
+});
+
+// config-completeness.test.ts
+it("blocks project transition when config incomplete", async () => {
+  const project = await getProject("proj_1");
+  const canProceed = await checkConfigCompleteness(project.id);
+  expect(canProceed.complete).toBe(false);
+  expect(canProceed.missing).toContain("能源品种未配置");
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/master-data/master-data-validation.test.ts`
-Expected: FAIL because master data services do not exist
+Create `004_master_data.sql` with:
+- `dictionaries` table (category, code, name, parent)
+- `enterprise_energy_definitions` table
+- `enterprise_product_definitions` table
+- `enterprise_unit_definitions` table
+- `config_snapshots` table for project binding
+- indexes on project_id and enterprise_id
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement services**
 
 Implement:
+- Dictionary CRUD with hierarchical support
+- Energy definition CRUD with conversion factors
+- Product definition CRUD with unit linkage
+- Unit definition CRUD with boundary description
+- Config completeness checker
+- Config snapshot creation on project start
 
-- platform dictionaries
-- enterprise energy definitions
-- enterprise product definitions
-- enterprise unit definitions
+**Step 4: Build UI**
 
-**Step 4: Run test to verify it passes**
+Create:
+- Config center dashboard showing completion status
+- Energy config page with table editor
+- Product config page with unit selector
+- Unit config page with boundary diagram
 
-Run: `pnpm test apps/api/tests/master-data/master-data-validation.test.ts`
+**Step 5: Run tests**
+
+Run: `pnpm test apps/api/tests/master-data/`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 6: Commit**
 
 ```bash
-git add apps/api/src/modules/master-data apps/web/src/modules/master-data apps/api/tests/master-data/master-data-validation.test.ts
-git commit -m "feat: add master data and enterprise config center"
+git add apps/api/src/modules/master-data apps/web/src/modules/master-data apps/api/src/db/migrations/004_master_data.sql apps/api/tests/master-data/
+git commit -m "feat: master data and enterprise config center"
 ```
 
-### Task 7: Build Data Collection Framework
+### Task 7: Build Data Collection Framework (24 Modules)
+
+**Scope:** Configurable data entry framework supporting 24 filing modules with validation, calculation, and multi-format input (forms, tables, imports).
 
 **Files:**
 - Create: `packages/config-engine/src/module-config.ts`
 - Create: `packages/config-engine/src/field-config.ts`
+- Create: `packages/config-engine/src/validation-rule.ts`
+- Create: `packages/config-engine/src/calculation-rule.ts`
 - Create: `apps/api/src/modules/data-entry/data-record.service.ts`
 - Create: `apps/api/src/modules/data-entry/data-validation.service.ts`
+- Create: `apps/api/src/modules/data-entry/data-calculation.service.ts`
+- Create: `apps/api/src/modules/data-entry/data-import.service.ts`
+- Create: `apps/api/src/modules/data-entry/data-entry.controller.ts`
 - Create: `apps/web/src/modules/data-entry/pages/module-runner.tsx`
+- Create: `apps/web/src/modules/data-entry/components/form-renderer.tsx`
+- Create: `apps/web/src/modules/data-entry/components/table-renderer.tsx`
+- Create: `apps/api/src/db/migrations/005_data_collection.sql`
+- Create: `docs/modules/filing-modules-spec.md`
 - Test: `apps/api/tests/data-entry/data-record-submit.test.ts`
+- Test: `apps/api/tests/data-entry/validation-execution.test.ts`
 
-**Step 1: Write the failing submission test**
+**Requirements Coverage:**
+- 24个填报子模块框架（企业概况、经营指标、设备管理、能效分析、能源流、产品能耗、碳排放、节能措施等）
+- 模块启停配置
+- 字段定义与分组
+- 必填/显示/隐藏规则
+- 字段联动
+- 保存/提交动作
+- 校验规则分层（基础/字段/跨字段/跨模块/完整性）
+- 计算规则执行（字段级/模块级）
+- 导入模板支持
+- 数据记录状态（草稿/已保存/校验失败/待提交/已提交/已退回/已归档）
+
+**Step 1: Write the failing tests**
 
 ```ts
-it("blocks submission when a required field is missing", async () => {
+// data-record-submit.test.ts
+it("blocks submission when required field missing", async () => {
   const result = await submitRecord({
+    projectId: "proj_1",
     moduleCode: "enterprise-profile",
     values: {},
   });
   expect(result.status).toBe("校验失败");
+  expect(result.errors).toContainEqual(
+    expect.objectContaining({ severity: "错误", field: "enterpriseName" })
+  );
+});
+
+it("allows save with validation warnings", async () => {
+  const result = await saveRecord({
+    projectId: "proj_1",
+    moduleCode: "energy-consumption",
+    values: { totalEnergy: -100 },
+  });
+  expect(result.status).toBe("已保存");
+  expect(result.warnings).toHaveLength(1);
+});
+
+// validation-execution.test.ts
+it("executes cross-field validation rules", async () => {
+  const errors = await validateRecord({
+    moduleCode: "energy-balance",
+    values: { input: 100, output: 120 },
+  });
+  expect(errors).toContainEqual(
+    expect.objectContaining({ ruleCode: "energy-balance-check" })
+  );
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/data-entry/data-record-submit.test.ts`
-Expected: FAIL because data entry framework does not exist
+Create `005_data_collection.sql` with:
+- `data_modules` config table
+- `data_fields` config table
+- `validation_rules` table
+- `calculation_rules` table
+- `data_records` table
+- `data_items` table (field values)
+- `validation_results` table
+- `import_jobs` table
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement config engine**
+
+Implement in `packages/config-engine`:
+- Module config loader with enable/disable
+- Field config with type, constraints, display rules
+- Validation rule engine (5 layers)
+- Calculation rule engine with dependency resolution
+- Rule versioning tied to template version
+
+**Step 4: Implement data services**
 
 Implement:
+- Data record CRUD with status transitions
+- Save action (allows warnings)
+- Submit action (blocks on errors)
+- Validation execution with severity filtering
+- Calculation execution with snapshot
+- Import job processing
 
-- module config loader
-- field config loader
-- data record persistence
-- save and submit actions
-- blocking validation execution
+**Step 5: Document 24 modules**
 
-**Step 4: Run test to verify it passes**
+Create `docs/modules/filing-modules-spec.md` listing:
+1. 企业概况与目标
+2. 经营与技术指标
+3. 设备与计量管理
+4. 能效与对标分析
+5-24. (其他模块按设计文档)
 
-Run: `pnpm test apps/api/tests/data-entry/data-record-submit.test.ts`
+**Step 6: Build UI**
+
+Create:
+- Module runner with dynamic form/table rendering
+- Form renderer for simple fields
+- Table renderer for tabular data
+- Validation error display with severity colors
+- Save/submit buttons with state management
+
+**Step 7: Run tests**
+
+Run: `pnpm test apps/api/tests/data-entry/`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 8: Commit**
 
 ```bash
-git add packages/config-engine apps/api/src/modules/data-entry apps/web/src/modules/data-entry apps/api/tests/data-entry/data-record-submit.test.ts
-git commit -m "feat: add data collection framework"
+git add packages/config-engine apps/api/src/modules/data-entry apps/web/src/modules/data-entry apps/api/src/db/migrations/005_data_collection.sql docs/modules/ apps/api/tests/data-entry/
+git commit -m "feat: configurable data collection framework with 24 modules"
 ```
 
-### Task 8: Build Calculation, Chart, And Report Foundations
+### Task 8: Build Calculation, Chart, And Report Generation
+
+**Scope:** Calculation engine, chart generation, report template system, and draft report assembly with version management.
 
 **Files:**
 - Create: `apps/api/src/modules/calculation/calculation.service.ts`
+- Create: `apps/api/src/modules/calculation/calculation-engine.ts`
 - Create: `apps/api/src/modules/chart/chart.service.ts`
+- Create: `apps/api/src/modules/chart/chart-config.ts`
 - Create: `apps/api/src/modules/report/report.service.ts`
+- Create: `apps/api/src/modules/report/report-assembly.service.ts`
+- Create: `apps/api/src/modules/report/report.controller.ts`
 - Create: `packages/reporting/src/report-template.ts`
+- Create: `packages/reporting/src/chart-renderer.ts`
+- Create: `apps/web/src/modules/report/pages/report-list.tsx`
+- Create: `apps/web/src/modules/report/pages/report-viewer.tsx`
+- Create: `apps/api/src/db/migrations/006_reporting.sql`
 - Test: `apps/api/tests/report/report-draft-generation.test.ts`
+- Test: `apps/api/tests/calculation/calculation-snapshot.test.ts`
 
-**Step 1: Write the failing report test**
+**Requirements Coverage:**
+- 关键指标计算（综合能耗、当量值、等价值、单位产值能耗、产品单耗、碳排放、节能量等）
+- 计算结果快照保存
+- 图表配置与生成（规定图表+辅助图表）
+- 报告模板（章节结构、字段映射、图表嵌入）
+- 报告版本管理（系统初稿/企业修订稿/归档终稿）
+- 报告状态（未生成/已生成初稿/企业修订中/待提交终稿/终稿已上传/审核中/已归档/已作废）
+- 异步报告生成任务
+
+**Step 1: Write the failing tests**
 
 ```ts
-it("creates a draft report version from structured project data", async () => {
-  const report = await generateDraftReport({ auditProjectId: "proj_1" });
+// calculation-snapshot.test.ts
+it("calculates comprehensive energy consumption with conversion factors", async () => {
+  const result = await calculateComprehensiveEnergy({
+    projectId: "proj_1",
+    energyData: [
+      { type: "electricity", value: 1000, unit: "kWh" },
+      { type: "coal", value: 500, unit: "kg" },
+    ],
+  });
+  expect(result.totalTce).toBeCloseTo(0.123 + 0.357, 2);
+  expect(result.snapshotId).toBeDefined();
+});
+
+// report-draft-generation.test.ts
+it("generates draft report from project data and calculations", async () => {
+  const report = await generateDraftReport({ projectId: "proj_1" });
   expect(report.versionType).toBe("system_draft");
+  expect(report.status).toBe("已生成初稿");
+  expect(report.sections).toHaveLength(8);
+});
+
+it("embeds charts into report sections", async () => {
+  const report = await generateDraftReport({ projectId: "proj_1" });
+  const energySection = report.sections.find(s => s.code === "energy-consumption");
+  expect(energySection.charts).toContainEqual(
+    expect.objectContaining({ chartCode: "energy-structure-pie" })
+  );
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/report/report-draft-generation.test.ts`
-Expected: FAIL because reporting services do not exist
+Create `006_reporting.sql` with:
+- `calculation_snapshots` table
+- `chart_outputs` table
+- `report_versions` table
+- `report_sections` table
+- `report_status` enum
+- indexes on project_id and version_type
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement calculation engine**
 
 Implement:
+- Calculation rule executor with formula parsing
+- Conversion factor lookup
+- Dependency resolution for chained calculations
+- Snapshot creation with timestamp and rule version
+- Key metrics: 综合能耗、单耗、碳排放、节能量
 
-- calculation snapshot generation
-- chart configuration execution
-- draft report version creation
-- file metadata registration
+**Step 4: Implement chart service**
 
-**Step 4: Run test to verify it passes**
+Implement:
+- Chart config loader (type, dimensions, metrics)
+- Data aggregation for charts
+- Chart output generation (JSON format)
+- Chart embedding in reports
 
-Run: `pnpm test apps/api/tests/report/report-draft-generation.test.ts`
+**Step 5: Implement report service**
+
+Implement in `packages/reporting`:
+- Report template loader with sections
+- Field mapping from data records to report
+- Chart insertion rules
+- Report assembly orchestrator
+
+Implement in `apps/api`:
+- Draft generation as async job
+- Version management (create, upload, archive)
+- Report download endpoint
+- Report status transitions
+
+**Step 6: Build UI**
+
+Create:
+- Report list with version filter
+- Report viewer with section navigation
+- Chart display components
+- Download/upload buttons
+
+**Step 7: Run tests**
+
+Run: `pnpm test apps/api/tests/report/ apps/api/tests/calculation/`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 8: Commit**
 
 ```bash
-git add apps/api/src/modules/calculation apps/api/src/modules/chart apps/api/src/modules/report packages/reporting apps/api/tests/report/report-draft-generation.test.ts
-git commit -m "feat: add calculation and reporting foundation"
+git add apps/api/src/modules/calculation apps/api/src/modules/chart apps/api/src/modules/report packages/reporting apps/web/src/modules/report apps/api/src/db/migrations/006_reporting.sql apps/api/tests/report/ apps/api/tests/calculation/
+git commit -m "feat: calculation engine, chart generation, and report assembly"
 ```
 
 ### Task 9: Build Review And Rectification Workflows
+
+**Scope:** Review task assignment, scoring system, issue registration, rectification task generation, and closure tracking.
 
 **Files:**
 - Create: `apps/api/src/modules/review/review-task.service.ts`
 - Create: `apps/api/src/modules/review/review-score.service.ts`
 - Create: `apps/api/src/modules/review/review-issue.service.ts`
+- Create: `apps/api/src/modules/review/review.controller.ts`
 - Create: `apps/api/src/modules/rectification/rectification.service.ts`
+- Create: `apps/api/src/modules/rectification/rectification.controller.ts`
 - Create: `apps/web/src/modules/review/pages/review-workbench.tsx`
+- Create: `apps/web/src/modules/review/pages/review-scoring.tsx`
 - Create: `apps/web/src/modules/rectification/pages/rectification-board.tsx`
+- Create: `apps/web/src/modules/rectification/pages/rectification-detail.tsx`
+- Create: `apps/api/src/db/migrations/007_review_rectification.sql`
 - Test: `apps/api/tests/review/review-to-rectification.test.ts`
+- Test: `apps/api/tests/review/review-workflow.test.ts`
 
-**Step 1: Write the failing workflow test**
+**Requirements Coverage:**
+- 审核任务分派（管理端 → 审核端）
+- 审核任务状态（待分派/已分派/审核中/待确认/已退回/已完成/已关闭）
+- 评分表结构化录入
+- 问题登记（问题描述、严重程度、整改建议）
+- 审核结论输出
+- 整改任务生成（从审核问题/节能潜力）
+- 整改任务状态（待下发/待认领/整改中/待验收/已完成/延期中/已关闭）
+- 整改进度跟踪
+- 整改闭环验证
+
+**Step 1: Write the failing tests**
 
 ```ts
+// review-workflow.test.ts
+it("assigns review task to reviewer", async () => {
+  const task = await assignReviewTask({
+    projectId: "proj_1",
+    reviewerId: "reviewer_1",
+  });
+  expect(task.status).toBe("已分派");
+  expect(task.reviewerId).toBe("reviewer_1");
+});
+
+it("records structured review scores", async () => {
+  const scores = await submitReviewScores({
+    taskId: "task_1",
+    scores: [
+      { category: "数据完整性", score: 85, maxScore: 100 },
+      { category: "数据准确性", score: 90, maxScore: 100 },
+    ],
+  });
+  expect(scores).toHaveLength(2);
+});
+
+// review-to-rectification.test.ts
 it("creates rectification tasks from confirmed review issues", async () => {
-  const tasks = await createRectificationTasksFromIssues(["issue_1"]);
-  expect(tasks).toHaveLength(1);
+  const issue = await createReviewIssue({
+    taskId: "task_1",
+    description: "能源计量设备未校准",
+    severity: "high",
+  });
+
+  const rectTasks = await generateRectificationTasks([issue.id]);
+  expect(rectTasks).toHaveLength(1);
+  expect(rectTasks[0].status).toBe("待下发");
+  expect(rectTasks[0].sourceIssueId).toBe(issue.id);
+});
+
+it("tracks rectification progress to completion", async () => {
+  const task = await createRectificationTask({
+    projectId: "proj_1",
+    title: "完成设备校准",
+  });
+
+  await updateRectificationProgress(task.id, {
+    status: "整改中",
+    progress: 50,
+    note: "已联系校准单位",
+  });
+
+  await completeRectification(task.id, {
+    completionNote: "校准完成，已上传证明",
+    attachments: ["cert_1.pdf"],
+  });
+
+  const completed = await getRectificationTask(task.id);
+  expect(completed.status).toBe("已完成");
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/review/review-to-rectification.test.ts`
-Expected: FAIL because review and rectification modules do not exist
+Create `007_review_rectification.sql` with:
+- `review_tasks` table
+- `review_scores` table
+- `review_issues` table
+- `rectification_tasks` table
+- `rectification_progress` table
+- `review_task_status` enum
+- `rectification_task_status` enum
+- `issue_severity` enum
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement review services**
 
 Implement:
+- Task assignment with reviewer selection
+- Score submission with category structure
+- Issue registration with severity
+- Review conclusion generation
+- Task status transitions
 
-- task assignment
-- score submission
-- issue registration
-- rectification task generation
-- progress updates
+**Step 4: Implement rectification services**
 
-**Step 4: Run test to verify it passes**
+Implement:
+- Task generation from issues
+- Task assignment to enterprise
+- Progress tracking with timeline
+- Completion verification
+- Closure workflow
 
-Run: `pnpm test apps/api/tests/review/review-to-rectification.test.ts`
+**Step 5: Build UI**
+
+Create:
+- Review workbench (task list for reviewers)
+- Review scoring page with structured form
+- Issue registration form
+- Rectification board (kanban by status)
+- Rectification detail with progress timeline
+
+**Step 6: Run tests**
+
+Run: `pnpm test apps/api/tests/review/`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 7: Commit**
 
 ```bash
-git add apps/api/src/modules/review apps/api/src/modules/rectification apps/web/src/modules/review apps/web/src/modules/rectification apps/api/tests/review/review-to-rectification.test.ts
-git commit -m "feat: add review and rectification workflow"
+git add apps/api/src/modules/review apps/api/src/modules/rectification apps/web/src/modules/review apps/web/src/modules/rectification apps/api/src/db/migrations/007_review_rectification.sql apps/api/tests/review/
+git commit -m "feat: review and rectification workflow with issue tracking"
 ```
 
-### Task 10: Add Integration, Async Jobs, And Operational Hardening
+### Task 10: Build Integration, Async Jobs, And Operational Infrastructure
+
+**Scope:** External system adapters, async job framework, audit logging, and operational resilience.
 
 **Files:**
-- Create: `apps/api/src/modules/integration/enterprise-info.adapter.ts`
+- Create: `packages/integrations/src/enterprise-info.adapter.ts`
+- Create: `packages/integrations/src/auth-provider.adapter.ts`
+- Create: `packages/integrations/src/storage.adapter.ts`
 - Create: `apps/api/src/modules/integration/sync-job.service.ts`
+- Create: `apps/api/src/modules/integration/integration.controller.ts`
 - Create: `apps/api/src/modules/jobs/job-runner.ts`
+- Create: `apps/api/src/modules/jobs/job-registry.ts`
 - Create: `apps/api/src/modules/audit-log/audit-log.service.ts`
+- Create: `apps/api/src/modules/audit-log/audit-log.controller.ts`
+- Create: `apps/web/src/modules/integration/pages/sync-status.tsx`
+- Create: `apps/api/src/db/migrations/008_integration_jobs.sql`
 - Test: `apps/api/tests/integration/enterprise-sync-retry.test.ts`
+- Test: `apps/api/tests/jobs/async-job-execution.test.ts`
 
-**Step 1: Write the failing sync retry test**
+**Requirements Coverage:**
+- 企业基本信息接口适配器（拉取/事件/人工触发）
+- 同步失败重试机制
+- 降级模式（保留最近成功快照）
+- 异步任务队列（报告生成、批量操作、导入导出）
+- 审计日志（关键操作留痕）
+- 附件与文件管理（S3兼容存储）
+
+**Step 1: Write the failing tests**
 
 ```ts
-it("keeps the last successful enterprise snapshot when external sync fails", async () => {
-  const result = await syncEnterprise("ent_1");
+// enterprise-sync-retry.test.ts
+it("retries failed sync with exponential backoff", async () => {
+  const job = await triggerEnterpriseSync("ent_1");
+
+  // Simulate failure
+  await markSyncFailed(job.id, "Connection timeout");
+
+  const retried = await getSyncJob(job.id);
+  expect(retried.retryCount).toBe(1);
+  expect(retried.nextRetryAt).toBeDefined();
+});
+
+it("enters degraded mode after max retries", async () => {
+  const result = await syncEnterpriseWithRetries("ent_1", { maxRetries: 3 });
   expect(result.mode).toBe("degraded");
+  expect(result.lastSuccessfulSnapshot).toBeDefined();
+});
+
+// async-job-execution.test.ts
+it("executes report generation as async job", async () => {
+  const job = await enqueueJob({
+    type: "report-generation",
+    payload: { projectId: "proj_1" },
+  });
+
+  await processJob(job.id);
+
+  const completed = await getJob(job.id);
+  expect(completed.status).toBe("completed");
+  expect(completed.result.reportId).toBeDefined();
 });
 ```
 
-**Step 2: Run test to verify it fails**
+**Step 2: Add database migration**
 
-Run: `pnpm test apps/api/tests/integration/enterprise-sync-retry.test.ts`
-Expected: FAIL because integration and retry services do not exist
+Create `008_integration_jobs.sql` with:
+- `sync_jobs` table
+- `async_jobs` table (type, status, payload, result)
+- `audit_logs` table
+- `file_attachments` table
+- indexes on status and created_at
 
-**Step 3: Write minimal implementation**
+**Step 3: Implement integration adapters**
+
+Implement in `packages/integrations`:
+- Enterprise info adapter interface
+- Mock adapter for development
+- Auth provider adapter interface
+- Storage adapter (S3-compatible)
+
+**Step 4: Implement sync services**
 
 Implement:
+- Sync job orchestrator
+- Retry logic with exponential backoff
+- Degraded mode handler
+- Sync log recording
+- Manual sync trigger
 
-- adapter boundary for enterprise info interface
-- sync job records
-- retry and degraded mode behavior
-- async job runner for reports and batch operations
-- audit log recording
+**Step 5: Implement job framework**
 
-**Step 4: Run test to verify it passes**
+Implement:
+- Job registry with type handlers
+- BullMQ integration
+- Job enqueue/process/retry
+- Job types: report-generation, batch-import, batch-assignment
 
-Run: `pnpm test apps/api/tests/integration/enterprise-sync-retry.test.ts`
+**Step 6: Implement audit logging**
+
+Implement:
+- Audit log writer
+- Key operation tracking (login, data submit, review, approval)
+- Query interface for audit trail
+
+**Step 7: Build UI**
+
+Create:
+- Sync status dashboard
+- Manual sync trigger button
+- Audit log viewer
+
+**Step 8: Run tests**
+
+Run: `pnpm test apps/api/tests/integration/ apps/api/tests/jobs/`
 Expected: PASS
 
-**Step 5: Commit**
+**Step 9: Commit**
 
 ```bash
-git add apps/api/src/modules/integration apps/api/src/modules/jobs apps/api/src/modules/audit-log apps/api/tests/integration/enterprise-sync-retry.test.ts
-git commit -m "feat: add integration resilience and job framework"
+git add packages/integrations apps/api/src/modules/integration apps/api/src/modules/jobs apps/api/src/modules/audit-log apps/web/src/modules/integration apps/api/src/db/migrations/008_integration_jobs.sql apps/api/tests/integration/ apps/api/tests/jobs/
+git commit -m "feat: integration adapters, async jobs, and audit logging"
 ```
 
-### Task 11: Add End-To-End Verification And Delivery Checklist
+### Task 11: End-To-End Verification And Delivery
+
+**Scope:** Complete system verification, sample data seeding, acceptance testing, and delivery documentation.
 
 **Files:**
 - Create: `docs/testing/end-to-end-checklist.md`
 - Create: `docs/testing/sample-data-seed.md`
+- Create: `docs/testing/acceptance-criteria.md`
+- Create: `scripts/seed-sample-data.ts`
+- Create: `docs/deployment/deployment-guide.md`
 - Modify: `docs/plans/2026-03-27-energy-audit-platform-design.md`
 - Modify: `docs/plans/2026-03-27-energy-audit-platform-implementation.md`
 
-**Step 1: Write the verification checklist**
+**Requirements Coverage:**
+- 完整业务流程验证
+- 三端功能验证
+- 配置化能力验证
+- 外部接口降级验证
+- 性能基准测试
+- 交付验收清单
 
-Cover:
+**Step 1: Write end-to-end checklist**
 
-- enterprise registration and binding
-- project creation
-- master data setup
-- module save and submit
-- draft report generation
-- review scoring
-- rectification closure
-- degraded external sync behavior
+Create `docs/testing/end-to-end-checklist.md` covering:
 
-**Step 2: Define sample data**
+**企业端流程：**
+- [ ] 企业注册申请
+- [ ] 企业基础配置（能源/产品/单元）
+- [ ] 24个模块数据填报
+- [ ] 保存/提交/退回流程
+- [ ] 校验规则执行
+- [ ] 报告初稿生成
+- [ ] 报告下载/上传
+- [ ] 整改任务接收与处理
 
-Document minimal sample data set for:
+**管理端流程：**
+- [ ] 企业准入审核
+- [ ] 审计批次创建
+- [ ] 企业分配到批次
+- [ ] 审核任务分派
+- [ ] 整改督办
+- [ ] 统计分析查看
 
-- one enterprise
-- one batch
-- one audit project
-- one report
-- one review issue
-- one rectification task
+**审核端流程：**
+- [ ] 审核任务查看
+- [ ] 评分表填写
+- [ ] 问题登记
+- [ ] 审核结论提交
 
-**Step 3: Run the full validation suite**
+**系统能力：**
+- [ ] 外部同步降级模式
+- [ ] 异步任务执行
+- [ ] 审计日志记录
+- [ ] 权限隔离验证
 
-Run: `pnpm test`
-Expected: PASS
+**Step 2: Create sample data seed**
 
-Run: `pnpm type-check`
-Expected: PASS
+Create `docs/testing/sample-data-seed.md` defining:
+- 1 个审计批次（2026年度审计）
+- 3 个企业（制造业/能源/化工）
+- 5 个用户账号（企业用户×2、管理员×2、审核员×1）
+- 完整配置数据（能源/产品/单元）
+- 部分填报数据
+- 1 个报告
+- 1 个审核任务
+- 2 个整改任务
 
-**Step 4: Commit**
+**Step 3: Implement seed script**
+
+Create `scripts/seed-sample-data.ts` that:
+- Clears existing data (dev only)
+- Seeds enterprises with external bindings
+- Seeds users with roles
+- Seeds batch and projects
+- Seeds master data
+- Seeds partial filing data
+- Triggers report generation
+- Creates review and rectification tasks
+
+**Step 4: Write acceptance criteria**
+
+Create `docs/testing/acceptance-criteria.md` with:
+- 功能完整性标准
+- 性能基准（报告生成<30s、页面响应<2s）
+- 数据一致性要求
+- 安全性要求
+- 可用性要求
+
+**Step 5: Run full test suite**
 
 ```bash
-git add docs/testing/end-to-end-checklist.md docs/testing/sample-data-seed.md docs/plans/2026-03-27-energy-audit-platform-design.md docs/plans/2026-03-27-energy-audit-platform-implementation.md
-git commit -m "docs: add delivery verification checklist"
+# Unit and integration tests
+pnpm test
+
+# Type checking
+pnpm type-check
+
+# Linting
+pnpm lint
+
+# Build verification
+pnpm build
 ```
 
-Plan complete and saved to `docs/plans/2026-03-27-energy-audit-platform-implementation.md`. Two execution options:
+Expected: All PASS
 
-**1. Subagent-Driven (this session)** - I dispatch fresh subagent per task, review between tasks, fast iteration
+**Step 6: Run seed and manual verification**
 
-**2. Parallel Session (separate)** - Open new session with executing-plans, batch execution with checkpoints
+```bash
+# Seed sample data
+pnpm seed:sample
 
-**Which approach?**
+# Start dev environment
+pnpm dev
+
+# Manual verification against checklist
+```
+
+**Step 7: Write deployment guide**
+
+Create `docs/deployment/deployment-guide.md` with:
+- Environment requirements
+- Database setup
+- Redis setup
+- S3 storage setup
+- Environment variables
+- Migration execution
+- Initial admin account creation
+
+**Step 8: Update design and implementation docs**
+
+Mark implementation status in both documents:
+- Task 1-11: ✅ Completed
+- Add "Implementation Complete" section
+- Document known limitations
+- List future enhancements
+
+**Step 9: Final commit**
+
+```bash
+git add docs/testing/ scripts/seed-sample-data.ts docs/deployment/ docs/plans/
+git commit -m "docs: add end-to-end verification and delivery documentation"
+```
+
+**Step 10: Create delivery summary**
+
+Generate summary report:
+- ✅ 平台核心底座
+- ✅ 企业管理与外部绑定
+- ✅ 审计批次与项目生命周期
+- ✅ 主数据与配置中心
+- ✅ 24模块数据采集框架
+- ✅ 计算、图表与报告生成
+- ✅ 审核与整改闭环
+- ✅ 集成、异步任务与审计日志
+- ✅ 端到端验证与交付文档
+
+**Delivery Artifacts:**
+- Source code (all tasks)
+- Database migrations (8 files)
+- Test suite (100+ tests)
+- Documentation (design, implementation, testing, deployment)
+- Sample data seed
+- Deployment guide
