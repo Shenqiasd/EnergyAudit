@@ -29,8 +29,9 @@ ENV NODE_ENV=production
 COPY --from=build /app/apps/api/dist ./apps/api/dist
 COPY --from=build /app/apps/api/package.json ./apps/api/package.json
 
-# Copy the full node_modules (pnpm hoisted) — symlinks are resolved by Docker COPY
+# Copy node_modules — both root (pnpm store) and workspace-local (symlinks)
 COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/apps/api/node_modules ./apps/api/node_modules
 
 # Copy migration files (needed at runtime)
 COPY --from=build /app/apps/api/src/db/migrations ./apps/api/dist/db/migrations
