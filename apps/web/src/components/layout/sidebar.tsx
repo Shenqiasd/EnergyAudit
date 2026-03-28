@@ -70,6 +70,12 @@ const managerMenus: MenuGroup[] = [
     ],
   },
   {
+    label: "数据管理",
+    items: [
+      { label: "填报概览", href: "/manager/data-overview", icon: Database },
+    ],
+  },
+  {
     label: "审核与监管",
     items: [
       { label: "审核管理", href: "/manager/reviews", icon: Shield },

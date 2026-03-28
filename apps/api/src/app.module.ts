@@ -6,6 +6,7 @@ import { AttachmentModule } from './modules/attachment/attachment.module';
 import { AuditBatchModule } from './modules/audit-batch/audit-batch.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { AuditProjectModule } from './modules/audit-project/audit-project.module';
+import { DataEntryModule } from './modules/data-entry/data-entry.module';
 import { EnterpriseModule } from './modules/enterprise/enterprise.module';
 import { HealthModule } from './modules/health/health.module';
 import { IntegrationModule } from './modules/integration/integration.module';
@@ -27,6 +28,7 @@ import { UserModule } from './modules/user/user.module';
     JobsModule,
     AuditLogModule,
     AttachmentModule,
+    DataEntryModule,
   ],
 })
 export class AppModule {}
