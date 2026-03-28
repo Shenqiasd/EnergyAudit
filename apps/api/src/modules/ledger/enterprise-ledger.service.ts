@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, sql, and, desc, asc } from 'drizzle-orm';
+import { eq, sql, and, desc, asc, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -108,55 +108,93 @@ export class EnterpriseLedgerService {
       .limit(pageSize)
       .offset(offset);
 
-    // Enrich with review scores and rectification status
-    const items: EnterpriseLedgerItem[] = [];
-    for (const row of rows) {
-      // Get review score
-      const [reviewTask] = await this.db
-        .select({ totalScore: schema.reviewTasks.totalScore })
-        .from(schema.reviewTasks)
-        .where(eq(schema.reviewTasks.auditProjectId, row.projectId))
-        .orderBy(desc(schema.reviewTasks.createdAt))
-        .limit(1);
+    // Batch-fetch enrichment data to avoid N+1 queries
+    const projectIds = rows.map((r) => r.projectId);
 
-      // Get rectification status
-      const rectTasks = await this.db
-        .select({ status: schema.rectificationTasks.status })
-        .from(schema.rectificationTasks)
-        .where(eq(schema.rectificationTasks.auditProjectId, row.projectId));
+    if (projectIds.length === 0) {
+      return { items: [], total, page, pageSize };
+    }
 
+    // Batch: review scores (latest per project)
+    const allReviewTasks = await this.db
+      .select({
+        auditProjectId: schema.reviewTasks.auditProjectId,
+        totalScore: schema.reviewTasks.totalScore,
+        createdAt: schema.reviewTasks.createdAt,
+      })
+      .from(schema.reviewTasks)
+      .where(inArray(schema.reviewTasks.auditProjectId, projectIds))
+      .orderBy(desc(schema.reviewTasks.createdAt));
+
+    const reviewScoreMap = new Map<string, string | null>();
+    for (const rt of allReviewTasks) {
+      if (!reviewScoreMap.has(rt.auditProjectId)) {
+        reviewScoreMap.set(rt.auditProjectId, rt.totalScore);
+      }
+    }
+
+    // Batch: rectification statuses
+    const allRectTasks = await this.db
+      .select({
+        auditProjectId: schema.rectificationTasks.auditProjectId,
+        status: schema.rectificationTasks.status,
+      })
+      .from(schema.rectificationTasks)
+      .where(inArray(schema.rectificationTasks.auditProjectId, projectIds));
+
+    const rectTasksByProject = new Map<string, string[]>();
+    for (const rt of allRectTasks) {
+      const statuses = rectTasksByProject.get(rt.auditProjectId) ?? [];
+      statuses.push(rt.status);
+      rectTasksByProject.set(rt.auditProjectId, statuses);
+    }
+
+    // Batch: filing progress (data records)
+    const allDataRecords = await this.db
+      .select({
+        auditProjectId: schema.dataRecords.auditProjectId,
+        status: schema.dataRecords.status,
+      })
+      .from(schema.dataRecords)
+      .where(inArray(schema.dataRecords.auditProjectId, projectIds));
+
+    const dataRecordsByProject = new Map<string, string[]>();
+    for (const dr of allDataRecords) {
+      const statuses = dataRecordsByProject.get(dr.auditProjectId) ?? [];
+      statuses.push(dr.status);
+      dataRecordsByProject.set(dr.auditProjectId, statuses);
+    }
+
+    // Build items from batch data
+    const items: EnterpriseLedgerItem[] = rows.map((row) => {
+      const rectStatuses = rectTasksByProject.get(row.projectId);
       let rectificationStatus: string | null = null;
-      if (rectTasks.length > 0) {
-        const allCompleted = rectTasks.every(
-          (t) => t.status === 'completed' || t.status === 'verified',
+      if (rectStatuses && rectStatuses.length > 0) {
+        const allCompleted = rectStatuses.every(
+          (s) => s === 'completed' || s === 'verified',
         );
         rectificationStatus = allCompleted ? 'completed' : 'in_progress';
       }
 
-      // Get filing progress
-      const dataRecords = await this.db
-        .select({ status: schema.dataRecords.status })
-        .from(schema.dataRecords)
-        .where(eq(schema.dataRecords.auditProjectId, row.projectId));
-
-      const totalRecords = dataRecords.length;
-      const submittedRecords = dataRecords.filter(
-        (r) => r.status === 'submitted' || r.status === 'approved',
+      const records = dataRecordsByProject.get(row.projectId) ?? [];
+      const totalRecords = records.length;
+      const submittedRecords = records.filter(
+        (s) => s === 'submitted' || s === 'approved',
       ).length;
       const filingProgress = totalRecords > 0 ? submittedRecords / totalRecords : 0;
 
-      items.push({
+      return {
         enterpriseId: row.enterpriseId,
         enterpriseName: row.enterpriseName,
         industryCode: row.industryCode,
         projectId: row.projectId,
         projectStatus: row.projectStatus,
         isOverdue: row.isOverdue,
-        reviewScore: reviewTask?.totalScore ?? null,
+        reviewScore: reviewScoreMap.get(row.projectId) ?? null,
         rectificationStatus,
         filingProgress,
-      });
-    }
+      };
+    });
 
     return { items, total, page, pageSize };
   }

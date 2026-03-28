@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, sql, and, desc } from 'drizzle-orm';
+import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -70,12 +70,13 @@ export class ReviewLedgerService {
 
     const total = Number(countResult[0]?.count ?? 0);
 
-    // Data
+    // Data - join enterprises to avoid N+1 for enterprise names
     const rows = await this.db
       .select({
         reviewTaskId: schema.reviewTasks.id,
         projectId: schema.auditProjects.id,
         enterpriseId: schema.auditProjects.enterpriseId,
+        enterpriseName: schema.enterprises.name,
         reviewerId: schema.reviewTasks.reviewerId,
         status: schema.reviewTasks.status,
         totalScore: schema.reviewTasks.totalScore,
@@ -87,39 +88,46 @@ export class ReviewLedgerService {
         schema.auditProjects,
         eq(schema.reviewTasks.auditProjectId, schema.auditProjects.id),
       )
+      .innerJoin(
+        schema.enterprises,
+        eq(schema.auditProjects.enterpriseId, schema.enterprises.id),
+      )
       .where(whereClause)
       .orderBy(desc(schema.reviewTasks.createdAt))
       .limit(pageSize)
       .offset(offset);
 
-    const items: ReviewLedgerItem[] = [];
-    for (const row of rows) {
-      // Get enterprise name
-      const [enterprise] = await this.db
-        .select({ name: schema.enterprises.name })
-        .from(schema.enterprises)
-        .where(eq(schema.enterprises.id, row.enterpriseId))
-        .limit(1);
+    const reviewTaskIds = rows.map((r) => r.reviewTaskId);
 
-      // Get issue count
-      const [issueResult] = await this.db
-        .select({ count: sql<number>`count(*)`.as('count') })
+    // Batch: issue counts per review task
+    const issueCountMap = new Map<string, number>();
+    if (reviewTaskIds.length > 0) {
+      const issueCounts = await this.db
+        .select({
+          reviewTaskId: schema.reviewIssues.reviewTaskId,
+          count: sql<number>`count(*)`.as('count'),
+        })
         .from(schema.reviewIssues)
-        .where(eq(schema.reviewIssues.reviewTaskId, row.reviewTaskId));
+        .where(inArray(schema.reviewIssues.reviewTaskId, reviewTaskIds))
+        .groupBy(schema.reviewIssues.reviewTaskId);
 
-      items.push({
-        reviewTaskId: row.reviewTaskId,
-        projectId: row.projectId,
-        enterpriseId: row.enterpriseId,
-        enterpriseName: enterprise?.name ?? 'Unknown',
-        reviewerId: row.reviewerId,
-        status: row.status,
-        totalScore: row.totalScore,
-        issueCount: Number(issueResult?.count ?? 0),
-        completedAt: row.completedAt?.toISOString() ?? null,
-        createdAt: row.createdAt.toISOString(),
-      });
+      for (const ic of issueCounts) {
+        issueCountMap.set(ic.reviewTaskId, Number(ic.count));
+      }
     }
+
+    const items: ReviewLedgerItem[] = rows.map((row) => ({
+      reviewTaskId: row.reviewTaskId,
+      projectId: row.projectId,
+      enterpriseId: row.enterpriseId,
+      enterpriseName: row.enterpriseName ?? 'Unknown',
+      reviewerId: row.reviewerId,
+      status: row.status,
+      totalScore: row.totalScore,
+      issueCount: issueCountMap.get(row.reviewTaskId) ?? 0,
+      completedAt: row.completedAt?.toISOString() ?? null,
+      createdAt: row.createdAt.toISOString(),
+    }));
 
     return { items, total, page, pageSize };
   }

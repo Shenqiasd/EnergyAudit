@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, sql, and, desc } from 'drizzle-orm';
+import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -83,12 +83,13 @@ export class RectificationLedgerService {
 
     const total = Number(countResult[0]?.count ?? 0);
 
-    // Data
+    // Data - join enterprises to avoid N+1 for enterprise names
     const rows = await this.db
       .select({
         rectificationTaskId: schema.rectificationTasks.id,
         projectId: schema.auditProjects.id,
         enterpriseId: schema.auditProjects.enterpriseId,
+        enterpriseName: schema.enterprises.name,
         title: schema.rectificationTasks.title,
         description: schema.rectificationTasks.description,
         status: schema.rectificationTasks.status,
@@ -105,48 +106,51 @@ export class RectificationLedgerService {
           schema.auditProjects.id,
         ),
       )
+      .innerJoin(
+        schema.enterprises,
+        eq(schema.auditProjects.enterpriseId, schema.enterprises.id),
+      )
       .where(whereClause)
       .orderBy(desc(schema.rectificationTasks.createdAt))
       .limit(pageSize)
       .offset(offset);
 
-    const items: RectificationLedgerItem[] = [];
-    for (const row of rows) {
-      // Get enterprise name
-      const [enterprise] = await this.db
-        .select({ name: schema.enterprises.name })
-        .from(schema.enterprises)
-        .where(eq(schema.enterprises.id, row.enterpriseId))
-        .limit(1);
+    const taskIds = rows.map((r) => r.rectificationTaskId);
 
-      // Get latest progress
-      const [latestProgress] = await this.db
-        .select({ progressPercent: schema.rectificationProgress.progressPercent })
+    // Batch: latest progress per rectification task
+    const progressMap = new Map<string, number>();
+    if (taskIds.length > 0) {
+      const allProgress = await this.db
+        .select({
+          rectificationTaskId: schema.rectificationProgress.rectificationTaskId,
+          progressPercent: schema.rectificationProgress.progressPercent,
+          createdAt: schema.rectificationProgress.createdAt,
+        })
         .from(schema.rectificationProgress)
-        .where(
-          eq(
-            schema.rectificationProgress.rectificationTaskId,
-            row.rectificationTaskId,
-          ),
-        )
-        .orderBy(desc(schema.rectificationProgress.createdAt))
-        .limit(1);
+        .where(inArray(schema.rectificationProgress.rectificationTaskId, taskIds))
+        .orderBy(desc(schema.rectificationProgress.createdAt));
 
-      items.push({
-        rectificationTaskId: row.rectificationTaskId,
-        projectId: row.projectId,
-        enterpriseId: row.enterpriseId,
-        enterpriseName: enterprise?.name ?? 'Unknown',
-        title: row.title,
-        description: row.description,
-        status: row.status,
-        isOverdue: row.isOverdue,
-        progressPercent: latestProgress?.progressPercent ?? 0,
-        deadline: row.deadline?.toISOString() ?? null,
-        completedAt: row.completedAt?.toISOString() ?? null,
-        createdAt: row.createdAt.toISOString(),
-      });
+      for (const p of allProgress) {
+        if (!progressMap.has(p.rectificationTaskId)) {
+          progressMap.set(p.rectificationTaskId, p.progressPercent);
+        }
+      }
     }
+
+    const items: RectificationLedgerItem[] = rows.map((row) => ({
+      rectificationTaskId: row.rectificationTaskId,
+      projectId: row.projectId,
+      enterpriseId: row.enterpriseId,
+      enterpriseName: row.enterpriseName ?? 'Unknown',
+      title: row.title,
+      description: row.description,
+      status: row.status,
+      isOverdue: row.isOverdue,
+      progressPercent: progressMap.get(row.rectificationTaskId) ?? 0,
+      deadline: row.deadline?.toISOString() ?? null,
+      completedAt: row.completedAt?.toISOString() ?? null,
+      createdAt: row.createdAt.toISOString(),
+    }));
 
     return { items, total, page, pageSize };
   }
