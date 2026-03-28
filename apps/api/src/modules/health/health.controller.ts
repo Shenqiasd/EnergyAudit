@@ -2,9 +2,11 @@ import { Controller, Get, HttpException, HttpStatus, Inject } from '@nestjs/comm
 import { sql } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
+import { Public } from '../auth/public.decorator';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(

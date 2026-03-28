@@ -10,10 +10,12 @@ import {
   Req,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { AttachmentService } from './attachment.service';
 
 import type { FastifyRequest } from 'fastify';
 
+@Roles('enterprise_user', 'manager', 'reviewer')
 @Controller('attachments')
 export class AttachmentController {
   constructor(private readonly attachmentService: AttachmentService) {}

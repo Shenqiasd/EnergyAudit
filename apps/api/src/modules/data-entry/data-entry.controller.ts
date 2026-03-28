@@ -3,17 +3,18 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
 
+import { Roles } from '../auth/roles.decorator';
 import { DataCalculationService } from './data-calculation.service';
 import { DataImportService } from './data-import.service';
 import { DataLockService } from './data-lock.service';
@@ -24,6 +25,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { ImportDataDto } from './data-import.service';
 import type { CreateRecordDto, RecordListQuery, SaveRecordDto } from './data-record.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller('data-entry')
 export class DataEntryController {
   constructor(

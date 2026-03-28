@@ -9,12 +9,14 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { AuditProjectService } from './audit-project.service';
 import { ProjectMemberService } from './project-member.service';
 
 import type { AuditProjectListQuery, TransitionDto } from './audit-project.service';
 import type { AddMemberDto } from './project-member.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller('audit-projects')
 export class AuditProjectController {
   constructor(

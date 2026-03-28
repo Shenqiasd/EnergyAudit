@@ -8,12 +8,16 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { AdmissionService } from './admission.service';
 import { EnterpriseService } from './enterprise.service';
 import { ExternalBindingService } from './external-binding.service';
 
-import type { CreateEnterpriseDto, EnterpriseListQuery, UpdateEnterpriseDto } from './enterprise.service';
+import type { EnterpriseListQuery } from './enterprise.service';
+import type { CreateEnterpriseDto } from './dto/create-enterprise.dto';
+import type { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
 
+@Roles('enterprise_user', 'manager')
 @Controller('enterprises')
 export class EnterpriseController {
   constructor(

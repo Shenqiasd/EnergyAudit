@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { CalculationService } from './calculation.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller('calculations')
 export class CalculationController {
   constructor(private readonly calculationService: CalculationService) {}

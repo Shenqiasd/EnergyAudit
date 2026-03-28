@@ -1,5 +1,6 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { EnterpriseLedgerService } from './enterprise-ledger.service';
 import { ReviewLedgerService } from './review-ledger.service';
 import { RectificationLedgerService } from './rectification-ledger.service';
@@ -10,6 +11,7 @@ import type { ReviewLedgerQuery } from './review-ledger.service';
 import type { RectificationLedgerQuery } from './rectification-ledger.service';
 import type { FastifyReply } from 'fastify';
 
+@Roles('manager')
 @Controller('ledgers')
 export class LedgerController {
   constructor(

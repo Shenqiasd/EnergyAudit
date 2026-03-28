@@ -26,6 +26,14 @@ function getAuthHeaders(): Record<string, string> {
   if (typeof window === "undefined") return {};
 
   try {
+    const token = localStorage.getItem("energy_audit_token");
+    if (token) {
+      return {
+        Authorization: `Bearer ${token}`,
+      };
+    }
+
+    // Fallback to dev mode headers if no JWT token
     const stored = localStorage.getItem("energy_audit_user");
     if (stored) {
       const user = JSON.parse(stored);
