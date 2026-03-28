@@ -81,6 +81,7 @@ const managerMenus: MenuGroup[] = [
     label: "审核与监管",
     items: [
       { label: "审核管理", href: "/manager/reviews", icon: Shield },
+      { label: "整改监管", href: "/manager/rectifications", icon: Wrench },
       { label: "统计分析", href: "/manager/statistics", icon: BarChart3 },
     ],
   },

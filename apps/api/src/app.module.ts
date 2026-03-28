@@ -15,7 +15,9 @@ import { HealthModule } from './modules/health/health.module';
 import { IntegrationModule } from './modules/integration/integration.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { MasterDataModule } from './modules/master-data/master-data.module';
+import { RectificationModule } from './modules/rectification/rectification.module';
 import { ReportModule } from './modules/report/report.module';
+import { ReviewModule } from './modules/review/review.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -37,6 +39,8 @@ import { UserModule } from './modules/user/user.module';
     CalculationModule,
     ChartModule,
     ReportModule,
+    ReviewModule,
+    RectificationModule,
   ],
 })
 export class AppModule {}
