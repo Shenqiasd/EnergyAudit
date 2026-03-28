@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, desc, sql } from 'drizzle-orm';
+import { and, eq, desc, sql, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -96,6 +96,14 @@ export class RectificationService {
     if (query.status) {
       conditions.push(eq(schema.rectificationTasks.status, query.status));
     }
+    if (query.enterpriseId) {
+      const projectIds = await this.getProjectIdsByEnterprise(query.enterpriseId);
+      if (projectIds.length > 0) {
+        conditions.push(inArray(schema.rectificationTasks.auditProjectId, projectIds));
+      } else {
+        return { items: [], page, pageSize };
+      }
+    }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -161,6 +169,12 @@ export class RectificationService {
   }
 
   async updateProgress(id: string, input: UpdateProgressInput) {
+    const task = await this.getTask(id);
+
+    if (task.status !== 'in_progress') {
+      throw new Error(`无法在 ${task.status} 状态下更新进度`);
+    }
+
     const progressId = `rp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     await this.db.insert(schema.rectificationProgress).values({
@@ -263,6 +277,14 @@ export class RectificationService {
     if (query.projectId) {
       conditions.push(eq(schema.rectificationTasks.auditProjectId, query.projectId));
     }
+    if (query.batchId) {
+      const projectIds = await this.getProjectIdsByBatch(query.batchId);
+      if (projectIds.length > 0) {
+        conditions.push(inArray(schema.rectificationTasks.auditProjectId, projectIds));
+      } else {
+        return { total: 0, statusCounts: {}, completionRate: '0.0%', overdueCount: 0 };
+      }
+    }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -291,6 +313,22 @@ export class RectificationService {
       completionRate: `${completionRate}%`,
       overdueCount: statusCounts['delayed'] ?? 0,
     };
+  }
+
+  private async getProjectIdsByEnterprise(enterpriseId: string): Promise<string[]> {
+    const projects = await this.db
+      .select({ id: schema.auditProjects.id })
+      .from(schema.auditProjects)
+      .where(eq(schema.auditProjects.enterpriseId, enterpriseId));
+    return projects.map((p) => p.id);
+  }
+
+  private async getProjectIdsByBatch(batchId: string): Promise<string[]> {
+    const projects = await this.db
+      .select({ id: schema.auditProjects.id })
+      .from(schema.auditProjects)
+      .where(eq(schema.auditProjects.batchId, batchId));
+    return projects.map((p) => p.id);
   }
 
   private async getTask(id: string) {

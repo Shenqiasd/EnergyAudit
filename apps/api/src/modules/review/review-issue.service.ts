@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -63,7 +63,10 @@ export class ReviewIssueService {
     return this.db
       .select()
       .from(schema.reviewIssues)
-      .where(eq(schema.reviewIssues.reviewTaskId, reviewTaskId));
+      .where(and(
+        eq(schema.reviewIssues.reviewTaskId, reviewTaskId),
+        eq(schema.reviewIssues.requiresRectification, true),
+      ));
   }
 
   private async getIssueById(id: string) {
