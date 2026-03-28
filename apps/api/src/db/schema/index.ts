@@ -541,3 +541,49 @@ export const rectificationProgress = pgTable('rectification_progress', {
     .references(() => userAccounts.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ==================== Enterprise Admission & Sync Logs ====================
+
+export const enterpriseApplications = pgTable(
+  'enterprise_applications',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    action: text('action').notNull(),
+    fromStatus: text('from_status').notNull(),
+    toStatus: text('to_status').notNull(),
+    reason: text('reason'),
+    operatedBy: text('operated_by').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_enterprise_applications_enterprise').on(table.enterpriseId),
+    index('idx_enterprise_applications_created').on(table.createdAt),
+  ],
+);
+
+export const syncLogs = pgTable(
+  'sync_logs',
+  {
+    id: text('id').primaryKey(),
+    enterpriseId: text('enterprise_id')
+      .notNull()
+      .references(() => enterprises.id, { onDelete: 'cascade' }),
+    bindingId: text('binding_id')
+      .notNull()
+      .references(() => enterpriseExternalBindings.id, { onDelete: 'cascade' }),
+    syncType: text('sync_type').notNull(),
+    status: text('status').notNull(),
+    requestPayload: text('request_payload'),
+    responsePayload: text('response_payload'),
+    errorMessage: text('error_message'),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+  },
+  (table) => [
+    index('idx_sync_logs_enterprise').on(table.enterpriseId),
+    index('idx_sync_logs_binding').on(table.bindingId),
+  ],
+);
