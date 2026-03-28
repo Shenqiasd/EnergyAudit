@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  jsonb,
   numeric,
   pgTable,
   primaryKey,
@@ -625,4 +626,94 @@ export const projectSnapshots = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index('idx_project_snapshots_project').on(table.auditProjectId)],
+);
+
+// ==================== Data Collection Framework ====================
+
+export const dataModules = pgTable(
+  'data_modules',
+  {
+    id: text('id').primaryKey(),
+    code: text('code').notNull().unique(),
+    name: text('name').notNull(),
+    category: text('category').notNull(),
+    description: text('description'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    isEnabled: boolean('is_enabled').notNull().default(true),
+    fieldSchema: jsonb('field_schema'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_data_modules_category').on(table.category)],
+);
+
+export const dataFields = pgTable(
+  'data_fields',
+  {
+    id: text('id').primaryKey(),
+    moduleId: text('module_id')
+      .notNull()
+      .references(() => dataModules.id, { onDelete: 'cascade' }),
+    code: text('code').notNull(),
+    name: text('name').notNull(),
+    fieldType: text('field_type').notNull().default('text'),
+    constraints: jsonb('constraints'),
+    displayRules: jsonb('display_rules'),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique().on(table.moduleId, table.code),
+    index('idx_data_fields_module').on(table.moduleId),
+  ],
+);
+
+export const validationRules = pgTable(
+  'validation_rules',
+  {
+    id: text('id').primaryKey(),
+    moduleCode: text('module_code').notNull(),
+    ruleCode: text('rule_code').notNull().unique(),
+    layer: integer('layer').notNull().default(1),
+    severity: text('severity').notNull().default('error'),
+    expression: text('expression').notNull(),
+    message: text('message').notNull(),
+    fieldCodes: text('field_codes'),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_validation_rules_module').on(table.moduleCode),
+    index('idx_validation_rules_layer').on(table.layer),
+  ],
+);
+
+export const calculationRules = pgTable(
+  'calculation_rules',
+  {
+    id: text('id').primaryKey(),
+    moduleCode: text('module_code').notNull(),
+    ruleCode: text('rule_code').notNull().unique(),
+    expression: text('expression').notNull(),
+    dependencies: jsonb('dependencies'),
+    outputFieldCode: text('output_field_code').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_calculation_rules_module').on(table.moduleCode)],
+);
+
+export const dataLocks = pgTable(
+  'data_locks',
+  {
+    id: text('id').primaryKey(),
+    recordId: text('record_id').notNull().unique(),
+    userId: text('user_id').notNull(),
+    lockedAt: timestamp('locked_at', { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    index('idx_data_locks_record').on(table.recordId),
+    index('idx_data_locks_expires').on(table.expiresAt),
+  ],
 );
