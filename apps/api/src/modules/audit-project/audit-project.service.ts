@@ -82,7 +82,15 @@ export class AuditProjectService {
       this.db
         .select({ total: count() })
         .from(schema.auditProjects)
-        .where(whereClause),
+        .leftJoin(
+          schema.enterprises,
+          eq(schema.auditProjects.enterpriseId, schema.enterprises.id),
+        )
+        .where(
+          query.enterpriseName
+            ? and(whereClause, ilike(schema.enterprises.name, `%${query.enterpriseName}%`))
+            : whereClause,
+        ),
     ]);
 
     return {
@@ -128,7 +136,9 @@ export class AuditProjectService {
     const project = results[0];
 
     const now = new Date();
-    const isOverdue = project.deadline ? new Date(project.deadline) < now : false;
+    const isOverdue = project.deadline && project.status !== 'completed' && project.status !== 'closed'
+      ? new Date(project.deadline) < now
+      : false;
 
     if (isOverdue !== project.isOverdue) {
       await this.db

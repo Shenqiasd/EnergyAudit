@@ -17,8 +17,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Layers, Plus } from "lucide-react";
-import { useAuditBatches, useCreateBatch, useCloseBatch } from "@/lib/api/hooks/use-audit-batches";
+import { useAuditBatches, useCreateBatch } from "@/lib/api/hooks/use-audit-batches";
 import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api/client";
 
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 5 }, (_, i) => ({
@@ -36,7 +38,6 @@ export default function ManagerBatchesPage() {
   const router = useRouter();
   const [yearFilter, setYearFilter] = useState<number | undefined>();
   const [showCreate, setShowCreate] = useState(false);
-  const [closingId, setClosingId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -48,7 +49,14 @@ export default function ManagerBatchesPage() {
 
   const { data, isLoading } = useAuditBatches({ year: yearFilter });
   const createBatch = useCreateBatch();
-  const closeBatch = useCloseBatch(closingId ?? "");
+  const queryClient = useQueryClient();
+  const closeBatch = useMutation({
+    mutationFn: (batchId: string) =>
+      apiClient.put(`/audit-batches/${batchId}/close`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
+    },
+  });
 
   const handleCreate = async () => {
     await createBatch.mutateAsync({
@@ -63,9 +71,7 @@ export default function ManagerBatchesPage() {
   };
 
   const handleClose = async (id: string) => {
-    setClosingId(id);
-    await closeBatch.mutateAsync();
-    setClosingId(null);
+    await closeBatch.mutateAsync(id);
   };
 
   const formatDate = (dateStr: string | null) => {
