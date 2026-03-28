@@ -19,6 +19,8 @@ import { RectificationModule } from './modules/rectification/rectification.modul
 import { ReportModule } from './modules/report/report.module';
 import { ReviewModule } from './modules/review/review.module';
 import { UserModule } from './modules/user/user.module';
+import { StatisticsModule } from './modules/statistics/statistics.module';
+import { LedgerModule } from './modules/ledger/ledger.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { UserModule } from './modules/user/user.module';
     ReportModule,
     ReviewModule,
     RectificationModule,
+    StatisticsModule,
+    LedgerModule,
   ],
 })
 export class AppModule {}

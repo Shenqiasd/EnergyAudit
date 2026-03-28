@@ -1,7 +1,66 @@
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Home } from "lucide-react";
+"use client";
+
+import { Activity, AlertTriangle, CheckCircle, Layers } from "lucide-react";
+import { Loading } from "@/components/ui/loading";
+import { KpiCard } from "@/components/dashboard/kpi-card";
+import { ProgressBoard } from "@/components/dashboard/progress-board";
+import { AlertList } from "@/components/dashboard/alert-list";
+import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
+import {
+  useDashboardSummary,
+  useAlerts,
+  useTimeline,
+} from "@/lib/api/hooks/use-statistics";
 
 export default function ManagerDashboardPage() {
+  const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
+  const { data: alerts, isLoading: alertsLoading } = useAlerts();
+  const { data: timeline, isLoading: timelineLoading } = useTimeline();
+
+  const isLoading = summaryLoading || alertsLoading || timelineLoading;
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  const kpiCards = [
+    {
+      icon: Layers,
+      label: "活跃批次数",
+      value: summary?.activeBatches ?? 0,
+    },
+    {
+      icon: CheckCircle,
+      label: "项目完成率",
+      value: summary
+        ? `${(summary.projectCompletionRate * 100).toFixed(1)}%`
+        : "0%",
+    },
+    {
+      icon: Activity,
+      label: "待审核任务",
+      value: summary?.pendingReviewTasks ?? 0,
+    },
+    {
+      icon: AlertTriangle,
+      label: "超期预警",
+      value: summary?.overdueAlerts ?? 0,
+    },
+  ];
+
+  const progressItems = [
+    {
+      label: "项目完成",
+      value: Math.round((summary?.projectCompletionRate ?? 0) * 100),
+      total: 100,
+    },
+    {
+      label: "待审核处理",
+      value: summary?.pendingReviewTasks ?? 0,
+      total: Math.max(summary?.pendingReviewTasks ?? 0, 1),
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -11,37 +70,26 @@ export default function ManagerDashboardPage() {
         </p>
       </div>
 
+      {/* KPI Cards Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: "在审项目", value: "0" },
-          { label: "待审核", value: "0" },
-          { label: "待整改", value: "0" },
-          { label: "已完成", value: "0" },
-        ].map((stat) => (
-          <Card key={stat.label}>
-            <div className="text-sm text-[var(--color-text-secondary)]">
-              {stat.label}
-            </div>
-            <div className="mt-2 text-3xl font-bold text-[var(--color-primary)]">
-              {stat.value}
-            </div>
-          </Card>
+        {kpiCards.map((card) => (
+          <KpiCard
+            key={card.label}
+            icon={card.icon}
+            label={card.label}
+            value={card.value}
+          />
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <Home size={20} />
-              功能建设中
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          管理端工作台将展示：审计工作总览、项目进度统计图表、待办事项、最近操作记录等内容。
-        </p>
-      </Card>
+      {/* Middle Section: Progress Board + Alert List */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ProgressBoard title="批次进度概览" items={progressItems} />
+        <AlertList title="预警提醒" alerts={alerts ?? []} />
+      </div>
+
+      {/* Bottom: Recent Activity Timeline */}
+      <ActivityTimeline title="最近操作记录" items={timeline ?? []} />
     </div>
   );
 }
