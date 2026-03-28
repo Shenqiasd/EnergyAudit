@@ -139,6 +139,29 @@ export function useRemoveMember(projectId: string) {
   });
 }
 
+interface EnterpriseProfile {
+  id: string;
+  auditProjectId: string;
+  enterpriseId: string;
+  name: string;
+  unifiedSocialCreditCode: string;
+  industryCode: string | null;
+  contactPerson: string | null;
+  contactPhone: string | null;
+  contactEmail: string | null;
+  address: string | null;
+  snapshotAt: string;
+}
+
+export function useEnterpriseProfile(projectId: string) {
+  return useQuery<EnterpriseProfile>({
+    queryKey: ["enterprise-profile", projectId],
+    queryFn: () =>
+      apiClient.get<EnterpriseProfile>(`/audit-projects/${projectId}/enterprise-profile`),
+    enabled: !!projectId,
+  });
+}
+
 export function useProjectTimeline(id: string) {
   return useQuery<StatusTransition[]>({
     queryKey: ["project-timeline", id],
@@ -156,4 +179,5 @@ export type {
   TransitionInput,
   TransitionResult,
   StatusTransition,
+  EnterpriseProfile,
 };

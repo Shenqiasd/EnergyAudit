@@ -343,6 +343,8 @@ export const dataRecords = pgTable(
     ),
     submittedAt: timestamp('submitted_at', { withTimezone: true }),
     returnReason: text('return_reason'),
+    returnedBy: text('returned_by').references(() => userAccounts.id, { onDelete: 'set null' }),
+    returnedAt: timestamp('returned_at', { withTimezone: true }),
     lockHolderId: text('lock_holder_id').references(() => userAccounts.id, {
       onDelete: 'set null',
     }),
@@ -766,6 +768,7 @@ export const reportVersions = pgTable(
       .references(() => reports.id, { onDelete: 'cascade' }),
     versionType: text('version_type').notNull(),
     versionNumber: integer('version_number').notNull(),
+    isActive: boolean('is_active').notNull().default(false),
     fileUrl: text('file_url'),
     createdBy: text('created_by'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -780,6 +783,7 @@ export const reportSections = pgTable(
     reportId: text('report_id')
       .notNull()
       .references(() => reports.id, { onDelete: 'cascade' }),
+    reportVersionId: text('report_version_id').references(() => reportVersions.id, { onDelete: 'set null' }),
     sectionCode: text('section_code').notNull(),
     sectionName: text('section_name').notNull(),
     sortOrder: integer('sort_order').notNull().default(0),

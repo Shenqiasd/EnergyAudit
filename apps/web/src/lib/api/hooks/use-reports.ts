@@ -43,9 +43,30 @@ interface ReportVersion {
   reportId: string;
   versionType: string;
   versionNumber: number;
+  isActive: boolean;
   fileUrl: string | null;
   createdBy: string | null;
   createdAt: string;
+}
+
+interface ReportVersionDetail extends ReportVersion {
+  sections: ReportSection[];
+}
+
+interface VersionDiff {
+  sectionCode: string;
+  sectionName: string;
+  v1Content: string | null;
+  v2Content: string | null;
+  changed: boolean;
+}
+
+interface VersionComparison {
+  version1: { id: string; versionNumber: number; versionType: string };
+  version2: { id: string; versionNumber: number; versionType: string };
+  diffs: VersionDiff[];
+  totalSections: number;
+  changedSections: number;
 }
 
 interface ReportListQuery {
@@ -127,12 +148,47 @@ export function useReportVersions(id: string) {
   });
 }
 
+export function useReportVersionDetail(reportId: string, versionId: string) {
+  return useQuery<ReportVersionDetail>({
+    queryKey: ["report-version-detail", reportId, versionId],
+    queryFn: () =>
+      apiClient.get<ReportVersionDetail>(`/reports/${reportId}/versions/${versionId}`),
+    enabled: !!reportId && !!versionId,
+  });
+}
+
+export function useCompareVersions(reportId: string, v1: string, v2: string) {
+  return useQuery<VersionComparison>({
+    queryKey: ["version-comparison", reportId, v1, v2],
+    queryFn: () =>
+      apiClient.get<VersionComparison>(`/reports/${reportId}/versions/compare`, {
+        params: { v1, v2 },
+      }),
+    enabled: !!reportId && !!v1 && !!v2,
+  });
+}
+
+export function useActivateVersion(reportId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (versionId: string) =>
+      apiClient.post(`/reports/${reportId}/versions/${versionId}/activate`),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["report-versions", reportId] });
+      void queryClient.invalidateQueries({ queryKey: ["report", reportId] });
+    },
+  });
+}
+
 export type {
   Report,
   ReportSection,
   ReportDetail,
   ReportListResponse,
   ReportVersion,
+  ReportVersionDetail,
   ReportListQuery,
   GenerateResult,
+  VersionDiff,
+  VersionComparison,
 };

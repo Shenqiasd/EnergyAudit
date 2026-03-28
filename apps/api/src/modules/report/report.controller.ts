@@ -12,6 +12,7 @@ import { Roles } from '../auth/roles.decorator';
 import { JobRunner } from '../jobs/job-runner';
 import { ReportAssemblyService } from './report-assembly.service';
 import { ReportService } from './report.service';
+import { ReportVersionService } from './report-version.service';
 
 import type { ReportListQuery } from './report.service';
 
@@ -22,6 +23,7 @@ export class ReportController {
     private readonly reportService: ReportService,
     private readonly assemblyService: ReportAssemblyService,
     private readonly jobRunner: JobRunner,
+    private readonly versionService: ReportVersionService,
   ) {}
 
   @Get()
@@ -78,8 +80,33 @@ export class ReportController {
     return { report, message: '报告数据已返回，客户端可根据sections组装文档' };
   }
 
+  @Get(':id/versions/compare')
+  async compareVersions(
+    @Param('id') _id: string,
+    @Query('v1') v1: string,
+    @Query('v2') v2: string,
+  ) {
+    return this.versionService.compareVersions(v1, v2);
+  }
+
+  @Get(':id/versions/:versionId')
+  async getVersion(
+    @Param('id') _id: string,
+    @Param('versionId') versionId: string,
+  ) {
+    return this.versionService.getVersion(versionId);
+  }
+
   @Get(':id/versions')
   async listVersions(@Param('id') id: string) {
-    return this.reportService.getVersions(id);
+    return this.versionService.listVersions(id);
+  }
+
+  @Post(':id/versions/:versionId/activate')
+  async activateVersion(
+    @Param('id') id: string,
+    @Param('versionId') versionId: string,
+  ) {
+    return this.versionService.setActiveVersion(id, versionId);
   }
 }

@@ -61,4 +61,14 @@ export class AuditProjectController {
   async getTimeline(@Param('id') id: string) {
     return this.projectService.getTimeline(id);
   }
+
+  @Get(':id/enterprise-profile')
+  async getEnterpriseProfile(@Param('id') id: string) {
+    return this.projectService.getProjectProfile(id);
+  }
+
+  @Post(':id/snapshot-profile')
+  async snapshotProfile(@Param('id') id: string) {
+    return this.projectService.snapshotEnterpriseProfile(id);
+  }
 }
