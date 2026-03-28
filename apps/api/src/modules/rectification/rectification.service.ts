@@ -3,6 +3,7 @@ import { and, eq, desc, sql, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
+import { NotificationTriggerService } from '../notification/notification-trigger.service';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
@@ -59,6 +60,7 @@ export interface UpdateProgressInput {
 export class RectificationService {
   constructor(
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
+    private readonly notificationTrigger: NotificationTriggerService,
   ) {}
 
   async generateFromIssues(input: GenerateRectificationInput) {
@@ -150,6 +152,20 @@ export class RectificationService {
       .set({ status: 'pending_claim', updatedAt: new Date() })
       .where(eq(schema.rectificationTasks.id, id));
 
+    // Notify enterprise users about the new rectification task
+    try {
+      const [project] = await this.db
+        .select({ enterpriseId: schema.auditProjects.enterpriseId })
+        .from(schema.auditProjects)
+        .where(eq(schema.auditProjects.id, task.auditProjectId))
+        .limit(1);
+      if (project) {
+        await this.notificationTrigger.onRectificationAssigned(id, project.enterpriseId);
+      }
+    } catch {
+      // Non-critical
+    }
+
     return this.findById(id);
   }
 
@@ -219,6 +235,12 @@ export class RectificationService {
         updatedAt: new Date(),
       })
       .where(eq(schema.rectificationTasks.id, id));
+
+    try {
+      await this.notificationTrigger.onRectificationCompleted(id);
+    } catch {
+      // Non-critical
+    }
 
     return this.findById(id);
   }

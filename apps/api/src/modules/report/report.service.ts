@@ -3,6 +3,7 @@ import { and, eq, desc } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
+import { NotificationTriggerService } from '../notification/notification-trigger.service';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
@@ -42,6 +43,7 @@ export interface ReportListQuery {
 export class ReportService {
   constructor(
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
+    private readonly notificationTrigger: NotificationTriggerService,
   ) {}
 
   async findAll(query: ReportListQuery) {
@@ -113,6 +115,12 @@ export class ReportService {
       .update(schema.reports)
       .set(updates)
       .where(eq(schema.reports.id, id));
+
+    try {
+      await this.notificationTrigger.onReportStatusChange(id, newStatus);
+    } catch {
+      // Non-critical
+    }
 
     return { ...report, status: newStatus };
   }

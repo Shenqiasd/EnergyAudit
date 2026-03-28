@@ -21,6 +21,7 @@ import { ReviewModule } from './modules/review/review.module';
 import { UserModule } from './modules/user/user.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { LedgerModule } from './modules/ledger/ledger.module';
     RectificationModule,
     StatisticsModule,
     LedgerModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

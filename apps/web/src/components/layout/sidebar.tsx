@@ -4,6 +4,7 @@ import { clsx } from "clsx";
 import {
   Activity,
   BarChart3,
+  Bell,
   Building2,
   ChevronDown,
   ClipboardCheck,
@@ -41,6 +42,7 @@ const enterpriseMenus: MenuGroup[] = [
     label: "工作台",
     items: [
       { label: "工作台", href: "/enterprise/dashboard", icon: LayoutDashboard },
+      { label: "消息通知", href: "/enterprise/notifications", icon: Bell },
     ],
   },
   {
@@ -59,6 +61,7 @@ const managerMenus: MenuGroup[] = [
     label: "工作台",
     items: [
       { label: "工作台", href: "/manager/dashboard", icon: Home },
+      { label: "消息通知", href: "/manager/notifications", icon: Bell },
     ],
   },
   {
@@ -102,6 +105,7 @@ const reviewerMenus: MenuGroup[] = [
     items: [
       { label: "我的审核", href: "/reviewer/tasks", icon: ListChecks },
       { label: "审核历史", href: "/reviewer/history", icon: History },
+      { label: "消息通知", href: "/reviewer/notifications", icon: Bell },
     ],
   },
 ];
