@@ -182,7 +182,7 @@ pnpm dev
 ### 方式一：种子脚本
 
 ```bash
-DATABASE_URL=postgresql://user:password@host:5432/energy_audit npx tsx scripts/seed-sample-data.ts
+DATABASE_URL=postgresql://user:password@host:5432/energy_audit pnpm seed:sample
 ```
 
 ### 方式二：SQL 插入

@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "test": "vitest run",
     "type-check": "turbo run type-check",
-    "seed:sample": "tsx scripts/seed-sample-data.ts"
+    "seed:sample": "pnpm --filter @energy-audit/api exec tsx ../../scripts/seed-sample-data.ts"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
