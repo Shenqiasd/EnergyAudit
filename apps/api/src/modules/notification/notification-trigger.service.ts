@@ -121,7 +121,8 @@ export class NotificationTriggerService {
       .from(schema.userAccounts)
       .where(eq(schema.userAccounts.role, 'manager'));
 
-    const recipients = [...enterpriseUsers, ...managers];
+    const recipientIds = new Set([...enterpriseUsers.map(u => u.id), ...managers.map(u => u.id)]);
+    const recipients = Array.from(recipientIds).map(id => ({ id }));
 
     const notifications = recipients.map((user) => ({
       recipientId: user.id,
@@ -208,7 +209,8 @@ export class NotificationTriggerService {
       .from(schema.userAccounts)
       .where(eq(schema.userAccounts.role, 'manager'));
 
-    const recipients = [...enterpriseUsers, ...managers];
+    const recipientIds = new Set([...enterpriseUsers.map(u => u.id), ...managers.map(u => u.id)]);
+    const recipients = Array.from(recipientIds).map(id => ({ id }));
 
     const notifications = recipients.map((user) => ({
       recipientId: user.id,
