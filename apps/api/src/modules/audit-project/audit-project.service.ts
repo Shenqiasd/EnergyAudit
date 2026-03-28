@@ -3,6 +3,7 @@ import { and, count, eq, ilike, sql } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
+import { NotificationTriggerService } from '../notification/notification-trigger.service';
 import {
   canTransition,
   checkPreconditions,
@@ -32,6 +33,7 @@ export interface TransitionDto {
 export class AuditProjectService {
   constructor(
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
+    private readonly notificationTrigger: NotificationTriggerService,
   ) {}
 
   async findAll(query: AuditProjectListQuery) {
@@ -239,6 +241,13 @@ export class AuditProjectService {
         detail: JSON.stringify({ fromStatus, toStatus, reason: dto.reason }),
       });
     });
+
+    // Trigger notification for status change
+    try {
+      await this.notificationTrigger.onProjectStatusChange(id, fromStatus, toStatus);
+    } catch {
+      // Non-critical: don't fail the transition if notification fails
+    }
 
     return { projectId: id, fromStatus, toStatus };
   }

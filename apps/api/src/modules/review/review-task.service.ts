@@ -3,6 +3,7 @@ import { and, eq, desc, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
+import { NotificationTriggerService } from '../notification/notification-trigger.service';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
@@ -48,6 +49,7 @@ export interface CreateReviewTaskInput {
 export class ReviewTaskService {
   constructor(
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
+    private readonly notificationTrigger: NotificationTriggerService,
   ) {}
 
   async create(input: CreateReviewTaskInput) {
@@ -134,6 +136,12 @@ export class ReviewTaskService {
       })
       .where(eq(schema.reviewTasks.id, id));
 
+    try {
+      await this.notificationTrigger.onReviewTaskAssigned(id, reviewerId);
+    } catch {
+      // Non-critical
+    }
+
     return this.findById(id);
   }
 
@@ -190,6 +198,12 @@ export class ReviewTaskService {
         updatedAt: new Date(),
       })
       .where(eq(schema.reviewTasks.id, id));
+
+    try {
+      await this.notificationTrigger.onReviewCompleted(id, task.conclusion ?? 'completed');
+    } catch {
+      // Non-critical
+    }
 
     return this.findById(id);
   }

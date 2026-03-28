@@ -2,12 +2,13 @@ import { Module, OnModuleInit } from '@nestjs/common';
 
 import { JobsModule } from '../jobs/jobs.module';
 import { JobRunner } from '../jobs/job-runner';
+import { NotificationModule } from '../notification/notification.module';
 import { ReportAssemblyService } from './report-assembly.service';
 import { ReportController } from './report.controller';
 import { ReportService } from './report.service';
 
 @Module({
-  imports: [JobsModule],
+  imports: [JobsModule, NotificationModule],
   controllers: [ReportController],
   providers: [ReportService, ReportAssemblyService],
   exports: [ReportService, ReportAssemblyService],

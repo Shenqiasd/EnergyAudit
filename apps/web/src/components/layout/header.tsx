@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { NotificationBell } from "@/components/notification/notification-bell";
 import type { UserRole } from "@/lib/auth/auth-provider";
 import { useAuth } from "@/lib/auth/use-auth";
 import {
@@ -44,6 +45,7 @@ const breadcrumbMap: Record<string, string> = {
   statistics: "统计分析",
   tasks: "我的审核",
   history: "审核历史",
+  notifications: "消息通知",
 };
 
 export function Header({ onMenuToggle }: HeaderProps) {
@@ -94,8 +96,9 @@ export function Header({ onMenuToggle }: HeaderProps) {
         </nav>
       </div>
 
-      {/* Right: user info + role switcher */}
+      {/* Right: notification bell + user info + role switcher */}
       <div className="flex items-center gap-3">
+        <NotificationBell />
         {/* Role switcher (dev only) */}
         <div className="relative">
           <button

@@ -814,3 +814,27 @@ export const benchmarkValues = pgTable(
     index('idx_benchmark_values_indicator').on(table.indicatorCode),
   ],
 );
+
+// ==================== Notification System ====================
+
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: text('id').primaryKey(),
+    recipientId: text('recipient_id')
+      .notNull()
+      .references(() => userAccounts.id, { onDelete: 'cascade' }),
+    type: text('type').notNull(),
+    title: text('title').notNull(),
+    content: text('content').notNull(),
+    relatedType: text('related_type'),
+    relatedId: text('related_id'),
+    isRead: boolean('is_read').notNull().default(false),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_notifications_recipient').on(table.recipientId),
+    index('idx_notifications_unread').on(table.recipientId, table.isRead),
+  ],
+);
