@@ -67,6 +67,7 @@ const managerMenus: MenuGroup[] = [
       { label: "企业管理", href: "/manager/enterprises", icon: Building2 },
       { label: "批次管理", href: "/manager/batches", icon: Layers },
       { label: "项目管理", href: "/manager/projects", icon: ClipboardCheck },
+      { label: "业务类型", href: "/manager/business-types", icon: Settings },
     ],
   },
   {

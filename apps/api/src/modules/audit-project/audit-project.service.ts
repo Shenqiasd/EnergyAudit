@@ -19,6 +19,7 @@ export interface AuditProjectListQuery {
   status?: string;
   enterpriseId?: string;
   enterpriseName?: string;
+  businessType?: string;
 }
 
 export interface TransitionDto {
@@ -48,6 +49,9 @@ export class AuditProjectService {
     if (query.enterpriseId) {
       conditions.push(eq(schema.auditProjects.enterpriseId, query.enterpriseId));
     }
+    if (query.businessType) {
+      conditions.push(eq(schema.auditProjects.businessType, query.businessType));
+    }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -58,6 +62,7 @@ export class AuditProjectService {
           enterpriseId: schema.auditProjects.enterpriseId,
           batchId: schema.auditProjects.batchId,
           status: schema.auditProjects.status,
+          businessType: schema.auditProjects.businessType,
           templateVersionId: schema.auditProjects.templateVersionId,
           deadline: schema.auditProjects.deadline,
           isOverdue: schema.auditProjects.isOverdue,
@@ -108,6 +113,7 @@ export class AuditProjectService {
         enterpriseId: schema.auditProjects.enterpriseId,
         batchId: schema.auditProjects.batchId,
         status: schema.auditProjects.status,
+        businessType: schema.auditProjects.businessType,
         templateVersionId: schema.auditProjects.templateVersionId,
         deadline: schema.auditProjects.deadline,
         isOverdue: schema.auditProjects.isOverdue,

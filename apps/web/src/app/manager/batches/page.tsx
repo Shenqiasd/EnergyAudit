@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Layers, Plus } from "lucide-react";
 import { useAuditBatches, useCreateBatch } from "@/lib/api/hooks/use-audit-batches";
+import { useBusinessTypes } from "@/lib/api/hooks/use-business-types";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api/client";
@@ -34,9 +35,15 @@ const statusMap: Record<string, { label: string; variant: "default" | "primary" 
   closed: { label: "已关闭", variant: "danger" },
 };
 
+const businessTypeLabels: Record<string, string> = {
+  energy_audit: "能源审计",
+  energy_diagnosis: "节能诊断",
+};
+
 export default function ManagerBatchesPage() {
   const router = useRouter();
   const [yearFilter, setYearFilter] = useState<number | undefined>();
+  const [businessTypeFilter, setBusinessTypeFilter] = useState<string | undefined>();
   const [showCreate, setShowCreate] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -45,9 +52,11 @@ export default function ManagerBatchesPage() {
     description: "",
     filingDeadline: "",
     reviewDeadline: "",
+    businessType: "energy_audit",
   });
 
-  const { data, isLoading } = useAuditBatches({ year: yearFilter });
+  const { data, isLoading } = useAuditBatches({ year: yearFilter, businessType: businessTypeFilter });
+  const { data: businessTypes } = useBusinessTypes();
   const createBatch = useCreateBatch();
   const queryClient = useQueryClient();
   const closeBatch = useMutation({
@@ -65,9 +74,10 @@ export default function ManagerBatchesPage() {
       description: formData.description || undefined,
       filingDeadline: formData.filingDeadline || undefined,
       reviewDeadline: formData.reviewDeadline || undefined,
+      businessType: formData.businessType,
     });
     setShowCreate(false);
-    setFormData({ name: "", year: currentYear, description: "", filingDeadline: "", reviewDeadline: "" });
+    setFormData({ name: "", year: currentYear, description: "", filingDeadline: "", reviewDeadline: "", businessType: "energy_audit" });
   };
 
   const handleClose = async (id: string) => {
@@ -102,12 +112,27 @@ export default function ManagerBatchesPage() {
               批次列表
             </span>
           </CardTitle>
-          <div className="w-48">
-            <Select
-              options={[{ value: "", label: "全部年度" }, ...yearOptions]}
-              value={yearFilter ? String(yearFilter) : ""}
-              onChange={(e) => setYearFilter(e.target.value ? Number(e.target.value) : undefined)}
-            />
+          <div className="flex items-center gap-3">
+            <div className="w-48">
+              <Select
+                options={[{ value: "", label: "全部年度" }, ...yearOptions]}
+                value={yearFilter ? String(yearFilter) : ""}
+                onChange={(e) => setYearFilter(e.target.value ? Number(e.target.value) : undefined)}
+              />
+            </div>
+            <div className="w-48">
+              <Select
+                options={[
+                  { value: "", label: "全部业务类型" },
+                  ...(businessTypes?.map((bt) => ({ value: bt.businessType, label: bt.label })) ?? [
+                    { value: "energy_audit", label: "能源审计" },
+                    { value: "energy_diagnosis", label: "节能诊断" },
+                  ]),
+                ]}
+                value={businessTypeFilter ?? ""}
+                onChange={(e) => setBusinessTypeFilter(e.target.value || undefined)}
+              />
+            </div>
           </div>
         </CardHeader>
 
@@ -118,6 +143,7 @@ export default function ManagerBatchesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>批次名称</TableHead>
+                <TableHead>业务类型</TableHead>
                 <TableHead>年度</TableHead>
                 <TableHead>填报截止日期</TableHead>
                 <TableHead>审核截止日期</TableHead>
@@ -132,6 +158,11 @@ export default function ManagerBatchesPage() {
                 return (
                   <TableRow key={batch.id}>
                     <TableCell className="font-medium">{batch.name}</TableCell>
+                    <TableCell>
+                      <Badge variant="primary">
+                        {businessTypeLabels[batch.businessType ?? "energy_audit"] ?? batch.businessType ?? "能源审计"}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{batch.year}</TableCell>
                     <TableCell>{formatDate(batch.filingDeadline)}</TableCell>
                     <TableCell>{formatDate(batch.reviewDeadline)}</TableCell>
@@ -164,7 +195,7 @@ export default function ManagerBatchesPage() {
               })}
               {(!data?.items || data.items.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-[var(--color-text-secondary)]">
+                  <TableCell colSpan={8} className="text-center text-[var(--color-text-secondary)]">
                     暂无批次数据
                   </TableCell>
                 </TableRow>
@@ -187,6 +218,17 @@ export default function ManagerBatchesPage() {
             options={yearOptions}
             value={String(formData.year)}
             onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+          />
+          <Select
+            label="业务类型"
+            options={[
+              ...(businessTypes?.map((bt) => ({ value: bt.businessType, label: bt.label })) ?? [
+                { value: "energy_audit", label: "能源审计" },
+                { value: "energy_diagnosis", label: "节能诊断" },
+              ]),
+            ]}
+            value={formData.businessType}
+            onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
           />
           <Input
             label="描述"

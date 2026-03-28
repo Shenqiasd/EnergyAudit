@@ -1,3 +1,17 @@
+// Module visibility (from platform-merge)
+export {
+  getVisibleModules,
+  isModuleVisible,
+  isModuleRequired,
+  getModuleOrder,
+} from './module-visibility';
+
+export type {
+  ModuleVisibility,
+  ModuleVisibilityStore,
+} from './module-visibility';
+
+// Module config (from data-collection)
 export {
   getModuleCategories,
   filterModulesByCategory,

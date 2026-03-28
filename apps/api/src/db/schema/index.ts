@@ -182,6 +182,7 @@ export const auditBatches = pgTable('audit_batches', {
   name: text('name').notNull(),
   year: integer('year').notNull(),
   status: text('status').notNull().default('draft'),
+  businessType: text('business_type').notNull().default('energy_audit'),
   templateVersionId: text('template_version_id').references(
     () => templateVersions.id,
     { onDelete: 'set null' },
@@ -207,6 +208,7 @@ export const auditProjects = pgTable(
       .notNull()
       .references(() => auditBatches.id, { onDelete: 'cascade' }),
     status: text('status').notNull().default('pending_start'),
+    businessType: text('business_type').notNull().default('energy_audit'),
     templateVersionId: text('template_version_id').references(
       () => templateVersions.id,
       { onDelete: 'set null' },
@@ -541,6 +543,38 @@ export const rectificationProgress = pgTable('rectification_progress', {
     .notNull()
     .references(() => userAccounts.id, { onDelete: 'restrict' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ==================== Business Type & Module Visibility ====================
+
+export const moduleVisibility = pgTable(
+  'module_visibility',
+  {
+    id: text('id').primaryKey(),
+    businessType: text('business_type').notNull(),
+    moduleCode: text('module_code').notNull(),
+    isVisible: boolean('is_visible').notNull().default(true),
+    isRequired: boolean('is_required').notNull().default(false),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique().on(table.businessType, table.moduleCode),
+    index('idx_module_visibility_business_type').on(table.businessType),
+  ],
+);
+
+export const businessTypeConfig = pgTable('business_type_config', {
+  id: text('id').primaryKey(),
+  businessType: text('business_type').notNull().unique(),
+  label: text('label').notNull(),
+  description: text('description'),
+  defaultTemplateId: text('default_template_id'),
+  reportTemplateId: text('report_template_id'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ==================== Enterprise Admission & Sync Logs ====================
