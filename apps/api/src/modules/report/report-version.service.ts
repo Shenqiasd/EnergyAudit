@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -53,50 +53,50 @@ export class ReportVersionService {
     const versionNumber = existingVersions.length + 1;
     const versionId = `rv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-    // Deactivate all existing versions
-    await this.db
-      .update(schema.reportVersions)
-      .set({ isActive: false })
-      .where(eq(schema.reportVersions.reportId, reportId));
+    await this.db.transaction(async (tx) => {
+      // Deactivate all existing versions
+      await tx
+        .update(schema.reportVersions)
+        .set({ isActive: false })
+        .where(eq(schema.reportVersions.reportId, reportId));
 
-    // Create the new version
-    await this.db.insert(schema.reportVersions).values({
-      id: versionId,
-      reportId,
-      versionType,
-      versionNumber,
-      isActive: true,
-      fileUrl: fileUrl ?? null,
-      createdBy: createdBy ?? null,
-    });
-
-    // Snapshot current report sections into this version
-    const currentSections = await this.db
-      .select()
-      .from(schema.reportSections)
-      .where(
-        and(
-          eq(schema.reportSections.reportId, reportId),
-          // Only snapshot sections without a version (current sections)
-        ),
-      )
-      .orderBy(schema.reportSections.sortOrder);
-
-    for (const section of currentSections) {
-      if (section.reportVersionId) continue; // Already belongs to a version snapshot
-
-      const snapshotId = `rs_snap_${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${section.sortOrder}`;
-      await this.db.insert(schema.reportSections).values({
-        id: snapshotId,
+      // Create the new version
+      await tx.insert(schema.reportVersions).values({
+        id: versionId,
         reportId,
-        reportVersionId: versionId,
-        sectionCode: section.sectionCode,
-        sectionName: section.sectionName,
-        sortOrder: section.sortOrder,
-        content: section.content,
-        charts: section.charts,
+        versionType,
+        versionNumber,
+        isActive: true,
+        fileUrl: fileUrl ?? null,
+        createdBy: createdBy ?? null,
       });
-    }
+
+      // Snapshot current report sections into this version
+      const currentSections = await tx
+        .select()
+        .from(schema.reportSections)
+        .where(
+          and(
+            eq(schema.reportSections.reportId, reportId),
+            isNull(schema.reportSections.reportVersionId),
+          ),
+        )
+        .orderBy(schema.reportSections.sortOrder);
+
+      for (const section of currentSections) {
+        const snapshotId = `rs_snap_${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${section.sortOrder}`;
+        await tx.insert(schema.reportSections).values({
+          id: snapshotId,
+          reportId,
+          reportVersionId: versionId,
+          sectionCode: section.sectionCode,
+          sectionName: section.sectionName,
+          sortOrder: section.sortOrder,
+          content: section.content,
+          charts: section.charts,
+        });
+      }
+    });
 
     return { id: versionId, versionType, versionNumber, isActive: true };
   }
@@ -180,17 +180,19 @@ export class ReportVersionService {
       throw new HttpException('版本不存在或不属于该报告', HttpStatus.NOT_FOUND);
     }
 
-    // Deactivate all versions for this report
-    await this.db
-      .update(schema.reportVersions)
-      .set({ isActive: false })
-      .where(eq(schema.reportVersions.reportId, reportId));
+    await this.db.transaction(async (tx) => {
+      // Deactivate all versions for this report
+      await tx
+        .update(schema.reportVersions)
+        .set({ isActive: false })
+        .where(eq(schema.reportVersions.reportId, reportId));
 
-    // Activate the specified version
-    await this.db
-      .update(schema.reportVersions)
-      .set({ isActive: true })
-      .where(eq(schema.reportVersions.id, versionId));
+      // Activate the specified version
+      await tx
+        .update(schema.reportVersions)
+        .set({ isActive: true })
+        .where(eq(schema.reportVersions.id, versionId));
+    });
 
     return { reportId, versionId, isActive: true };
   }
