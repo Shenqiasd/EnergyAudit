@@ -88,25 +88,28 @@ export class ExternalBindingService {
           externalId: binding.externalId,
         });
 
-        await this.db
-          .update(schema.enterpriseExternalBindings)
-          .set({
-            syncStatus: 'synced',
-            lastSyncedAt: now,
-            lastSuccessfulSnapshot: snapshot,
-            updatedAt: now,
-          })
-          .where(eq(schema.enterpriseExternalBindings.id, binding.id));
+        // Wrap update + log insert in a transaction for atomicity
+        await this.db.transaction(async (tx) => {
+          await tx
+            .update(schema.enterpriseExternalBindings)
+            .set({
+              syncStatus: 'synced',
+              lastSyncedAt: now,
+              lastSuccessfulSnapshot: snapshot,
+              updatedAt: now,
+            })
+            .where(eq(schema.enterpriseExternalBindings.id, binding.id));
 
-        await this.db.insert(schema.syncLogs).values({
-          id: logId,
-          enterpriseId,
-          bindingId: binding.id,
-          syncType: 'manual',
-          status: 'success',
-          responsePayload: snapshot,
-          startedAt: now,
-          completedAt: new Date(),
+          await tx.insert(schema.syncLogs).values({
+            id: logId,
+            enterpriseId,
+            bindingId: binding.id,
+            syncType: 'manual',
+            status: 'success',
+            responsePayload: snapshot,
+            startedAt: now,
+            completedAt: new Date(),
+          });
         });
 
         results.push({
@@ -116,23 +119,23 @@ export class ExternalBindingService {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-        if (binding.lastSuccessfulSnapshot) {
-          await this.db
-            .update(schema.enterpriseExternalBindings)
-            .set({
-              syncStatus: 'degraded',
-              updatedAt: now,
-            })
-            .where(eq(schema.enterpriseExternalBindings.id, binding.id));
-        } else {
-          await this.db
-            .update(schema.enterpriseExternalBindings)
-            .set({
-              syncStatus: 'failed',
-              updatedAt: now,
-            })
-            .where(eq(schema.enterpriseExternalBindings.id, binding.id));
-        }
+        // Re-query the current binding state to avoid stale data in degraded/failed decision
+        const [currentBinding] = await this.db
+          .select()
+          .from(schema.enterpriseExternalBindings)
+          .where(eq(schema.enterpriseExternalBindings.id, binding.id))
+          .limit(1);
+
+        const hasPriorSnapshot = currentBinding?.lastSuccessfulSnapshot != null;
+        const failStatus = hasPriorSnapshot ? 'degraded' : 'failed';
+
+        await this.db
+          .update(schema.enterpriseExternalBindings)
+          .set({
+            syncStatus: failStatus,
+            updatedAt: now,
+          })
+          .where(eq(schema.enterpriseExternalBindings.id, binding.id));
 
         await this.db.insert(schema.syncLogs).values({
           id: logId,
@@ -147,7 +150,7 @@ export class ExternalBindingService {
 
         results.push({
           bindingId: binding.id,
-          status: binding.lastSuccessfulSnapshot ? 'degraded' : 'failed',
+          status: failStatus,
           error: errorMessage,
         });
       }

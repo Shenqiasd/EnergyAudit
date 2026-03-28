@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -79,38 +79,54 @@ export class AdmissionService {
 
     const toStatus = transitions[action];
 
-    await this.db
-      .update(schema.enterprises)
-      .set({
-        admissionStatus: toStatus,
-        updatedAt: new Date(),
-      })
-      .where(eq(schema.enterprises.id, enterpriseId));
+    await this.db.transaction(async (tx) => {
+      // Use optimistic locking: include current status in WHERE to prevent race conditions
+      const updated = await tx
+        .update(schema.enterprises)
+        .set({
+          admissionStatus: toStatus,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(schema.enterprises.id, enterpriseId),
+            eq(schema.enterprises.admissionStatus, currentStatus),
+          ),
+        )
+        .returning();
 
-    const applicationId = `app_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await this.db.insert(schema.enterpriseApplications).values({
-      id: applicationId,
-      enterpriseId,
-      action,
-      fromStatus: currentStatus,
-      toStatus,
-      reason: reason ?? null,
-      operatedBy,
-    });
+      if (updated.length === 0) {
+        throw new HttpException(
+          '状态已被其他操作修改，请刷新后重试',
+          HttpStatus.CONFLICT,
+        );
+      }
 
-    const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await this.db.insert(schema.auditLogs).values({
-      id: logId,
-      userId: operatedBy,
-      userRole: 'manager',
-      action: `admission_${action}`,
-      targetType: 'enterprise',
-      targetId: enterpriseId,
-      detail: JSON.stringify({
+      const applicationId = `app_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await tx.insert(schema.enterpriseApplications).values({
+        id: applicationId,
+        enterpriseId,
+        action,
         fromStatus: currentStatus,
         toStatus,
-        reason,
-      }),
+        reason: reason ?? null,
+        operatedBy,
+      });
+
+      const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await tx.insert(schema.auditLogs).values({
+        id: logId,
+        userId: operatedBy,
+        userRole: 'manager',
+        action: `admission_${action}`,
+        targetType: 'enterprise',
+        targetId: enterpriseId,
+        detail: JSON.stringify({
+          fromStatus: currentStatus,
+          toStatus,
+          reason,
+        }),
+      });
     });
 
     return {
