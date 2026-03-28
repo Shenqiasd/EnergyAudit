@@ -8,6 +8,7 @@ interface AuditBatch {
   name: string;
   year: number;
   status: string;
+  businessType?: string;
   templateVersionId: string | null;
   description: string | null;
   filingDeadline: string | null;
@@ -39,6 +40,7 @@ interface BatchListParams {
   pageSize?: number;
   year?: number;
   status?: string;
+  businessType?: string;
 }
 
 interface CreateBatchInput {
@@ -49,6 +51,7 @@ interface CreateBatchInput {
   reviewDeadline?: string;
   templateVersionId?: string;
   createdBy?: string;
+  businessType?: string;
 }
 
 interface UpdateBatchInput {
@@ -73,6 +76,7 @@ export function useAuditBatches(params: BatchListParams = {}) {
   if (params.pageSize) queryParams.pageSize = String(params.pageSize);
   if (params.year) queryParams.year = String(params.year);
   if (params.status) queryParams.status = params.status;
+  if (params.businessType) queryParams.businessType = params.businessType;
 
   return useQuery<BatchListResponse>({
     queryKey: ["audit-batches", params],

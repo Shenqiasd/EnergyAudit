@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { DatabaseModule } from './db/database.module';
 import { AttachmentModule } from './modules/attachment/attachment.module';
+import { BusinessTypeModule } from './modules/business-type/business-type.module';
 import { AuditBatchModule } from './modules/audit-batch/audit-batch.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { AuditProjectModule } from './modules/audit-project/audit-project.module';
@@ -27,6 +28,7 @@ import { UserModule } from './modules/user/user.module';
     JobsModule,
     AuditLogModule,
     AttachmentModule,
+    BusinessTypeModule,
   ],
 })
 export class AppModule {}

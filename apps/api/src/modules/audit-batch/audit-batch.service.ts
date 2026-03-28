@@ -14,6 +14,7 @@ export interface CreateBatchDto {
   reviewDeadline?: string;
   templateVersionId?: string;
   createdBy?: string;
+  businessType?: string;
 }
 
 export interface UpdateBatchDto {
@@ -28,6 +29,7 @@ export interface BatchListQuery {
   pageSize?: number;
   year?: number;
   status?: string;
+  businessType?: string;
 }
 
 export interface AssignEnterprisesDto {
@@ -50,6 +52,7 @@ export class AuditBatchService {
         name: dto.name,
         year: dto.year,
         status: 'draft',
+        businessType: dto.businessType ?? 'energy_audit',
         description: dto.description ?? null,
         filingDeadline: dto.filingDeadline ? new Date(dto.filingDeadline) : null,
         reviewDeadline: dto.reviewDeadline ? new Date(dto.reviewDeadline) : null,
@@ -72,6 +75,9 @@ export class AuditBatchService {
     }
     if (query.status) {
       conditions.push(eq(schema.auditBatches.status, query.status));
+    }
+    if (query.businessType) {
+      conditions.push(eq(schema.auditBatches.businessType, query.businessType));
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
@@ -213,6 +219,7 @@ export class AuditBatchService {
         enterpriseId,
         batchId,
         status: 'pending_start',
+        businessType: batch.businessType ?? 'energy_audit',
         templateVersionId: batch.templateVersionId ?? null,
         deadline: batch.filingDeadline ?? null,
         isOverdue: false,
