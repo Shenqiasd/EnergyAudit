@@ -721,10 +721,12 @@ async function seed() {
 // ---------------------------------------------------------------------------
 
 seed()
-  .then(() => {
+  .then(async () => {
+    await sql.end();
     process.exit(0);
   })
-  .catch((error: unknown) => {
+  .catch(async (error: unknown) => {
     console.error('种子数据插入失败:', error);
+    await sql.end();
     process.exit(1);
   });
