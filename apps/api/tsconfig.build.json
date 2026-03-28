@@ -3,7 +3,9 @@
   "compilerOptions": {
     "noEmit": false,
     "outDir": "./dist",
-    "declaration": true
+    "declaration": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node"
   },
   "exclude": ["node_modules", "dist", "tests"]
 }

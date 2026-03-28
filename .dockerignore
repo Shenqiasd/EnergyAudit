@@ -1,0 +1,12 @@
+**/node_modules
+**/.turbo
+**/.next
+**/dist
+**/coverage
+.git
+.gitignore
+.env
+.env.*
+*.md
+docs
+.DS_Store
