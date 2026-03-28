@@ -19,6 +19,11 @@ COPY --from=deps /app/packages/domain/node_modules ./packages/domain/node_module
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules 2>/dev/null || true
 COPY . .
 
+# INTERNAL_API_URL is used in next.config.ts rewrites and baked at build time.
+# Railway sets this as a build-time variable; defaults to localhost for local dev.
+ARG INTERNAL_API_URL=http://localhost:3001
+ENV INTERNAL_API_URL=${INTERNAL_API_URL}
+
 # Build Next.js (standalone output)
 RUN pnpm --filter @energy-audit/web run build
 
@@ -38,4 +43,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
+# Note: Railway injects INTERNAL_API_URL as a build arg via service variables.
+# The rewrite destination is baked into the Next.js build manifest at build time.
 CMD ["node", "apps/web/server.js"]
