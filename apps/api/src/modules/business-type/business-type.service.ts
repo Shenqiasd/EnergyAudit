@@ -131,24 +131,26 @@ export class BusinessTypeService {
       throw new HttpException('业务类型不存在', HttpStatus.NOT_FOUND);
     }
 
-    // Delete existing visibility records for this business type
-    await this.db
-      .delete(schema.moduleVisibility)
-      .where(eq(schema.moduleVisibility.businessType, businessType));
+    await this.db.transaction(async (tx) => {
+      // Delete existing visibility records for this business type
+      await tx
+        .delete(schema.moduleVisibility)
+        .where(eq(schema.moduleVisibility.businessType, businessType));
 
-    // Insert new visibility records
-    if (modules.length > 0) {
-      const values = modules.map((m, idx) => ({
-        id: `mv_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 8)}`,
-        businessType,
-        moduleCode: m.moduleCode,
-        isVisible: m.isVisible,
-        isRequired: m.isRequired,
-        sortOrder: m.sortOrder,
-      }));
+      // Insert new visibility records
+      if (modules.length > 0) {
+        const values = modules.map((m, idx) => ({
+          id: `mv_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 8)}`,
+          businessType,
+          moduleCode: m.moduleCode,
+          isVisible: m.isVisible,
+          isRequired: m.isRequired,
+          sortOrder: m.sortOrder,
+        }));
 
-      await this.db.insert(schema.moduleVisibility).values(values);
-    }
+        await tx.insert(schema.moduleVisibility).values(values);
+      }
+    });
 
     return this.getModuleVisibility(businessType);
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -314,22 +314,22 @@ function ModuleVisibilityModal({
   );
 
   // Sync with server data when loaded
-  const [initialized, setInitialized] = useState(false);
-  if (currentVisibility && currentVisibility.length > 0 && !initialized) {
-    const serverModules = AVAILABLE_MODULES.map((m, idx) => {
-      const existing = currentVisibility.find(
-        (v) => v.moduleCode === m.code,
-      );
-      return {
-        moduleCode: m.code,
-        isVisible: existing ? existing.isVisible : true,
-        isRequired: existing ? existing.isRequired : false,
-        sortOrder: existing ? existing.sortOrder : idx,
-      };
-    });
-    setModules(serverModules);
-    setInitialized(true);
-  }
+  useEffect(() => {
+    if (currentVisibility && currentVisibility.length > 0) {
+      const serverModules = AVAILABLE_MODULES.map((m, idx) => {
+        const existing = currentVisibility.find(
+          (v) => v.moduleCode === m.code,
+        );
+        return {
+          moduleCode: m.code,
+          isVisible: existing ? existing.isVisible : true,
+          isRequired: existing ? existing.isRequired : false,
+          sortOrder: existing ? existing.sortOrder : idx,
+        };
+      });
+      setModules(serverModules);
+    }
+  }, [currentVisibility]);
 
   const toggleVisible = (moduleCode: string) => {
     setModules((prev) =>

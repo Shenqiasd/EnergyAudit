@@ -555,8 +555,8 @@ export const moduleVisibility = pgTable(
     isVisible: boolean('is_visible').notNull().default(true),
     isRequired: boolean('is_required').notNull().default(false),
     sortOrder: integer('sort_order').notNull().default(0),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
     unique().on(table.businessType, table.moduleCode),
@@ -572,8 +572,8 @@ export const businessTypeConfig = pgTable('business_type_config', {
   defaultTemplateId: text('default_template_id'),
   reportTemplateId: text('report_template_id'),
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ==================== Enterprise Admission & Sync Logs ====================

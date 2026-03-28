@@ -24,22 +24,9 @@ export class BusinessTypeController {
     return this.businessTypeService.getBusinessTypes();
   }
 
-  @Get(':type')
-  async getBusinessType(@Param('type') type: string) {
-    return this.businessTypeService.getBusinessType(type);
-  }
-
   @Post()
   async createBusinessType(@Body() dto: CreateBusinessTypeDto) {
     return this.businessTypeService.createBusinessType(dto);
-  }
-
-  @Put(':type')
-  async updateBusinessType(
-    @Param('type') type: string,
-    @Body() dto: UpdateBusinessTypeDto,
-  ) {
-    return this.businessTypeService.updateBusinessType(type, dto);
   }
 
   @Get(':type/modules')
@@ -53,5 +40,18 @@ export class BusinessTypeController {
     @Body() modules: ModuleVisibilityDto[],
   ) {
     return this.businessTypeService.setModuleVisibility(type, modules);
+  }
+
+  @Get(':type')
+  async getBusinessType(@Param('type') type: string) {
+    return this.businessTypeService.getBusinessType(type);
+  }
+
+  @Put(':type')
+  async updateBusinessType(
+    @Param('type') type: string,
+    @Body() dto: UpdateBusinessTypeDto,
+  ) {
+    return this.businessTypeService.updateBusinessType(type, dto);
   }
 }
