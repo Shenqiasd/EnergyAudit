@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiClient } from "../client";
+import { apiClient, getAuthHeaders } from "../client";
 
 interface EnterpriseLedgerItem {
   enterpriseId: string;
@@ -134,7 +134,7 @@ export function useExportLedger(type: "enterprise" | "review" | "rectification")
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
       const url = `${baseUrl}/ledgers/${type}/export${queryString ? `?${queryString}` : ""}`;
 
-      const response = await fetch(url);
+      const response = await fetch(url, { headers: getAuthHeaders() });
       if (!response.ok) {
         throw new Error("导出失败");
       }

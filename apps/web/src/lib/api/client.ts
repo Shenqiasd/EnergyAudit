@@ -102,5 +102,5 @@ export const apiClient = {
     request<T>("DELETE", path, undefined, options),
 };
 
-export { ApiClientError };
+export { ApiClientError, getAuthHeaders };
 export type { ApiError };

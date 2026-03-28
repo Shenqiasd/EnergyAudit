@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, sql, and, desc } from 'drizzle-orm';
+import { eq, sql, and, desc, inArray } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -97,9 +97,7 @@ export class CarbonStatisticsService {
         ? await this.db
             .select({ id: schema.enterprises.id, name: schema.enterprises.name })
             .from(schema.enterprises)
-            .where(
-              sql`${schema.enterprises.id} IN ${enterpriseIds}`,
-            )
+            .where(inArray(schema.enterprises.id, enterpriseIds))
         : [];
 
     const enterpriseNameMap = new Map(enterprises.map((e) => [e.id, e.name]));
