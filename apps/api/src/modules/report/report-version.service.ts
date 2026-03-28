@@ -45,6 +45,7 @@ export class ReportVersionService {
     }
 
     const versionId = `rv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    let versionNumber = 0;
 
     await this.db.transaction(async (tx) => {
       // Get next version number inside transaction
@@ -53,7 +54,7 @@ export class ReportVersionService {
         .from(schema.reportVersions)
         .where(eq(schema.reportVersions.reportId, reportId));
 
-      const versionNumber = existingVersions.length + 1;
+      versionNumber = existingVersions.length + 1;
 
       // Deactivate all existing versions
       await tx

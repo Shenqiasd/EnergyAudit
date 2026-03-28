@@ -211,6 +211,7 @@ export function useReturnRecord(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
       void queryClient.invalidateQueries({ queryKey: ["data-records"] });
+      void queryClient.invalidateQueries({ queryKey: ["data-modules"] });
     },
   });
 }
