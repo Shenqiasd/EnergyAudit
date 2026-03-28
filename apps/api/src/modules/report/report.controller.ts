@@ -8,12 +8,14 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { JobRunner } from '../jobs/job-runner';
 import { ReportAssemblyService } from './report-assembly.service';
 import { ReportService } from './report.service';
 
 import type { ReportListQuery } from './report.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller('reports')
 export class ReportController {
   constructor(

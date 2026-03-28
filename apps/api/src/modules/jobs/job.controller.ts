@@ -1,9 +1,11 @@
 import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { JobRunner } from './job-runner';
 
 import type { JobStatus, JobType } from './job-runner';
 
+@Roles('manager')
 @Controller('jobs')
 export class JobController {
   constructor(private readonly jobRunner: JobRunner) {}

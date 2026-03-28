@@ -22,11 +22,13 @@ import { UserModule } from './modules/user/user.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    AuthModule,
     HealthModule,
     EnterpriseModule,
     UserModule,

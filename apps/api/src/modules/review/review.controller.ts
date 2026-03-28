@@ -8,6 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { ReviewTaskService } from './review-task.service';
 import { ReviewScoreService } from './review-score.service';
 import { ReviewIssueService } from './review-issue.service';
@@ -16,6 +17,7 @@ import type { ReviewTaskListQuery, CreateReviewTaskInput } from './review-task.s
 import type { ScoreInput } from './review-score.service';
 import type { CreateIssueInput } from './review-issue.service';
 
+@Roles('reviewer', 'manager')
 @Controller('reviews')
 export class ReviewController {
   constructor(

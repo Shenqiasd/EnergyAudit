@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { ChartService } from './chart.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller('charts')
 export class ChartController {
   constructor(private readonly chartService: ChartService) {}

@@ -171,6 +171,9 @@ export const userAccounts = pgTable('user_accounts', {
   role: text('role').notNull(),
   status: text('status').notNull().default('active'),
   externalIdentityId: text('external_identity_id'),
+  passwordHash: text('password_hash'),
+  refreshToken: text('refresh_token'),
+  lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
