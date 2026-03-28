@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-import { DRIZZLE } from './database.module';
+import { DRIZZLE } from './db.constants';
 import * as schema from './schema';
 
 import type { Provider } from '@nestjs/common';
