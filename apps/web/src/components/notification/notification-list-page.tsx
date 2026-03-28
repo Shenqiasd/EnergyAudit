@@ -7,7 +7,6 @@ import {
   Bell,
   CheckCircle2,
   ClipboardCheck,
-  FileText,
   Info,
   Trash2,
   Wrench,

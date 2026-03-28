@@ -12,7 +12,6 @@ import {
   Bell,
   CheckCircle2,
   ClipboardCheck,
-  FileText,
   Info,
   Wrench,
 } from "lucide-react";
