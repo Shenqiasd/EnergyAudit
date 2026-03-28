@@ -8,4 +8,4 @@ ALTER TABLE data_records ADD COLUMN returned_at TIMESTAMPTZ;
 ALTER TABLE report_versions ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT false;
 
 -- Add report_version_id to report_sections for version-specific snapshots
-ALTER TABLE report_sections ADD COLUMN report_version_id TEXT REFERENCES report_versions(id) ON DELETE SET NULL;
+ALTER TABLE report_sections ADD COLUMN report_version_id TEXT REFERENCES report_versions(id) ON DELETE CASCADE;

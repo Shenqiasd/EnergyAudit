@@ -44,16 +44,17 @@ export class ReportVersionService {
       throw new HttpException('报告不存在', HttpStatus.NOT_FOUND);
     }
 
-    // Get next version number
-    const existingVersions = await this.db
-      .select()
-      .from(schema.reportVersions)
-      .where(eq(schema.reportVersions.reportId, reportId));
-
-    const versionNumber = existingVersions.length + 1;
     const versionId = `rv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
     await this.db.transaction(async (tx) => {
+      // Get next version number inside transaction
+      const existingVersions = await tx
+        .select()
+        .from(schema.reportVersions)
+        .where(eq(schema.reportVersions.reportId, reportId));
+
+      const versionNumber = existingVersions.length + 1;
+
       // Deactivate all existing versions
       await tx
         .update(schema.reportVersions)
@@ -109,15 +110,20 @@ export class ReportVersionService {
       .orderBy(desc(schema.reportVersions.versionNumber));
   }
 
-  async getVersion(versionId: string) {
+  async getVersion(versionId: string, reportId?: string) {
+    const conditions = [eq(schema.reportVersions.id, versionId)];
+    if (reportId) {
+      conditions.push(eq(schema.reportVersions.reportId, reportId));
+    }
+
     const [version] = await this.db
       .select()
       .from(schema.reportVersions)
-      .where(eq(schema.reportVersions.id, versionId))
+      .where(and(...conditions))
       .limit(1);
 
     if (!version) {
-      throw new HttpException('版本不存在', HttpStatus.NOT_FOUND);
+      throw new HttpException('版本不存在或不属于该报告', HttpStatus.NOT_FOUND);
     }
 
     const sections = await this.db
@@ -129,10 +135,10 @@ export class ReportVersionService {
     return { ...version, sections };
   }
 
-  async compareVersions(versionId1: string, versionId2: string) {
+  async compareVersions(versionId1: string, versionId2: string, reportId?: string) {
     const [v1, v2] = await Promise.all([
-      this.getVersion(versionId1),
-      this.getVersion(versionId2),
+      this.getVersion(versionId1, reportId),
+      this.getVersion(versionId2, reportId),
     ]);
 
     const allSectionCodes = new Set([

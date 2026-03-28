@@ -783,7 +783,7 @@ export const reportSections = pgTable(
     reportId: text('report_id')
       .notNull()
       .references(() => reports.id, { onDelete: 'cascade' }),
-    reportVersionId: text('report_version_id').references(() => reportVersions.id, { onDelete: 'set null' }),
+    reportVersionId: text('report_version_id').references(() => reportVersions.id, { onDelete: 'cascade' }),
     sectionCode: text('section_code').notNull(),
     sectionName: text('section_name').notNull(),
     sortOrder: integer('sort_order').notNull().default(0),

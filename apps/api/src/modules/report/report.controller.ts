@@ -82,19 +82,19 @@ export class ReportController {
 
   @Get(':id/versions/compare')
   async compareVersions(
-    @Param('id') _id: string,
+    @Param('id') id: string,
     @Query('v1') v1: string,
     @Query('v2') v2: string,
   ) {
-    return this.versionService.compareVersions(v1, v2);
+    return this.versionService.compareVersions(v1, v2, id);
   }
 
   @Get(':id/versions/:versionId')
   async getVersion(
-    @Param('id') _id: string,
+    @Param('id') id: string,
     @Param('versionId') versionId: string,
   ) {
-    return this.versionService.getVersion(versionId);
+    return this.versionService.getVersion(versionId, id);
   }
 
   @Get(':id/versions')
