@@ -219,8 +219,18 @@ export class OverdueScannerService {
         const daysRemaining = Math.ceil(
           (batch.deadline.getTime() - now.getTime()) / (24 * 60 * 60 * 1000),
         );
-        // Avoid duplicates if batch already added from filing deadline
-        if (!results.some((r) => r.entityId === batch.id && r.entityType === 'audit_batch')) {
+        // If batch already added from filing deadline, update if review deadline is more urgent
+        const existingIdx = results.findIndex((r) => r.entityId === batch.id && r.entityType === 'audit_batch');
+        if (existingIdx !== -1) {
+          if (daysRemaining < results[existingIdx].daysRemaining) {
+            results[existingIdx] = {
+              entityType: 'audit_batch',
+              entityId: batch.id,
+              deadline: batch.deadline,
+              daysRemaining,
+            };
+          }
+        } else {
           results.push({
             entityType: 'audit_batch',
             entityId: batch.id,
