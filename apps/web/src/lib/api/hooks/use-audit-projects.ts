@@ -139,6 +139,21 @@ export function useRemoveMember(projectId: string) {
   });
 }
 
+export function useExtendProjectDeadline(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { newDeadline: string; reason: string }) =>
+      apiClient.patch<{ id: string; deadline: string; isOverdue: boolean; reason: string }>(
+        `/audit-projects/${id}/extend-deadline`,
+        data,
+      ),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["audit-projects"] });
+      void queryClient.invalidateQueries({ queryKey: ["audit-project", id] });
+    },
+  });
+}
+
 export function useProjectTimeline(id: string) {
   return useQuery<StatusTransition[]>({
     queryKey: ["project-timeline", id],

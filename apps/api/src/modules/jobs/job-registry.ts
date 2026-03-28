@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger, OnModuleInit, forwardRef } from '@nestjs/common';
 
 import { JobRunner } from './job-runner';
+import { OverdueScannerService } from './overdue-scanner.service';
 
 import type { JobHandler, JobType } from './job-runner';
 
@@ -11,6 +12,7 @@ export class JobRegistry implements OnModuleInit {
   constructor(
     @Inject(forwardRef(() => JobRunner))
     private readonly jobRunner: JobRunner,
+    private readonly overdueScanner: OverdueScannerService,
   ) {}
 
   onModuleInit() {
@@ -44,5 +46,10 @@ export class JobRegistry implements OnModuleInit {
     for (const type of defaultTypes) {
       this.register(type, defaultHandler(type));
     }
+
+    // Register overdue scanner job
+    this.register('overdue-scan', async () => {
+      return this.overdueScanner.scanAll();
+    });
   }
 }

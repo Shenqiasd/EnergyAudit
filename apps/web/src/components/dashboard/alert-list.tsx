@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
@@ -11,6 +12,7 @@ interface AlertItem {
   description: string;
   severity: string;
   createdAt: string;
+  relatedId?: string;
 }
 
 interface AlertListProps {
@@ -22,7 +24,28 @@ const typeLabels: Record<string, string> = {
   overdue_project: "项目超期",
   low_score: "评分偏低",
   delayed_rectification: "整改超期",
+  approaching_deadline: "即将到期",
+  overdue_batch: "批次超期",
 };
+
+const alertLinks: Record<string, (id: string) => string> = {
+  overdue_project: (id) => `/manager/projects?highlight=${id}`,
+  delayed_rectification: (id) => `/manager/rectifications?highlight=${id}`,
+  approaching_deadline: (id) => `/manager/projects?highlight=${id}`,
+  overdue_batch: (id) => `/manager/batches/${id}`,
+};
+
+function AlertItemWrapper({ href, children }: { href?: string; children: React.ReactNode }) {
+  const className = "flex items-start gap-3 rounded-lg border border-[var(--color-border)] p-3 transition-colors hover:bg-[var(--color-bg-secondary)]";
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  return <div className={className}>{children}</div>;
+}
 
 export function AlertList({ title, alerts }: AlertListProps) {
   if (alerts.length === 0) {
@@ -45,9 +68,9 @@ export function AlertList({ title, alerts }: AlertListProps) {
       </CardHeader>
       <div className="max-h-80 space-y-3 overflow-y-auto">
         {alerts.map((alert) => (
-          <div
+          <AlertItemWrapper
             key={alert.id}
-            className="flex items-start gap-3 rounded-lg border border-[var(--color-border)] p-3"
+            href={alert.relatedId && alertLinks[alert.type] ? alertLinks[alert.type](alert.relatedId) : undefined}
           >
             <AlertTriangle
               size={16}
@@ -72,7 +95,7 @@ export function AlertList({ title, alerts }: AlertListProps) {
                 {alert.description}
               </p>
             </div>
-          </div>
+          </AlertItemWrapper>
         ))}
       </div>
     </Card>

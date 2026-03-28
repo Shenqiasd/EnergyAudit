@@ -232,6 +232,73 @@ export class AuditBatchService {
     return { created: results, errors };
   }
 
+  async extendDeadline(
+    id: string,
+    body: { newDeadline: string; reason: string; deadlineType?: 'filing' | 'review' },
+  ) {
+    const [batch] = await this.db
+      .select()
+      .from(schema.auditBatches)
+      .where(eq(schema.auditBatches.id, id))
+      .limit(1);
+
+    if (!batch) {
+      throw new HttpException('批次不存在', HttpStatus.NOT_FOUND);
+    }
+
+    const deadline = new Date(body.newDeadline);
+    const now = new Date();
+    const deadlineType = body.deadlineType ?? 'filing';
+
+    const updateData: Record<string, unknown> = { updatedAt: now };
+    if (deadlineType === 'filing') {
+      updateData.filingDeadline = deadline;
+    } else {
+      updateData.reviewDeadline = deadline;
+    }
+
+    // If new deadline is in the future, reset overdue status
+    if (deadline > now) {
+      // Check if both deadlines are now in future
+      const otherDeadline = deadlineType === 'filing' ? batch.reviewDeadline : batch.filingDeadline;
+      if (!otherDeadline || otherDeadline > now) {
+        updateData.isOverdue = false;
+      }
+    }
+
+    await this.db
+      .update(schema.auditBatches)
+      .set(updateData)
+      .where(eq(schema.auditBatches.id, id));
+
+    // Record in audit logs
+    const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await this.db.insert(schema.auditLogs).values({
+      id: logId,
+      userId: 'system',
+      userRole: 'manager',
+      action: 'extend_deadline',
+      targetType: 'audit_batch',
+      targetId: id,
+      detail: JSON.stringify({
+        deadlineType,
+        oldDeadline: deadlineType === 'filing'
+          ? batch.filingDeadline?.toISOString() ?? null
+          : batch.reviewDeadline?.toISOString() ?? null,
+        newDeadline: deadline.toISOString(),
+        reason: body.reason,
+      }),
+    });
+
+    const [updated] = await this.db
+      .select()
+      .from(schema.auditBatches)
+      .where(eq(schema.auditBatches.id, id))
+      .limit(1);
+
+    return updated;
+  }
+
   async close(id: string) {
     const [batch] = await this.db
       .select()

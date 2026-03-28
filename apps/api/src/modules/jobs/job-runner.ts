@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-export type JobType = 'enterprise-sync' | 'report-generation' | 'batch-import' | 'batch-assignment';
+export type JobType = 'enterprise-sync' | 'report-generation' | 'batch-import' | 'batch-assignment' | 'overdue-scan';
 export type JobStatus = 'queued' | 'processing' | 'completed' | 'failed';
 
 export interface JobPayload {

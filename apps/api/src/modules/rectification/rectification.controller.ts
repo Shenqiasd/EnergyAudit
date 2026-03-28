@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -85,5 +86,13 @@ export class RectificationController {
   @Put(':id/close')
   async closeTask(@Param('id') id: string) {
     return this.rectificationService.closeTask(id);
+  }
+
+  @Patch(':id/extend-deadline')
+  async extendDeadline(
+    @Param('id') id: string,
+    @Body() body: { newDeadline: string; reason: string },
+  ) {
+    return this.rectificationService.extendDeadline(id, body.newDeadline, body.reason);
   }
 }

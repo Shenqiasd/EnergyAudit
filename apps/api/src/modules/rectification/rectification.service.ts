@@ -294,6 +294,41 @@ export class RectificationService {
     return this.findById(id);
   }
 
+  async extendDeadline(id: string, newDeadline: string, reason: string) {
+    const task = await this.getTask(id);
+
+    const deadline = new Date(newDeadline);
+    const now = new Date();
+    const isOverdue = deadline < now;
+
+    await this.db
+      .update(schema.rectificationTasks)
+      .set({
+        deadline,
+        isOverdue,
+        updatedAt: now,
+      })
+      .where(eq(schema.rectificationTasks.id, id));
+
+    // Record in audit logs
+    const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    await this.db.insert(schema.auditLogs).values({
+      id: logId,
+      userId: 'system',
+      userRole: 'manager',
+      action: 'extend_deadline',
+      targetType: 'rectification_task',
+      targetId: id,
+      detail: JSON.stringify({
+        oldDeadline: task.deadline?.toISOString() ?? null,
+        newDeadline: deadline.toISOString(),
+        reason,
+      }),
+    });
+
+    return { id, deadline: deadline.toISOString(), isOverdue, reason };
+  }
+
   async getStatistics(query: { projectId?: string; batchId?: string }) {
     const conditions = [];
     if (query.projectId) {

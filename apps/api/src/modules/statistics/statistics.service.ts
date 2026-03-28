@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq, sql, and, desc, gt, inArray } from 'drizzle-orm';
+import { eq, sql, and, desc, gt, inArray, lt } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -15,7 +15,7 @@ export interface DashboardSummary {
 
 export interface AlertItem {
   id: string;
-  type: 'overdue_project' | 'low_score' | 'delayed_rectification';
+  type: 'overdue_project' | 'low_score' | 'delayed_rectification' | 'approaching_deadline' | 'overdue_batch';
   title: string;
   description: string;
   severity: 'warning' | 'danger';
@@ -72,18 +72,22 @@ export class StatisticsService {
         sql`${schema.reviewTasks.status} IN ('pending_assignment', 'assigned', 'in_review')`,
       );
 
-    // Overdue alerts (projects + rectification tasks)
+    // Overdue alerts (projects + rectification tasks + batches)
     const overdueProjects = allProjects.filter((p) => p.isOverdue).length;
     const overdueRectifications = await this.db
       .select({ id: schema.rectificationTasks.id })
       .from(schema.rectificationTasks)
       .where(eq(schema.rectificationTasks.isOverdue, true));
+    const overdueBatches = await this.db
+      .select({ id: schema.auditBatches.id })
+      .from(schema.auditBatches)
+      .where(eq(schema.auditBatches.isOverdue, true));
 
     return {
       activeBatches: batches.length,
       projectCompletionRate,
       pendingReviewTasks: pendingReviews.length,
-      overdueAlerts: overdueProjects + overdueRectifications.length,
+      overdueAlerts: overdueProjects + overdueRectifications.length + overdueBatches.length,
     };
   }
 
@@ -164,6 +168,68 @@ export class StatisticsService {
         severity: 'danger',
         createdAt: r.deadline?.toISOString() ?? new Date().toISOString(),
         relatedId: r.id,
+      });
+    }
+
+    // Overdue batches
+    const overdueBatches = await this.db
+      .select({
+        id: schema.auditBatches.id,
+        name: schema.auditBatches.name,
+        filingDeadline: schema.auditBatches.filingDeadline,
+        reviewDeadline: schema.auditBatches.reviewDeadline,
+      })
+      .from(schema.auditBatches)
+      .where(eq(schema.auditBatches.isOverdue, true))
+      .orderBy(desc(schema.auditBatches.updatedAt))
+      .limit(10);
+
+    for (const b of overdueBatches) {
+      alerts.push({
+        id: `alert_batch_${b.id}`,
+        type: 'overdue_batch',
+        title: '批次超期',
+        description: `批次「${b.name}」已超过截止日期`,
+        severity: 'danger',
+        createdAt: b.filingDeadline?.toISOString() ?? b.reviewDeadline?.toISOString() ?? new Date().toISOString(),
+        relatedId: b.id,
+      });
+    }
+
+    // Approaching deadlines (within 7 days)
+    const now = new Date();
+    const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const approachingProjects = await this.db
+      .select({
+        id: schema.auditProjects.id,
+        enterpriseId: schema.auditProjects.enterpriseId,
+        deadline: schema.auditProjects.deadline,
+      })
+      .from(schema.auditProjects)
+      .where(
+        and(
+          eq(schema.auditProjects.isOverdue, false),
+          sql`${schema.auditProjects.deadline} >= ${now}`,
+          sql`${schema.auditProjects.deadline} <= ${sevenDaysLater}`,
+          sql`${schema.auditProjects.status} NOT IN ('completed', 'closed')`,
+        ),
+      )
+      .orderBy(schema.auditProjects.deadline)
+      .limit(10);
+
+    for (const p of approachingProjects) {
+      const daysLeft = p.deadline
+        ? Math.ceil((p.deadline.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+        : 0;
+      alerts.push({
+        id: `alert_approaching_${p.id}`,
+        type: 'approaching_deadline',
+        title: '即将到期',
+        description: `项目 ${p.id} 距截止日期还有 ${daysLeft} 天`,
+        severity: 'warning',
+        createdAt: new Date().toISOString(),
+        relatedId: p.id,
       });
     }
 

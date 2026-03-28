@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -60,5 +61,13 @@ export class AuditProjectController {
   @Get(':id/timeline')
   async getTimeline(@Param('id') id: string) {
     return this.projectService.getTimeline(id);
+  }
+
+  @Patch(':id/extend-deadline')
+  async extendDeadline(
+    @Param('id') id: string,
+    @Body() body: { newDeadline: string; reason: string },
+  ) {
+    return this.projectService.extendDeadline(id, body.newDeadline, body.reason);
   }
 }

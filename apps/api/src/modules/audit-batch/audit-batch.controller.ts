@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -54,5 +55,13 @@ export class AuditBatchController {
   @Put(':id/close')
   async close(@Param('id') id: string) {
     return this.batchService.close(id);
+  }
+
+  @Patch(':id/extend-deadline')
+  async extendDeadline(
+    @Param('id') id: string,
+    @Body() body: { newDeadline: string; reason: string; deadlineType?: 'filing' | 'review' },
+  ) {
+    return this.batchService.extendDeadline(id, body);
   }
 }

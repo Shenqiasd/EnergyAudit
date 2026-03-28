@@ -13,6 +13,7 @@ interface AuditBatch {
   description: string | null;
   filingDeadline: string | null;
   reviewDeadline: string | null;
+  isOverdue?: boolean;
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;
@@ -125,6 +126,18 @@ export function useAssignEnterprises(batchId: string) {
       void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-batch", batchId] });
       void queryClient.invalidateQueries({ queryKey: ["audit-projects"] });
+    },
+  });
+}
+
+export function useExtendBatchDeadline(batchId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { newDeadline: string; reason: string; deadlineType?: 'filing' | 'review' }) =>
+      apiClient.patch<AuditBatch>(`/audit-batches/${batchId}/extend-deadline`, data),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
+      void queryClient.invalidateQueries({ queryKey: ["audit-batch", batchId] });
     },
   });
 }

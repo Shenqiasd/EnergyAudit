@@ -193,6 +193,7 @@ export const auditBatches = pgTable('audit_batches', {
   description: text('description'),
   filingDeadline: timestamp('filing_deadline', { withTimezone: true }),
   reviewDeadline: timestamp('review_deadline', { withTimezone: true }),
+  isOverdue: boolean('is_overdue').notNull().default(false),
   createdBy: text('created_by').references(() => userAccounts.id, {
     onDelete: 'set null',
   }),
