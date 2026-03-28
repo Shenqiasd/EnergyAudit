@@ -59,7 +59,7 @@ export class ReportController {
     @Param('id') id: string,
     @Body() body: { fileUrl: string; versionType?: string; createdBy?: string },
   ) {
-    const version = await this.reportService.createVersion(
+    const version = await this.versionService.createVersion(
       id,
       body.versionType ?? 'enterprise_revision',
       body.fileUrl,

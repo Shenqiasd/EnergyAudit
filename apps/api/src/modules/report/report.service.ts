@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, desc } from 'drizzle-orm';
+import { and, eq, desc, isNull } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -81,7 +81,7 @@ export class ReportService {
     const sections = await this.db
       .select()
       .from(schema.reportSections)
-      .where(eq(schema.reportSections.reportId, id))
+      .where(and(eq(schema.reportSections.reportId, id), isNull(schema.reportSections.reportVersionId)))
       .orderBy(schema.reportSections.sortOrder);
 
     return { ...report, sections };

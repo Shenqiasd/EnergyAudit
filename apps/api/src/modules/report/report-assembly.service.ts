@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -63,10 +63,10 @@ export class ReportAssemblyService {
         })
         .where(eq(schema.reports.id, reportId));
 
-      // Delete old sections
+      // Delete old current sections only (preserve version snapshots)
       await this.db
         .delete(schema.reportSections)
-        .where(eq(schema.reportSections.reportId, reportId));
+        .where(and(eq(schema.reportSections.reportId, reportId), isNull(schema.reportSections.reportVersionId)));
     } else {
       reportId = `rpt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       await this.db.insert(schema.reports).values({
