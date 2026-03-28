@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { BatchStatisticsService } from './batch-statistics.service';
 import { IndustryStatisticsService } from './industry-statistics.service';
 import { CarbonStatisticsService } from './carbon-statistics.service';
@@ -8,6 +9,7 @@ import { StatisticsService } from './statistics.service';
 import type { IndustryStatisticsQuery } from './industry-statistics.service';
 import type { CarbonStatisticsQuery } from './carbon-statistics.service';
 
+@Roles('manager')
 @Controller('statistics')
 export class StatisticsController {
   constructor(

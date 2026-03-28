@@ -21,11 +21,13 @@ import { ReviewModule } from './modules/review/review.module';
 import { UserModule } from './modules/user/user.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
+    AuthModule,
     HealthModule,
     EnterpriseModule,
     UserModule,

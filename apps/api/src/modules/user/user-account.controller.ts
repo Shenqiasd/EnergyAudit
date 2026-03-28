@@ -8,10 +8,12 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { UserAccountService } from './user-account.service';
 
 import type { CreateUserDto, UpdateUserDto, UpdateUserRolesDto, UserListQuery } from './user-account.service';
 
+@Roles('manager')
 @Controller('users')
 export class UserAccountController {
   constructor(

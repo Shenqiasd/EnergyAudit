@@ -8,6 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { RectificationService } from './rectification.service';
 
 import type {
@@ -16,6 +17,7 @@ import type {
   UpdateProgressInput,
 } from './rectification.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller('rectifications')
 export class RectificationController {
   constructor(

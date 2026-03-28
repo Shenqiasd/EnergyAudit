@@ -7,6 +7,7 @@ import {
   Put,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { BusinessTypeService } from './business-type.service';
 
 import type {
@@ -15,6 +16,7 @@ import type {
   UpdateBusinessTypeDto,
 } from './business-type.service';
 
+@Roles('manager')
 @Controller('business-types')
 export class BusinessTypeController {
   constructor(private readonly businessTypeService: BusinessTypeService) {}

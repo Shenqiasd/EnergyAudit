@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { apiClient } from "../api/client";
 
 export type UserRole = "enterprise_user" | "manager" | "reviewer";
 
@@ -14,19 +15,26 @@ export interface AuthUser {
   id: string;
   name: string;
   role: UserRole;
+  email?: string;
+  enterpriseId?: string | null;
 }
 
 export interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  login: (user: AuthUser) => void;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  loginDev: (user: AuthUser) => void;
   logout: () => void;
   switchRole: (role: UserRole) => void;
+  getAccessToken: () => string | null;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-const STORAGE_KEY = "energy_audit_user";
+const TOKEN_KEY = "energy_audit_token";
+const REFRESH_TOKEN_KEY = "energy_audit_refresh_token";
+const USER_KEY = "energy_audit_user";
 
 const DEFAULT_USERS: Record<UserRole, AuthUser> = {
   enterprise_user: {
@@ -46,41 +54,106 @@ const DEFAULT_USERS: Record<UserRole, AuthUser> = {
   },
 };
 
+function storeTokens(accessToken: string, refreshToken: string) {
+  localStorage.setItem(TOKEN_KEY, accessToken);
+  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+}
+
+function clearTokens() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function getStoredAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function getStoredRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+export async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getStoredRefreshToken();
+  if (!refreshToken) return null;
+
+  try {
+    const data = await apiClient.post<{
+      accessToken: string;
+      refreshToken: string;
+    }>("/auth/refresh", { refreshToken });
+    storeTokens(data.accessToken, data.refreshToken);
+    return data.accessToken;
+  } catch {
+    clearTokens();
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(USER_KEY);
       if (stored) {
         setUser(JSON.parse(stored));
       }
     } catch {
       // ignore parse errors
     }
+    setIsLoading(false);
   }, []);
 
-  const login = useCallback((u: AuthUser) => {
+  const login = useCallback(async (email: string, password: string) => {
+    const data = await apiClient.post<{
+      accessToken: string;
+      refreshToken: string;
+      user: AuthUser;
+    }>("/auth/login", { email, password });
+
+    storeTokens(data.accessToken, data.refreshToken);
+    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    setUser(data.user);
+  }, []);
+
+  const loginDev = useCallback((u: AuthUser) => {
     setUser(u);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+    localStorage.setItem(USER_KEY, JSON.stringify(u));
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
+    clearTokens();
   }, []);
 
   const switchRole = useCallback(
     (role: UserRole) => {
       const newUser = DEFAULT_USERS[role];
-      login(newUser);
+      loginDev(newUser);
     },
-    [login],
+    [loginDev],
   );
+
+  const getAccessToken = useCallback((): string | null => {
+    return getStoredAccessToken();
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, login, logout, switchRole }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        loginDev,
+        logout,
+        switchRole,
+        getAccessToken,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -53,7 +53,7 @@ const roleCards: RoleCard[] = [
 ];
 
 export default function HomePage() {
-  const { login } = useAuth();
+  const { loginDev } = useAuth();
   const router = useRouter();
 
   const handleRoleSelect = (card: RoleCard) => {
@@ -63,7 +63,7 @@ export default function HomePage() {
       reviewer: { id: "dev-reviewer-001", name: "测试审核员" },
     };
     const u = defaultUsers[card.role];
-    login({ ...u, role: card.role });
+    loginDev({ ...u, role: card.role });
     router.push(card.dashboard);
   };
 

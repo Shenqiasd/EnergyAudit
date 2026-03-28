@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { SyncJobService } from './sync-job.service';
 
+@Roles('manager')
 @Controller('integrations')
 export class IntegrationController {
   constructor(private readonly syncJobService: SyncJobService) {}

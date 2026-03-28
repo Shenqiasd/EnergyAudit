@@ -8,6 +8,7 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { AuditBatchService } from './audit-batch.service';
 
 import type {
@@ -17,6 +18,7 @@ import type {
   UpdateBatchDto,
 } from './audit-batch.service';
 
+@Roles('manager')
 @Controller('audit-batches')
 export class AuditBatchController {
   constructor(private readonly batchService: AuditBatchService) {}

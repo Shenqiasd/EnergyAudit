@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Roles } from '../auth/roles.decorator';
 import { DictionaryService } from './dictionary.service';
 import { EnergyDefinitionService } from './energy-definition.service';
 import { ProductDefinitionService } from './product-definition.service';
@@ -22,6 +23,7 @@ import type { CreateProductDefinitionDto, UpdateProductDefinitionDto } from './p
 import type { CreateUnitDefinitionDto, UpdateUnitDefinitionDto } from './unit-definition.service';
 import type { CreateCarbonEmissionFactorDto, UpdateCarbonEmissionFactorDto } from './carbon-emission-factor.service';
 
+@Roles('enterprise_user', 'manager')
 @Controller()
 export class MasterDataController {
   constructor(
