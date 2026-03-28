@@ -8,7 +8,8 @@
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "test": "vitest run",
-    "type-check": "turbo run type-check"
+    "type-check": "turbo run type-check",
+    "seed:sample": "tsx scripts/seed-sample-data.ts"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
