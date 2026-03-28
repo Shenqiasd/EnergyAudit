@@ -10,6 +10,7 @@ COPY apps/web/package.json ./apps/web/package.json
 COPY packages/domain/package.json ./packages/domain/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY packages/integrations/package.json ./packages/integrations/package.json
+COPY packages/config-engine/package.json ./packages/config-engine/package.json
 
 # Install all dependencies (pnpm symlinks must stay in the same stage)
 RUN pnpm install --frozen-lockfile

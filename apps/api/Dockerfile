@@ -10,6 +10,7 @@ COPY apps/web/package.json ./apps/web/package.json
 COPY packages/domain/package.json ./packages/domain/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY packages/integrations/package.json ./packages/integrations/package.json
+COPY packages/config-engine/package.json ./packages/config-engine/package.json
 
 # Install all dependencies (pnpm symlinks must stay in the same stage)
 RUN pnpm install --frozen-lockfile
@@ -17,9 +18,8 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build workspace dependencies first, then the API
-RUN pnpm --filter @energy-audit/integrations run build && \
-    pnpm --filter @energy-audit/api run build
+# Build the API (automatically builds workspace dependencies via chained build script)
+RUN pnpm --filter @energy-audit/api run build
 
 # ---- Production ----
 FROM node:22-alpine AS runner
