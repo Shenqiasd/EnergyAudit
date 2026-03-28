@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import { Select } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -12,8 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileText } from "lucide-react";
-import Link from "next/link";
+import { FileText, RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { useReports } from "@/lib/api/hooks/use-reports";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -38,15 +39,29 @@ const STATUS_VARIANTS: Record<string, "default" | "primary" | "success" | "warni
   voided: "danger",
 };
 
-export default function EnterpriseReportsPage() {
-  const { data, isLoading } = useReports();
+const STATUS_OPTIONS = [
+  { value: "", label: "全部状态" },
+  { value: "not_generated", label: "未生成" },
+  { value: "system_draft", label: "系统草稿" },
+  { value: "enterprise_revision", label: "企业修订" },
+  { value: "pending_final", label: "待终版" },
+  { value: "final_uploaded", label: "已上传终版" },
+  { value: "under_review", label: "审核中" },
+  { value: "archived", label: "已归档" },
+];
+
+export default function ManagerReportsPage() {
+  const [statusFilter, setStatusFilter] = useState("");
+  const { data, isLoading, refetch } = useReports({
+    status: statusFilter || undefined,
+  });
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-[var(--color-text)]">报告管理</h1>
         <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-          查看和管理审计报告，上传终版报告
+          管理所有项目的审计报告，跟踪报告状态
         </p>
       </div>
 
@@ -58,13 +73,25 @@ export default function EnterpriseReportsPage() {
               报告列表
             </span>
           </CardTitle>
+          <div className="flex items-center gap-3">
+            <Select
+              options={STATUS_OPTIONS}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-40"
+            />
+            <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+              <RefreshCw size={14} />
+              刷新
+            </Button>
+          </div>
         </CardHeader>
 
         {isLoading ? (
           <Loading text="加载中..." />
         ) : !data?.items?.length ? (
           <p className="text-sm text-[var(--color-text-secondary)]">
-            暂无报告数据。报告将在管理员发起计算和生成后显示。
+            暂无报告数据。
           </p>
         ) : (
           <Table>
@@ -72,9 +99,10 @@ export default function EnterpriseReportsPage() {
               <TableRow>
                 <TableHead>报告ID</TableHead>
                 <TableHead>版本</TableHead>
+                <TableHead>类型</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>生成时间</TableHead>
-                <TableHead>操作</TableHead>
+                <TableHead>更新时间</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -84,6 +112,13 @@ export default function EnterpriseReportsPage() {
                     {report.id.slice(0, 12)}...
                   </TableCell>
                   <TableCell>v{report.version}</TableCell>
+                  <TableCell className="text-sm">
+                    {report.versionType === "system_draft"
+                      ? "系统草稿"
+                      : report.versionType === "enterprise_revision"
+                        ? "企业修订"
+                        : report.versionType}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={STATUS_VARIANTS[report.status] ?? "default"}>
                       {STATUS_LABELS[report.status] ?? report.status}
@@ -94,14 +129,8 @@ export default function EnterpriseReportsPage() {
                       ? new Date(report.generatedAt).toLocaleString("zh-CN")
                       : "-"}
                   </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Link href={`/enterprise/reports/${report.id}`}>
-                        <Button size="sm" variant="secondary">
-                          查看
-                        </Button>
-                      </Link>
-                    </div>
+                  <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                    {new Date(report.updatedAt).toLocaleString("zh-CN")}
                   </TableCell>
                 </TableRow>
               ))}

@@ -751,3 +751,63 @@ export const dataLocks = pgTable(
     index('idx_data_locks_expires').on(table.expiresAt),
   ],
 );
+
+// ==================== Reporting & Benchmarks ====================
+
+export const reportVersions = pgTable(
+  'report_versions',
+  {
+    id: text('id').primaryKey(),
+    reportId: text('report_id')
+      .notNull()
+      .references(() => reports.id, { onDelete: 'cascade' }),
+    versionType: text('version_type').notNull(),
+    versionNumber: integer('version_number').notNull(),
+    fileUrl: text('file_url'),
+    createdBy: text('created_by'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_report_versions_report').on(table.reportId)],
+);
+
+export const reportSections = pgTable(
+  'report_sections',
+  {
+    id: text('id').primaryKey(),
+    reportId: text('report_id')
+      .notNull()
+      .references(() => reports.id, { onDelete: 'cascade' }),
+    sectionCode: text('section_code').notNull(),
+    sectionName: text('section_name').notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
+    content: text('content'),
+    charts: jsonb('charts'),
+  },
+  (table) => [index('idx_report_sections_report').on(table.reportId)],
+);
+
+export const chartConfigs = pgTable('chart_configs', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  chartType: text('chart_type').notNull(),
+  moduleCode: text('module_code'),
+  metrics: jsonb('metrics'),
+  dimensions: jsonb('dimensions'),
+});
+
+export const benchmarkValues = pgTable(
+  'benchmark_values',
+  {
+    id: text('id').primaryKey(),
+    industryCode: text('industry_code').notNull(),
+    indicatorCode: text('indicator_code').notNull(),
+    benchmarkValue: numeric('benchmark_value').notNull(),
+    year: integer('year'),
+    source: text('source'),
+  },
+  (table) => [
+    index('idx_benchmark_values_industry').on(table.industryCode),
+    index('idx_benchmark_values_indicator').on(table.indicatorCode),
+  ],
+);

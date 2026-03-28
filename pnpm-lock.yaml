@@ -126,6 +126,12 @@ importers:
 
   packages/integrations: {}
 
+  packages/reporting:
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
   packages/shared: {}
 
 packages:
