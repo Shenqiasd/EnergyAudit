@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEnterprises } from "@/lib/api/hooks/use-enterprises";
-import { useTriggerSync } from "@/lib/api/hooks/use-integration";
+import { useSyncStatus, useTriggerSync } from "@/lib/api/hooks/use-integration";
 import type { Enterprise } from "@/lib/api/hooks/use-enterprises";
 
 const SYNC_STATUS_MAP: Record<
@@ -155,20 +155,28 @@ export default function ManagerSyncPage() {
 }
 
 function SyncRow({ enterprise }: { enterprise: Enterprise }) {
+  const statusQuery = useSyncStatus(enterprise.id);
   const syncMutation = useTriggerSync(enterprise.id);
+
+  const displayStatus =
+    syncMutation.data?.status ?? statusQuery.data?.status ?? "pending";
+  const displayLastSyncedAt =
+    syncMutation.data?.lastSyncedAt ?? statusQuery.data?.lastSyncedAt;
+  const displayRetryCount =
+    syncMutation.data?.retryCount ?? statusQuery.data?.retryCount ?? 0;
 
   return (
     <TableRow>
       <TableCell className="font-medium">{enterprise.name}</TableCell>
       <TableCell>
-        <SyncStatusBadge status={syncMutation.data?.status ?? "pending"} />
+        <SyncStatusBadge status={displayStatus} />
       </TableCell>
       <TableCell className="text-sm text-[var(--color-text-secondary)]">
-        {syncMutation.data?.lastSyncedAt
-          ? new Date(syncMutation.data.lastSyncedAt).toLocaleString("zh-CN")
+        {displayLastSyncedAt
+          ? new Date(displayLastSyncedAt).toLocaleString("zh-CN")
           : "-"}
       </TableCell>
-      <TableCell>{syncMutation.data?.retryCount ?? 0}</TableCell>
+      <TableCell>{displayRetryCount}</TableCell>
       <TableCell>
         <Button
           variant="ghost"

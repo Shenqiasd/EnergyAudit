@@ -19,8 +19,16 @@ export class LocalStorageAdapter implements IStorageAdapter {
     this.baseUrl = baseUrl;
   }
 
+  private assertSafePath(key: string): string {
+    const resolved = path.resolve(this.basePath, key);
+    if (!resolved.startsWith(path.resolve(this.basePath))) {
+      throw new Error('Invalid storage key: path traversal detected');
+    }
+    return resolved;
+  }
+
   async upload(key: string, data: Buffer, _contentType: string): Promise<string> {
-    const filePath = path.join(this.basePath, key);
+    const filePath = this.assertSafePath(key);
     const dir = path.dirname(filePath);
 
     if (!fs.existsSync(dir)) {
@@ -32,7 +40,7 @@ export class LocalStorageAdapter implements IStorageAdapter {
   }
 
   async download(key: string): Promise<Buffer> {
-    const filePath = path.join(this.basePath, key);
+    const filePath = this.assertSafePath(key);
 
     if (!fs.existsSync(filePath)) {
       throw new Error(`文件不存在: ${key}`);
@@ -42,7 +50,7 @@ export class LocalStorageAdapter implements IStorageAdapter {
   }
 
   async delete(key: string): Promise<void> {
-    const filePath = path.join(this.basePath, key);
+    const filePath = this.assertSafePath(key);
 
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);

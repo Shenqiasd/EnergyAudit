@@ -25,9 +25,13 @@ export class AttachmentService {
     @Inject(STORAGE_ADAPTER) private readonly storageAdapter: IStorageAdapter,
   ) {}
 
+  private sanitizePathSegment(segment: string): string {
+    return segment.replace(/[\/\\]/g, '_').replace(/\.\./g, '_');
+  }
+
   async upload(dto: UploadAttachmentDto) {
     const id = `att_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const storageKey = `${dto.ownerType}/${dto.ownerId}/${id}_${dto.fileName}`;
+    const storageKey = `${this.sanitizePathSegment(dto.ownerType)}/${this.sanitizePathSegment(dto.ownerId)}/${id}_${this.sanitizePathSegment(dto.fileName)}`;
 
     const url = await this.storageAdapter.upload(storageKey, dto.data, dto.mimeType);
 
