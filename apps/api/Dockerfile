@@ -9,6 +9,7 @@ COPY apps/api/package.json ./apps/api/package.json
 COPY apps/web/package.json ./apps/web/package.json
 COPY packages/domain/package.json ./packages/domain/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/integrations/package.json ./packages/integrations/package.json
 
 # Install all dependencies (pnpm symlinks must stay in the same stage)
 RUN pnpm install --frozen-lockfile
@@ -16,8 +17,9 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build the API
-RUN pnpm --filter @energy-audit/api run build
+# Build workspace dependencies first, then the API
+RUN pnpm --filter @energy-audit/integrations run build && \
+    pnpm --filter @energy-audit/api run build
 
 # ---- Production ----
 FROM node:22-alpine AS runner
@@ -32,6 +34,10 @@ COPY --from=build /app/apps/api/package.json ./apps/api/package.json
 # Copy node_modules — both root (pnpm store) and workspace-local (symlinks)
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/api/node_modules ./apps/api/node_modules
+
+# Copy compiled workspace packages needed at runtime
+COPY --from=build /app/packages/integrations/dist ./packages/integrations/dist
+COPY --from=build /app/packages/integrations/package.json ./packages/integrations/package.json
 
 # Copy migration files (needed at runtime)
 COPY --from=build /app/apps/api/src/db/migrations ./apps/api/dist/db/migrations
