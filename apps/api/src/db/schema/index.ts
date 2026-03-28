@@ -587,3 +587,42 @@ export const syncLogs = pgTable(
     index('idx_sync_logs_binding').on(table.bindingId),
   ],
 );
+
+// ==================== Project Lifecycle ====================
+
+export const projectStatusTransitions = pgTable(
+  'project_status_transitions',
+  {
+    id: text('id').primaryKey(),
+    projectId: text('project_id')
+      .notNull()
+      .references(() => auditProjects.id, { onDelete: 'cascade' }),
+    fromStatus: text('from_status').notNull(),
+    toStatus: text('to_status').notNull(),
+    transitionedAt: timestamp('transitioned_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    userId: text('user_id').references(() => userAccounts.id, {
+      onDelete: 'set null',
+    }),
+    reason: text('reason'),
+  },
+  (table) => [
+    index('idx_project_transitions_project').on(table.projectId),
+    index('idx_project_transitions_timestamp').on(table.transitionedAt),
+  ],
+);
+
+export const projectSnapshots = pgTable(
+  'project_snapshots',
+  {
+    id: text('id').primaryKey(),
+    auditProjectId: text('audit_project_id')
+      .notNull()
+      .references(() => auditProjects.id, { onDelete: 'cascade' }),
+    snapshotType: text('snapshot_type').notNull(),
+    data: text('data').notNull().default('{}'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('idx_project_snapshots_project').on(table.auditProjectId)],
+);
