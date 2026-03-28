@@ -275,7 +275,7 @@ export class AuditProjectService {
 
     const deadline = new Date(newDeadline);
     const now = new Date();
-    const isOverdue = deadline < now;
+    const isOverdue = deadline < now && project.status !== 'completed' && project.status !== 'closed';
 
     await this.db
       .update(schema.auditProjects)

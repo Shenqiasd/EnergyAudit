@@ -257,13 +257,16 @@ export class AuditBatchService {
       updateData.reviewDeadline = deadline;
     }
 
-    // If new deadline is in the future, reset overdue status
+    // Update overdue status based on new deadline
     if (deadline > now) {
       // Check if both deadlines are now in future
       const otherDeadline = deadlineType === 'filing' ? batch.reviewDeadline : batch.filingDeadline;
       if (!otherDeadline || otherDeadline > now) {
         updateData.isOverdue = false;
       }
+    } else {
+      // New deadline is in the past, mark as overdue
+      updateData.isOverdue = true;
     }
 
     await this.db

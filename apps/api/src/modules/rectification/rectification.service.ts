@@ -299,7 +299,7 @@ export class RectificationService {
 
     const deadline = new Date(newDeadline);
     const now = new Date();
-    const isOverdue = deadline < now;
+    const isOverdue = deadline < now && task.status !== 'completed' && task.status !== 'closed';
 
     await this.db
       .update(schema.rectificationTasks)
