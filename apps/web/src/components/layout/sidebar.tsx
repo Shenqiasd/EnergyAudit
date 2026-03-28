@@ -2,9 +2,12 @@
 
 import { clsx } from "clsx";
 import {
+  Activity,
+  BarChart3,
   Building2,
   ChevronDown,
   ClipboardCheck,
+  Cpu,
   Database,
   FileBarChart,
   FileText,
@@ -16,7 +19,6 @@ import {
   Settings,
   Shield,
   Wrench,
-  BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -72,6 +74,14 @@ const managerMenus: MenuGroup[] = [
     items: [
       { label: "审核管理", href: "/manager/reviews", icon: Shield },
       { label: "统计分析", href: "/manager/statistics", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "运维管理",
+    items: [
+      { label: "同步管理", href: "/manager/sync", icon: Activity },
+      { label: "操作日志", href: "/manager/audit-logs", icon: FileText },
+      { label: "任务监控", href: "/manager/jobs", icon: Cpu },
     ],
   },
 ];
