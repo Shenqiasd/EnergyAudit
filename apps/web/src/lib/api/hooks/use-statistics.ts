@@ -191,6 +191,78 @@ export function useTimeline() {
   });
 }
 
+// ==================== Region Statistics ====================
+
+interface RegionDistributionItem {
+  regionCode: string;
+  regionName: string;
+  enterpriseCount: number;
+  totalEnergyConsumption: number;
+}
+
+interface RegionRankingItem {
+  regionName: string;
+  enterpriseCount: number;
+}
+
+interface ProvinceBreakdownItem {
+  province: string;
+  city: string | null;
+  enterpriseCount: number;
+}
+
+interface RegionComplianceItem {
+  regionName: string;
+  totalProjects: number;
+  completedProjects: number;
+  complianceRate: number;
+}
+
+export function useRegionDistribution(batchId?: string) {
+  const params: Record<string, string> = {};
+  if (batchId) params.batchId = batchId;
+
+  return useQuery<RegionDistributionItem[]>({
+    queryKey: ["statistics", "region", "distribution", batchId],
+    queryFn: () =>
+      apiClient.get<RegionDistributionItem[]>("/statistics/region/distribution", { params }),
+  });
+}
+
+export function useRegionEnergyRanking(batchId?: string, limit = 10) {
+  const params: Record<string, string> = { limit: String(limit) };
+  if (batchId) params.batchId = batchId;
+
+  return useQuery<RegionRankingItem[]>({
+    queryKey: ["statistics", "region", "ranking", batchId, limit],
+    queryFn: () =>
+      apiClient.get<RegionRankingItem[]>("/statistics/region/ranking", { params }),
+  });
+}
+
+export function useProvinceBreakdown(regionCode: string, batchId?: string) {
+  const params: Record<string, string> = {};
+  if (batchId) params.batchId = batchId;
+
+  return useQuery<ProvinceBreakdownItem[]>({
+    queryKey: ["statistics", "region", "province", regionCode, batchId],
+    queryFn: () =>
+      apiClient.get<ProvinceBreakdownItem[]>(`/statistics/region/province/${regionCode}`, { params }),
+    enabled: !!regionCode,
+  });
+}
+
+export function useRegionComplianceRate(batchId?: string) {
+  const params: Record<string, string> = {};
+  if (batchId) params.batchId = batchId;
+
+  return useQuery<RegionComplianceItem[]>({
+    queryKey: ["statistics", "region", "compliance", batchId],
+    queryFn: () =>
+      apiClient.get<RegionComplianceItem[]>("/statistics/region/compliance", { params }),
+  });
+}
+
 export type {
   DashboardSummary,
   BatchStatistics,
@@ -209,4 +281,8 @@ export type {
   IndustryStatisticsQuery,
   CarbonStatisticsQuery,
   RankingsQuery,
+  RegionDistributionItem,
+  RegionRankingItem,
+  ProvinceBreakdownItem,
+  RegionComplianceItem,
 };

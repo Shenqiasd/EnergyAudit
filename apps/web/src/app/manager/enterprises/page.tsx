@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Plus, RefreshCw, Search, Eye, CheckCircle } from "lucide-react";
+import { Building2, Plus, RefreshCw, Search, Eye, CheckCircle, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,6 +48,7 @@ export default function ManagerEnterprisesPage() {
   const [formPhone, setFormPhone] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formAddress, setFormAddress] = useState("");
+  const [filterRegion, setFilterRegion] = useState("");
 
   const { data, isLoading, refetch } = useEnterprises({
     page,
@@ -55,6 +56,7 @@ export default function ManagerEnterprisesPage() {
     name: searchName || undefined,
     creditCode: searchCode || undefined,
     admissionStatus: filterStatus || undefined,
+    regionCode: filterRegion || undefined,
   });
 
   const createMutation = useCreateEnterprise();
@@ -156,6 +158,16 @@ export default function ManagerEnterprisesPage() {
               ]}
             />
           </div>
+          <div className="w-40">
+            <Input
+              placeholder="区域筛选"
+              value={filterRegion}
+              onChange={(e) => {
+                setFilterRegion(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
           <Button variant="secondary" size="sm" onClick={() => void refetch()}>
             <Search size={14} />
             搜索
@@ -172,6 +184,8 @@ export default function ManagerEnterprisesPage() {
                   <TableHead>企业名称</TableHead>
                   <TableHead>统一社会信用代码</TableHead>
                   <TableHead>行业分类</TableHead>
+                  <TableHead>区域</TableHead>
+                  <TableHead>省/市</TableHead>
                   <TableHead>准入状态</TableHead>
                   <TableHead>联系人</TableHead>
                   <TableHead>操作</TableHead>
@@ -183,7 +197,7 @@ export default function ManagerEnterprisesPage() {
                 ))}
                 {data?.items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-[var(--color-text-secondary)]">
+                    <TableCell colSpan={8} className="text-center text-[var(--color-text-secondary)]">
                       暂无企业数据
                     </TableCell>
                   </TableRow>
@@ -297,6 +311,12 @@ function EnterpriseRow({ enterprise }: { enterprise: Enterprise }) {
       <TableCell className="font-medium">{enterprise.name}</TableCell>
       <TableCell className="font-mono text-xs">{enterprise.unifiedSocialCreditCode}</TableCell>
       <TableCell>{enterprise.industryCode ?? "-"}</TableCell>
+      <TableCell>{enterprise.regionName ?? "-"}</TableCell>
+      <TableCell>
+        {enterprise.province || enterprise.city
+          ? `${enterprise.province ?? ""}${enterprise.city ? " / " + enterprise.city : ""}`
+          : "-"}
+      </TableCell>
       <TableCell>
         <StatusBadge status={enterprise.admissionStatus} />
       </TableCell>
