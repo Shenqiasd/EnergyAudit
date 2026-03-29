@@ -8,7 +8,8 @@ function createController(checkResult: unknown) {
   const unit = { findByEnterprise: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), countByEnterprise: vi.fn() };
   const carbon = { findAll: vi.fn(), create: vi.fn(), update: vi.fn(), findDefaults: vi.fn(), findByEnergyCode: vi.fn() };
   const completeness = { check: vi.fn().mockResolvedValue(checkResult) };
-  return new MasterDataController(dict as any, energy as any, product as any, unit as any, carbon as any, completeness as any);
+  const benchmark = { findAll: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), findByIndustry: vi.fn(), compareEnterprise: vi.fn() };
+  return new MasterDataController(dict as any, energy as any, product as any, unit as any, carbon as any, completeness as any, benchmark as any);
 }
 
 describe('config completeness', () => {

@@ -5,6 +5,7 @@ import { BatchStatisticsService } from './batch-statistics.service';
 import { IndustryStatisticsService } from './industry-statistics.service';
 import { CarbonStatisticsService } from './carbon-statistics.service';
 import { StatisticsService } from './statistics.service';
+import { RegionStatisticsService } from './region-statistics.service';
 
 import type { IndustryStatisticsQuery } from './industry-statistics.service';
 import type { CarbonStatisticsQuery } from './carbon-statistics.service';
@@ -17,6 +18,7 @@ export class StatisticsController {
     private readonly industryStatisticsService: IndustryStatisticsService,
     private readonly carbonStatisticsService: CarbonStatisticsService,
     private readonly statisticsService: StatisticsService,
+    private readonly regionStatisticsService: RegionStatisticsService,
   ) {}
 
   @Get('dashboard')
@@ -67,5 +69,36 @@ export class StatisticsController {
   @Get('timeline')
   async getTimeline() {
     return this.statisticsService.getTimeline();
+  }
+
+  // ==================== Region Statistics ====================
+
+  @Get('region/distribution')
+  async getRegionDistribution(@Query('batchId') batchId?: string) {
+    return this.regionStatisticsService.getRegionDistribution(batchId);
+  }
+
+  @Get('region/ranking')
+  async getRegionEnergyRanking(
+    @Query('batchId') batchId?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.regionStatisticsService.getRegionEnergyRanking(
+      batchId,
+      limit ? parseInt(limit, 10) : 10,
+    );
+  }
+
+  @Get('region/province/:regionCode')
+  async getProvinceBreakdown(
+    @Param('regionCode') regionCode: string,
+    @Query('batchId') batchId?: string,
+  ) {
+    return this.regionStatisticsService.getProvinceBreakdown(regionCode, batchId);
+  }
+
+  @Get('region/compliance')
+  async getRegionComplianceRate(@Query('batchId') batchId?: string) {
+    return this.regionStatisticsService.getRegionComplianceRate(batchId);
   }
 }

@@ -7,6 +7,7 @@ import { ProductDefinitionService } from './product-definition.service';
 import { UnitDefinitionService } from './unit-definition.service';
 import { CarbonEmissionFactorService } from './carbon-emission-factor.service';
 import { ConfigCompletenessService } from './config-completeness.service';
+import { BenchmarkService } from './benchmark.service';
 
 @Module({
   controllers: [MasterDataController],
@@ -17,6 +18,7 @@ import { ConfigCompletenessService } from './config-completeness.service';
     UnitDefinitionService,
     CarbonEmissionFactorService,
     ConfigCompletenessService,
+    BenchmarkService,
   ],
   exports: [
     DictionaryService,
@@ -25,6 +27,7 @@ import { ConfigCompletenessService } from './config-completeness.service';
     UnitDefinitionService,
     CarbonEmissionFactorService,
     ConfigCompletenessService,
+    BenchmarkService,
   ],
 })
 export class MasterDataModule {}
