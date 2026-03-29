@@ -17,6 +17,7 @@ import { UnitDefinitionService } from './unit-definition.service';
 import { CarbonEmissionFactorService } from './carbon-emission-factor.service';
 import { ConfigCompletenessService } from './config-completeness.service';
 import { ConfigOverrideService } from './config-override.service';
+import { BenchmarkService } from './benchmark.service';
 
 import type { CreateDictionaryDto, UpdateDictionaryDto } from './dictionary.service';
 import type { CreateEnergyDefinitionDto, UpdateEnergyDefinitionDto } from './energy-definition.service';
@@ -24,6 +25,7 @@ import type { CreateProductDefinitionDto, UpdateProductDefinitionDto } from './p
 import type { CreateUnitDefinitionDto, UpdateUnitDefinitionDto } from './unit-definition.service';
 import type { CreateCarbonEmissionFactorDto, UpdateCarbonEmissionFactorDto } from './carbon-emission-factor.service';
 import type { SetOverrideDto } from './config-override.service';
+import type { CreateBenchmarkDto, UpdateBenchmarkDto } from './benchmark.service';
 
 @Roles('enterprise_user', 'manager')
 @Controller()
@@ -36,6 +38,7 @@ export class MasterDataController {
     private readonly carbonEmissionFactorService: CarbonEmissionFactorService,
     private readonly configCompletenessService: ConfigCompletenessService,
     private readonly configOverrideService: ConfigOverrideService,
+    private readonly benchmarkService: BenchmarkService,
   ) {}
 
   // ==================== Dictionaries ====================
@@ -217,5 +220,54 @@ export class MasterDataController {
       batchId,
       industryCode,
     });
+  }
+
+  // ==================== Benchmarks ====================
+
+  @Get('benchmarks')
+  getBenchmarks(
+    @Query('industryCode') industryCode?: string,
+    @Query('indicatorCode') indicatorCode?: string,
+    @Query('applicableYear') applicableYear?: string,
+  ) {
+    return this.benchmarkService.findAll({
+      industryCode,
+      indicatorCode,
+      applicableYear: applicableYear ? parseInt(applicableYear, 10) : undefined,
+    });
+  }
+
+  @Post('benchmarks')
+  createBenchmark(@Body() dto: CreateBenchmarkDto) {
+    return this.benchmarkService.create(dto);
+  }
+
+  @Put('benchmarks/:id')
+  updateBenchmark(@Param('id') id: string, @Body() dto: UpdateBenchmarkDto) {
+    return this.benchmarkService.update(id, dto);
+  }
+
+  @Delete('benchmarks/:id')
+  deleteBenchmark(@Param('id') id: string) {
+    return this.benchmarkService.delete(id);
+  }
+
+  @Get('benchmarks/industry/:industryCode')
+  getBenchmarksByIndustry(
+    @Param('industryCode') industryCode: string,
+    @Query('applicableYear') applicableYear?: string,
+  ) {
+    return this.benchmarkService.findByIndustry(
+      industryCode,
+      applicableYear ? parseInt(applicableYear, 10) : undefined,
+    );
+  }
+
+  @Get('benchmarks/compare/:enterpriseId/:projectId')
+  compareBenchmark(
+    @Param('enterpriseId') enterpriseId: string,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.benchmarkService.compareEnterprise(enterpriseId, projectId);
   }
 }

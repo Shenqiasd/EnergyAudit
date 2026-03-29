@@ -8,6 +8,7 @@ import { UnitDefinitionService } from './unit-definition.service';
 import { CarbonEmissionFactorService } from './carbon-emission-factor.service';
 import { ConfigCompletenessService } from './config-completeness.service';
 import { ConfigOverrideService } from './config-override.service';
+import { BenchmarkService } from './benchmark.service';
 
 @Module({
   controllers: [MasterDataController],
@@ -19,6 +20,7 @@ import { ConfigOverrideService } from './config-override.service';
     CarbonEmissionFactorService,
     ConfigCompletenessService,
     ConfigOverrideService,
+    BenchmarkService,
   ],
   exports: [
     DictionaryService,
@@ -28,6 +30,7 @@ import { ConfigOverrideService } from './config-override.service';
     CarbonEmissionFactorService,
     ConfigCompletenessService,
     ConfigOverrideService,
+    BenchmarkService,
   ],
 })
 export class MasterDataModule {}

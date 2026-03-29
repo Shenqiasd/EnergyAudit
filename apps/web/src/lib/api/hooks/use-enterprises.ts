@@ -14,6 +14,10 @@ interface Enterprise {
   contactEmail: string | null;
   address: string | null;
   notes: string | null;
+  regionCode: string | null;
+  regionName: string | null;
+  province: string | null;
+  city: string | null;
   expiryDate: string | null;
   lastLoginAt: string | null;
   sortOrder: number | null;
@@ -51,6 +55,7 @@ interface EnterpriseListParams {
   name?: string;
   creditCode?: string;
   admissionStatus?: string;
+  regionCode?: string;
 }
 
 interface CreateEnterpriseInput {
@@ -62,6 +67,10 @@ interface CreateEnterpriseInput {
   contactEmail?: string;
   address?: string;
   notes?: string;
+  regionCode?: string;
+  regionName?: string;
+  province?: string;
+  city?: string;
 }
 
 interface AdmissionActionInput {
@@ -76,6 +85,7 @@ export function useEnterprises(params: EnterpriseListParams = {}) {
   if (params.name) queryParams.name = params.name;
   if (params.creditCode) queryParams.creditCode = params.creditCode;
   if (params.admissionStatus) queryParams.admissionStatus = params.admissionStatus;
+  if (params.regionCode) queryParams.regionCode = params.regionCode;
 
   return useQuery<EnterpriseListResponse>({
     queryKey: ["enterprises", params],

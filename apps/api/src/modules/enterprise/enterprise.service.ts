@@ -15,6 +15,10 @@ export interface CreateEnterpriseDto {
   contactEmail?: string;
   address?: string;
   notes?: string;
+  regionCode?: string;
+  regionName?: string;
+  province?: string;
+  city?: string;
 }
 
 export interface UpdateEnterpriseDto {
@@ -25,6 +29,10 @@ export interface UpdateEnterpriseDto {
   contactEmail?: string;
   address?: string;
   notes?: string;
+  regionCode?: string;
+  regionName?: string;
+  province?: string;
+  city?: string;
 }
 
 export interface EnterpriseListQuery {
@@ -33,6 +41,7 @@ export interface EnterpriseListQuery {
   name?: string;
   creditCode?: string;
   admissionStatus?: string;
+  regionCode?: string;
 }
 
 @Injectable()
@@ -67,6 +76,10 @@ export class EnterpriseService {
         contactEmail: dto.contactEmail ?? null,
         address: dto.address ?? null,
         notes: dto.notes ?? null,
+        regionCode: dto.regionCode ?? null,
+        regionName: dto.regionName ?? null,
+        province: dto.province ?? null,
+        city: dto.city ?? null,
       })
       .returning();
 
@@ -89,6 +102,9 @@ export class EnterpriseService {
     }
     if (query.admissionStatus) {
       conditions.push(eq(schema.enterprises.admissionStatus, query.admissionStatus));
+    }
+    if (query.regionCode) {
+      conditions.push(eq(schema.enterprises.regionCode, query.regionCode));
     }
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;

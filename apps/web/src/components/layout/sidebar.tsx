@@ -17,8 +17,10 @@ import {
   Layers,
   LayoutDashboard,
   ListChecks,
+  MapPin,
   Settings,
   Shield,
+  Target,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -86,6 +88,8 @@ const managerMenus: MenuGroup[] = [
       { label: "审核管理", href: "/manager/reviews", icon: Shield },
       { label: "整改监管", href: "/manager/rectifications", icon: Wrench },
       { label: "统计分析", href: "/manager/statistics", icon: BarChart3 },
+      { label: "能效对标", href: "/manager/benchmarks", icon: Target },
+      { label: "区域统计", href: "/manager/statistics/region", icon: MapPin },
       { label: "台账管理", href: "/manager/ledgers", icon: FileText },
     ],
   },
