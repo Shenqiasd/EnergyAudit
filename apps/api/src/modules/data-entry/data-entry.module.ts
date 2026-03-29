@@ -6,6 +6,7 @@ import { DataImportService } from './data-import.service';
 import { DataLockService } from './data-lock.service';
 import { DataRecordService } from './data-record.service';
 import { DataValidationService } from './data-validation.service';
+import { DataExceptionService } from './data-exception.service';
 
 @Module({
   controllers: [DataEntryController],
@@ -15,6 +16,7 @@ import { DataValidationService } from './data-validation.service';
     DataCalculationService,
     DataImportService,
     DataLockService,
+    DataExceptionService,
   ],
   exports: [
     DataRecordService,
@@ -22,6 +24,7 @@ import { DataValidationService } from './data-validation.service';
     DataCalculationService,
     DataImportService,
     DataLockService,
+    DataExceptionService,
   ],
 })
 export class DataEntryModule {}

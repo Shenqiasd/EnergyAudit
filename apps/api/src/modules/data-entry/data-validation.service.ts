@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
+import { resolveValidationRules } from '@energy-audit/config-engine';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { ConfigOverrideRecord, ResolutionContext } from '@energy-audit/config-engine';
 
 export type ValidationSeverity = 'error' | 'warning' | 'info';
 
@@ -62,13 +64,34 @@ export class DataValidationService {
       .from(schema.dataItems)
       .where(eq(schema.dataItems.dataRecordId, recordId));
 
-    // Fetch validation rules for this module
-    const rules = await this.db
+    // Fetch validation rules for this module with config override resolution
+    const rawRules = await this.db
       .select()
       .from(schema.validationRules)
       .where(eq(schema.validationRules.moduleCode, record.moduleCode));
 
-    const activeRules = rules.filter((r) => r.isActive);
+    // Load config overrides for resolution context
+    const overrides = await this.db
+      .select()
+      .from(schema.configOverrides)
+      .where(eq(schema.configOverrides.isActive, true));
+
+    const overrideRecords: ConfigOverrideRecord[] = overrides.map((o) => ({
+      id: o.id,
+      scopeType: o.scopeType as ConfigOverrideRecord['scopeType'],
+      scopeId: o.scopeId,
+      targetType: o.targetType as ConfigOverrideRecord['targetType'],
+      targetCode: o.targetCode,
+      configJson: o.configJson as Record<string, unknown>,
+      isActive: o.isActive,
+    }));
+
+    // Build resolution context from project info
+    const resolutionContext = await this.buildResolutionContext(record.auditProjectId);
+
+    // Resolve effective rules through config override engine
+    const resolvedRules = resolveValidationRules(rawRules, overrideRecords, resolutionContext);
+    const activeRules = resolvedRules.filter((r) => r.isActive);
     const allErrors: ValidationError[] = [];
 
     // Build values map
@@ -171,6 +194,28 @@ export class DataValidationService {
         message: `规则执行异常: ${rule.ruleCode}`,
       };
     }
+  }
+
+  private async buildResolutionContext(auditProjectId: string): Promise<ResolutionContext> {
+    const [project] = await this.db
+      .select()
+      .from(schema.auditProjects)
+      .where(eq(schema.auditProjects.id, auditProjectId))
+      .limit(1);
+
+    if (!project) return {};
+
+    const [enterprise] = await this.db
+      .select()
+      .from(schema.enterprises)
+      .where(eq(schema.enterprises.id, project.enterpriseId))
+      .limit(1);
+
+    return {
+      enterpriseId: project.enterpriseId,
+      batchId: project.batchId,
+      industryCode: enterprise?.industryCode ?? undefined,
+    };
   }
 
   private aggregateResults(errors: ValidationError[]): ValidationResult {

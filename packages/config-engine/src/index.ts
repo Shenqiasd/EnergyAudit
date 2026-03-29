@@ -64,3 +64,20 @@ export type {
   CalculationResult,
   CalculationSnapshot,
 } from './calculation-rule';
+
+// Config override resolver
+export {
+  deepMerge,
+  filterAndSortOverrides,
+  applyOverrides,
+  resolveModuleConfig,
+  resolveFieldConfig,
+  resolveValidationRules,
+} from './config-resolver';
+export type {
+  ConfigOverrideRecord,
+  ResolutionContext,
+  MergedModuleConfig,
+  MergedFieldConfig,
+  MergedValidationRule,
+} from './config-resolver';

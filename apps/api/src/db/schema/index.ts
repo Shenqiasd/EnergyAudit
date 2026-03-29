@@ -829,6 +829,59 @@ export const benchmarkValues = pgTable(
 
 // ==================== Notification System ====================
 
+// ==================== Config Override Engine ====================
+
+export const configOverrides = pgTable(
+  'config_overrides',
+  {
+    id: text('id').primaryKey(),
+    scopeType: text('scope_type').notNull(), // 'platform' | 'batch_template' | 'enterprise_type' | 'enterprise'
+    scopeId: text('scope_id'), // null for platform, batchId / industryCode / enterpriseId
+    targetType: text('target_type').notNull(), // 'module' | 'field' | 'validation_rule'
+    targetCode: text('target_code').notNull(), // moduleCode or fieldCode or ruleCode
+    configJson: jsonb('config_json').notNull(),
+    isActive: boolean('is_active').notNull().default(true),
+    createdBy: text('created_by').references(() => userAccounts.id),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    unique().on(table.scopeType, table.scopeId, table.targetType, table.targetCode),
+    index('idx_config_overrides_scope').on(table.scopeType, table.scopeId),
+    index('idx_config_overrides_target').on(table.targetType, table.targetCode),
+  ],
+);
+
+// ==================== Validation Exceptions ====================
+
+export const validationExceptions = pgTable(
+  'validation_exceptions',
+  {
+    id: text('id').primaryKey(),
+    dataRecordId: text('data_record_id')
+      .notNull()
+      .references(() => dataRecords.id, { onDelete: 'cascade' }),
+    validationResultId: text('validation_result_id')
+      .references(() => validationResults.id, { onDelete: 'set null' }),
+    ruleCode: text('rule_code'), // stable key to re-link after re-validation
+    explanation: text('explanation').notNull(),
+    submittedBy: text('submitted_by')
+      .notNull()
+      .references(() => userAccounts.id),
+    approvedBy: text('approved_by').references(() => userAccounts.id),
+    approvalStatus: text('approval_status').notNull().default('pending'), // 'pending' | 'approved' | 'rejected'
+    rejectionReason: text('rejection_reason'),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('idx_validation_exceptions_record').on(table.dataRecordId),
+    index('idx_validation_exceptions_status').on(table.approvalStatus),
+  ],
+);
+
+// ==================== Notification System ====================
+
 export const notifications = pgTable(
   'notifications',
   {
