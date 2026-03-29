@@ -25,10 +25,18 @@ export class DataExceptionService {
   ) {
     const id = `ve_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+    // Look up the ruleCode from the validation result for stable re-linking
+    const [validationResult] = await this.db
+      .select()
+      .from(schema.validationResults)
+      .where(eq(schema.validationResults.id, validationResultId))
+      .limit(1);
+
     const newException = {
       id,
       dataRecordId,
       validationResultId,
+      ruleCode: validationResult?.ruleCode ?? null,
       explanation,
       submittedBy: userId,
       approvalStatus: 'pending',
@@ -136,14 +144,15 @@ export class DataExceptionService {
 
     if (blockingResults.length === 0) return true;
 
-    // Check each blocking result has an approved exception
+    // Check each blocking result has an approved exception (match by ruleCode for stability)
     for (const result of blockingResults) {
       const exceptions = await this.db
         .select()
         .from(schema.validationExceptions)
         .where(
           and(
-            eq(schema.validationExceptions.validationResultId, result.id),
+            eq(schema.validationExceptions.dataRecordId, dataRecordId),
+            eq(schema.validationExceptions.ruleCode, result.ruleCode),
             eq(schema.validationExceptions.approvalStatus, 'approved'),
           ),
         );

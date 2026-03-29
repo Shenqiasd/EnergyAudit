@@ -13,6 +13,11 @@ CREATE TABLE config_overrides (
   UNIQUE(scope_type, scope_id, target_type, target_code)
 );
 
+-- Partial unique index for NULL scope_id (PostgreSQL treats NULLs as distinct in UNIQUE)
+CREATE UNIQUE INDEX idx_config_overrides_unique_null_scope
+  ON config_overrides(scope_type, target_type, target_code)
+  WHERE scope_id IS NULL;
+
 CREATE INDEX idx_config_overrides_scope ON config_overrides(scope_type, scope_id);
 CREATE INDEX idx_config_overrides_target ON config_overrides(target_type, target_code);
 
@@ -20,7 +25,8 @@ CREATE INDEX idx_config_overrides_target ON config_overrides(target_type, target
 CREATE TABLE validation_exceptions (
   id TEXT PRIMARY KEY,
   data_record_id TEXT NOT NULL REFERENCES data_records(id) ON DELETE CASCADE,
-  validation_result_id TEXT NOT NULL REFERENCES validation_results(id) ON DELETE CASCADE,
+  validation_result_id TEXT REFERENCES validation_results(id) ON DELETE SET NULL,
+  rule_code TEXT, -- stable key to re-link after re-validation
   explanation TEXT NOT NULL,
   submitted_by TEXT NOT NULL REFERENCES user_accounts(id),
   approved_by TEXT REFERENCES user_accounts(id),

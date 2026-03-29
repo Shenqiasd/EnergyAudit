@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
@@ -57,6 +57,8 @@ export class ConfigOverrideService {
 
     if (dto.scopeId) {
       conditions.push(eq(schema.configOverrides.scopeId, dto.scopeId));
+    } else {
+      conditions.push(isNull(schema.configOverrides.scopeId));
     }
 
     const existing = await this.db

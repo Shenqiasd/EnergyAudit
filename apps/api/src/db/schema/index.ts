@@ -855,8 +855,8 @@ export const validationExceptions = pgTable(
       .notNull()
       .references(() => dataRecords.id, { onDelete: 'cascade' }),
     validationResultId: text('validation_result_id')
-      .notNull()
-      .references(() => validationResults.id, { onDelete: 'cascade' }),
+      .references(() => validationResults.id, { onDelete: 'set null' }),
+    ruleCode: text('rule_code'), // stable key to re-link after re-validation
     explanation: text('explanation').notNull(),
     submittedBy: text('submitted_by')
       .notNull()
