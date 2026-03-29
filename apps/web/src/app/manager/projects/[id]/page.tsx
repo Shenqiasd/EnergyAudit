@@ -33,8 +33,10 @@ import {
   useProjectMembers,
   useAddMember,
   useRemoveMember,
+  useExtendProjectDeadline,
   useProjectTimeline,
 } from "@/lib/api/hooks/use-audit-projects";
+import { DeadlineExtensionDialog } from "@/components/deadline-extension-dialog";
 
 const STATUS_LABELS: Record<string, string> = {
   pending_start: "待启动",
@@ -100,7 +102,9 @@ export default function ProjectDetailPage() {
   const removeMember = useRemoveMember(projectId);
 
   const [showAddMember, setShowAddMember] = useState(false);
+  const [showExtendDeadline, setShowExtendDeadline] = useState(false);
   const [memberForm, setMemberForm] = useState({ userId: "", role: "enterprise_contact" });
+  const extendDeadline = useExtendProjectDeadline(projectId);
 
   if (isLoading) return <PageLoading />;
   if (!project) return <div className="p-8 text-center text-[var(--color-text-secondary)]">项目不存在</div>;
@@ -145,6 +149,9 @@ export default function ProjectDetailPage() {
           <span className="text-sm font-medium text-[var(--color-danger)]">
             该项目已逾期，截止日期为 {formatDate(project.deadline)}
           </span>
+          <Button size="sm" variant="secondary" onClick={() => setShowExtendDeadline(true)}>
+            延期
+          </Button>
         </div>
       )}
 
@@ -164,9 +171,12 @@ export default function ProjectDetailPage() {
             <span className="text-[var(--color-text-secondary)]">批次：</span>
             <span className="text-[var(--color-text)]">{project.batchName ?? "-"}</span>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <span className="text-[var(--color-text-secondary)]">截止日期：</span>
             <span className="text-[var(--color-text)]">{formatDate(project.deadline)}</span>
+            <Button size="sm" variant="ghost" onClick={() => setShowExtendDeadline(true)}>
+              延期
+            </Button>
           </div>
           <div>
             <span className="text-[var(--color-text-secondary)]">创建时间：</span>
@@ -328,6 +338,17 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       </Modal>
+
+      <DeadlineExtensionDialog
+        open={showExtendDeadline}
+        onClose={() => setShowExtendDeadline(false)}
+        onSubmit={async (data) => {
+          await extendDeadline.mutateAsync(data);
+        }}
+        isPending={extendDeadline.isPending}
+        entityType="project"
+        currentDeadline={project.deadline}
+      />
     </div>
   );
 }

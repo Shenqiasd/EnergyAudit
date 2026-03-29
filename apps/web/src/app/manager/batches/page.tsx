@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Layers, Plus } from "lucide-react";
+import { AlertTriangle, Layers, Plus } from "lucide-react";
 import { useAuditBatches, useCreateBatch } from "@/lib/api/hooks/use-audit-batches";
 import { useBusinessTypes } from "@/lib/api/hooks/use-business-types";
 import { useRouter } from "next/navigation";
@@ -168,7 +168,15 @@ export default function ManagerBatchesPage() {
                     <TableCell>{formatDate(batch.reviewDeadline)}</TableCell>
                     <TableCell>{batch.projectCount ?? 0}</TableCell>
                     <TableCell>
-                      <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                        {batch.isOverdue && (
+                          <Badge variant="danger">
+                            <AlertTriangle size={12} className="mr-0.5" />
+                            超期
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

@@ -262,6 +262,51 @@ export class AuditProjectService {
     return transitions;
   }
 
+  async extendDeadline(id: string, newDeadline: string, reason: string, userId?: string, userRole?: string) {
+    const [project] = await this.db
+      .select()
+      .from(schema.auditProjects)
+      .where(eq(schema.auditProjects.id, id))
+      .limit(1);
+
+    if (!project) {
+      throw new HttpException('项目不存在', HttpStatus.NOT_FOUND);
+    }
+
+    const deadline = new Date(newDeadline);
+    const now = new Date();
+    const isOverdue = deadline < now && project.status !== 'completed' && project.status !== 'closed';
+
+    await this.db.transaction(async (tx) => {
+      await tx
+        .update(schema.auditProjects)
+        .set({
+          deadline,
+          isOverdue,
+          updatedAt: now,
+        })
+        .where(eq(schema.auditProjects.id, id));
+
+      // Record in audit logs
+      const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await tx.insert(schema.auditLogs).values({
+        id: logId,
+        userId: userId ?? 'system',
+        userRole: userRole ?? 'manager',
+        action: 'extend_deadline',
+        targetType: 'audit_project',
+        targetId: id,
+        detail: JSON.stringify({
+          oldDeadline: project.deadline?.toISOString() ?? null,
+          newDeadline: deadline.toISOString(),
+          reason,
+        }),
+      });
+    });
+
+    return { id, deadline: deadline.toISOString(), isOverdue, reason };
+  }
+
   async snapshotEnterpriseProfile(projectId: string) {
     const [project] = await this.db
       .select()

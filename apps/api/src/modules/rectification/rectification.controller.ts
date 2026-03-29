@@ -3,9 +3,11 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
+  Req,
 } from '@nestjs/common';
 
 import { Roles } from '../auth/roles.decorator';
@@ -85,5 +87,14 @@ export class RectificationController {
   @Put(':id/close')
   async closeTask(@Param('id') id: string) {
     return this.rectificationService.closeTask(id);
+  }
+
+  @Patch(':id/extend-deadline')
+  async extendDeadline(
+    @Param('id') id: string,
+    @Body() body: { newDeadline: string; reason: string },
+    @Req() req: { user?: { id?: string; role?: string } },
+  ) {
+    return this.rectificationService.extendDeadline(id, body.newDeadline, body.reason, req.user?.id, req.user?.role);
   }
 }

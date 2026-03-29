@@ -3,9 +3,11 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
+  Req,
 } from '@nestjs/common';
 
 import { Roles } from '../auth/roles.decorator';
@@ -54,5 +56,14 @@ export class AuditBatchController {
   @Put(':id/close')
   async close(@Param('id') id: string) {
     return this.batchService.close(id);
+  }
+
+  @Patch(':id/extend-deadline')
+  async extendDeadline(
+    @Param('id') id: string,
+    @Body() body: { newDeadline: string; reason: string; deadlineType?: 'filing' | 'review' },
+    @Req() req: { user?: { id?: string; role?: string } },
+  ) {
+    return this.batchService.extendDeadline(id, body, req.user?.id, req.user?.role);
   }
 }

@@ -164,6 +164,21 @@ export function useRejectRectification(id: string) {
   });
 }
 
+export function useExtendRectificationDeadline(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { newDeadline: string; reason: string }) =>
+      apiClient.patch<{ id: string; deadline: string; isOverdue: boolean; reason: string }>(
+        `/rectifications/${id}/extend-deadline`,
+        data,
+      ),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
+      void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+    },
+  });
+}
+
 export function useRectificationStats(query: { projectId?: string; batchId?: string } = {}) {
   const params: Record<string, string> = {};
   if (query.projectId) params.projectId = query.projectId;

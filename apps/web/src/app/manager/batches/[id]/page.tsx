@@ -15,7 +15,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowLeft, Building2, CheckCircle, Clock, FileText, Users } from "lucide-react";
-import { useAuditBatch, useAssignEnterprises } from "@/lib/api/hooks/use-audit-batches";
+import { useAuditBatch, useAssignEnterprises, useExtendBatchDeadline } from "@/lib/api/hooks/use-audit-batches";
+import { DeadlineExtensionDialog } from "@/components/deadline-extension-dialog";
 import { useEnterprises } from "@/lib/api/hooks/use-enterprises";
 import { useAuditProjects } from "@/lib/api/hooks/use-audit-projects";
 
@@ -52,6 +53,8 @@ export default function BatchDetailPage() {
   const assignEnterprises = useAssignEnterprises(batchId);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showExtendDeadline, setShowExtendDeadline] = useState(false);
+  const extendDeadline = useExtendBatchDeadline(batchId);
 
   if (batchLoading) return <PageLoading />;
   if (!batch) return <div className="p-8 text-center text-[var(--color-text-secondary)]">批次不存在</div>;
@@ -90,6 +93,9 @@ export default function BatchDetailPage() {
             {batch.year}年度 · 共 {batch.totalProjects} 个项目
           </p>
         </div>
+        <Button size="sm" variant="secondary" onClick={() => setShowExtendDeadline(true)}>
+          延期
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -217,6 +223,16 @@ export default function BatchDetailPage() {
           </TableBody>
         </Table>
       </Card>
+      <DeadlineExtensionDialog
+        open={showExtendDeadline}
+        onClose={() => setShowExtendDeadline(false)}
+        onSubmit={async (data) => {
+          await extendDeadline.mutateAsync({ ...data, deadlineType: "filing" });
+        }}
+        isPending={extendDeadline.isPending}
+        entityType="batch"
+        currentDeadline={batch.filingDeadline}
+      />
     </div>
   );
 }
