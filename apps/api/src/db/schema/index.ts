@@ -394,6 +394,12 @@ export const importJobs = pgTable('import_jobs', {
   startedAt: timestamp('started_at', { withTimezone: true }),
   completedAt: timestamp('completed_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  preImportSnapshot: jsonb('pre_import_snapshot'),
+  isRolledBack: boolean('is_rolled_back').notNull().default(false),
+  rolledBackAt: timestamp('rolled_back_at', { withTimezone: true }),
+  rolledBackBy: text('rolled_back_by').references(() => userAccounts.id, {
+    onDelete: 'set null',
+  }),
 });
 
 export const validationResults = pgTable(
