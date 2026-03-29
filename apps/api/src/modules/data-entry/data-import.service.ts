@@ -54,12 +54,15 @@ export class DataImportService {
       throw new HttpException('数据格式解析失败', HttpStatus.BAD_REQUEST);
     }
 
-    // Find or create the data record
+    // Find or create the data record (filter by both auditProjectId and moduleCode)
     let [record] = await this.db
       .select()
       .from(schema.dataRecords)
       .where(
-        eq(schema.dataRecords.auditProjectId, dto.auditProjectId),
+        and(
+          eq(schema.dataRecords.auditProjectId, dto.auditProjectId),
+          eq(schema.dataRecords.moduleCode, dto.moduleCode),
+        ),
       )
       .limit(1);
 
@@ -201,6 +204,7 @@ export class DataImportService {
    * Rollback an import: restore data items from pre-import snapshot.
    */
   async rollbackImport(importJobId: string, userId: string) {
+    // Pre-check outside transaction for fast rejection
     const check = await this.canRollback(importJobId);
     if (!check.canRollback) {
       throw new HttpException(
@@ -209,86 +213,105 @@ export class DataImportService {
       );
     }
 
-    const [job] = await this.db
-      .select()
-      .from(schema.importJobs)
-      .where(eq(schema.importJobs.id, importJobId))
-      .limit(1);
+    // Wrap entire rollback in a transaction to ensure atomicity
+    return await this.db.transaction(async (tx) => {
+      // Re-fetch job inside transaction to prevent race conditions
+      const [job] = await tx
+        .select()
+        .from(schema.importJobs)
+        .where(eq(schema.importJobs.id, importJobId))
+        .limit(1);
 
-    if (!job) {
-      throw new HttpException('导入任务不存在', HttpStatus.NOT_FOUND);
-    }
+      if (!job) {
+        throw new HttpException('导入任务不存在', HttpStatus.NOT_FOUND);
+      }
 
-    const snapshot = job.preImportSnapshot as SnapshotItem[] | null;
+      // Re-check rollback eligibility inside transaction to prevent race conditions
+      if (job.isRolledBack) {
+        throw new HttpException('该导入已被回滚', HttpStatus.BAD_REQUEST);
+      }
 
-    // Find the data record for this import
-    const [record] = await this.db
-      .select()
-      .from(schema.dataRecords)
-      .where(
-        and(
-          eq(schema.dataRecords.auditProjectId, job.auditProjectId),
-          eq(schema.dataRecords.moduleCode, job.moduleCode),
-        ),
-      )
-      .limit(1);
+      if (!job.preImportSnapshot) {
+        throw new HttpException('无导入前快照数据', HttpStatus.BAD_REQUEST);
+      }
 
-    if (!record) {
-      throw new HttpException('关联的数据记录不存在', HttpStatus.NOT_FOUND);
-    }
+      const completedAt = job.completedAt ?? job.createdAt;
+      const elapsed = Date.now() - new Date(completedAt).getTime();
+      if (elapsed > ROLLBACK_TIME_LIMIT_MS) {
+        throw new HttpException('已超过24小时回滚时限', HttpStatus.BAD_REQUEST);
+      }
 
-    // 1. Delete all current data items for this record
-    await this.db
-      .delete(schema.dataItems)
-      .where(eq(schema.dataItems.dataRecordId, record.id));
+      const snapshot = job.preImportSnapshot as SnapshotItem[] | null;
 
-    // 2. Restore data items from snapshot
-    if (snapshot && snapshot.length > 0) {
-      await this.db.insert(schema.dataItems).values(
-        snapshot.map((item) => ({
-          id: item.id,
-          dataRecordId: item.dataRecordId,
-          fieldCode: item.fieldCode,
-          rawValue: item.rawValue,
-          calculatedValue: item.calculatedValue,
-          manualOverrideValue: item.manualOverrideValue,
-          finalValue: item.finalValue,
-          unit: item.unit,
-        })),
-      );
-    }
+      // Find the data record for this import
+      const [record] = await tx
+        .select()
+        .from(schema.dataRecords)
+        .where(
+          and(
+            eq(schema.dataRecords.auditProjectId, job.auditProjectId),
+            eq(schema.dataRecords.moduleCode, job.moduleCode),
+          ),
+        )
+        .limit(1);
 
-    // 3. Mark import job as rolled back
-    await this.db
-      .update(schema.importJobs)
-      .set({
-        isRolledBack: true,
-        rolledBackAt: new Date(),
-        rolledBackBy: userId,
-      })
-      .where(eq(schema.importJobs.id, importJobId));
+      if (!record) {
+        throw new HttpException('关联的数据记录不存在', HttpStatus.NOT_FOUND);
+      }
 
-    // 4. Create audit log entry
-    const logId = `al_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await this.db.insert(schema.auditLogs).values({
-      id: logId,
-      userId,
-      userRole: 'manager',
-      action: 'import_rollback',
-      targetType: 'import_job',
-      targetId: importJobId,
-      detail: JSON.stringify({
-        auditProjectId: job.auditProjectId,
-        moduleCode: job.moduleCode,
+      // 1. Delete all current data items for this record
+      await tx
+        .delete(schema.dataItems)
+        .where(eq(schema.dataItems.dataRecordId, record.id));
+
+      // 2. Restore data items from snapshot
+      if (snapshot && snapshot.length > 0) {
+        await tx.insert(schema.dataItems).values(
+          snapshot.map((item) => ({
+            id: item.id,
+            dataRecordId: item.dataRecordId,
+            fieldCode: item.fieldCode,
+            rawValue: item.rawValue,
+            calculatedValue: item.calculatedValue,
+            manualOverrideValue: item.manualOverrideValue,
+            finalValue: item.finalValue,
+            unit: item.unit,
+          })),
+        );
+      }
+
+      // 3. Mark import job as rolled back
+      await tx
+        .update(schema.importJobs)
+        .set({
+          isRolledBack: true,
+          rolledBackAt: new Date(),
+          rolledBackBy: userId,
+        })
+        .where(eq(schema.importJobs.id, importJobId));
+
+      // 4. Create audit log entry
+      const logId = `al_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await tx.insert(schema.auditLogs).values({
+        id: logId,
+        userId,
+        userRole: 'manager',
+        action: 'import_rollback',
+        targetType: 'import_job',
+        targetId: importJobId,
+        detail: JSON.stringify({
+          auditProjectId: job.auditProjectId,
+          moduleCode: job.moduleCode,
+          restoredItemCount: snapshot?.length ?? 0,
+        }),
+      });
+
+      return {
+        success: true,
+        importJobId,
         restoredItemCount: snapshot?.length ?? 0,
-      }),
+      };
     });
-
-    return {
-      success: true,
-      importJobId,
-      restoredItemCount: snapshot?.length ?? 0,
-    };
   }
 
   private parseCsv(data: string): ImportRow[] {
