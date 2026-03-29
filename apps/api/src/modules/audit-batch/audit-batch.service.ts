@@ -235,6 +235,8 @@ export class AuditBatchService {
   async extendDeadline(
     id: string,
     body: { newDeadline: string; reason: string; deadlineType?: 'filing' | 'review' },
+    userId?: string,
+    userRole?: string,
   ) {
     const [batch] = await this.db
       .select()
@@ -269,35 +271,54 @@ export class AuditBatchService {
       updateData.isOverdue = true;
     }
 
-    await this.db
-      .update(schema.auditBatches)
-      .set(updateData)
-      .where(eq(schema.auditBatches.id, id));
+    const updated = await this.db.transaction(async (tx) => {
+      await tx
+        .update(schema.auditBatches)
+        .set(updateData)
+        .where(eq(schema.auditBatches.id, id));
 
-    // Record in audit logs
-    const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await this.db.insert(schema.auditLogs).values({
-      id: logId,
-      userId: 'system',
-      userRole: 'manager',
-      action: 'extend_deadline',
-      targetType: 'audit_batch',
-      targetId: id,
-      detail: JSON.stringify({
-        deadlineType,
-        oldDeadline: deadlineType === 'filing'
-          ? batch.filingDeadline?.toISOString() ?? null
-          : batch.reviewDeadline?.toISOString() ?? null,
-        newDeadline: deadline.toISOString(),
-        reason: body.reason,
-      }),
+      // Cascade deadline to child projects when filing deadline changes
+      if (deadlineType === 'filing') {
+        const isProjectOverdue = deadline < now;
+        await tx
+          .update(schema.auditProjects)
+          .set({
+            deadline,
+            isOverdue: isProjectOverdue
+              ? sql`CASE WHEN ${schema.auditProjects.status} NOT IN ('completed', 'closed') THEN true ELSE is_overdue END`
+              : false,
+            updatedAt: now,
+          })
+          .where(eq(schema.auditProjects.batchId, id));
+      }
+
+      // Record in audit logs
+      const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await tx.insert(schema.auditLogs).values({
+        id: logId,
+        userId: userId ?? 'system',
+        userRole: userRole ?? 'manager',
+        action: 'extend_deadline',
+        targetType: 'audit_batch',
+        targetId: id,
+        detail: JSON.stringify({
+          deadlineType,
+          oldDeadline: deadlineType === 'filing'
+            ? batch.filingDeadline?.toISOString() ?? null
+            : batch.reviewDeadline?.toISOString() ?? null,
+          newDeadline: deadline.toISOString(),
+          reason: body.reason,
+        }),
+      });
+
+      const [result] = await tx
+        .select()
+        .from(schema.auditBatches)
+        .where(eq(schema.auditBatches.id, id))
+        .limit(1);
+
+      return result;
     });
-
-    const [updated] = await this.db
-      .select()
-      .from(schema.auditBatches)
-      .where(eq(schema.auditBatches.id, id))
-      .limit(1);
 
     return updated;
   }

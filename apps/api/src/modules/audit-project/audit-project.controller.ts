@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
 } from '@nestjs/common';
 
 import { Roles } from '../auth/roles.decorator';
@@ -67,7 +68,8 @@ export class AuditProjectController {
   async extendDeadline(
     @Param('id') id: string,
     @Body() body: { newDeadline: string; reason: string },
+    @Req() req: { user?: { id?: string; role?: string } },
   ) {
-    return this.projectService.extendDeadline(id, body.newDeadline, body.reason);
+    return this.projectService.extendDeadline(id, body.newDeadline, body.reason, req.user?.id, req.user?.role);
   }
 }

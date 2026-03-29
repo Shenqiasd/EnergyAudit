@@ -262,7 +262,7 @@ export class AuditProjectService {
     return transitions;
   }
 
-  async extendDeadline(id: string, newDeadline: string, reason: string, userId?: string) {
+  async extendDeadline(id: string, newDeadline: string, reason: string, userId?: string, userRole?: string) {
     const [project] = await this.db
       .select()
       .from(schema.auditProjects)
@@ -277,29 +277,31 @@ export class AuditProjectService {
     const now = new Date();
     const isOverdue = deadline < now && project.status !== 'completed' && project.status !== 'closed';
 
-    await this.db
-      .update(schema.auditProjects)
-      .set({
-        deadline,
-        isOverdue,
-        updatedAt: now,
-      })
-      .where(eq(schema.auditProjects.id, id));
+    await this.db.transaction(async (tx) => {
+      await tx
+        .update(schema.auditProjects)
+        .set({
+          deadline,
+          isOverdue,
+          updatedAt: now,
+        })
+        .where(eq(schema.auditProjects.id, id));
 
-    // Record in audit logs
-    const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await this.db.insert(schema.auditLogs).values({
-      id: logId,
-      userId: userId ?? 'system',
-      userRole: 'manager',
-      action: 'extend_deadline',
-      targetType: 'audit_project',
-      targetId: id,
-      detail: JSON.stringify({
-        oldDeadline: project.deadline?.toISOString() ?? null,
-        newDeadline: deadline.toISOString(),
-        reason,
-      }),
+      // Record in audit logs
+      const logId = `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await tx.insert(schema.auditLogs).values({
+        id: logId,
+        userId: userId ?? 'system',
+        userRole: userRole ?? 'manager',
+        action: 'extend_deadline',
+        targetType: 'audit_project',
+        targetId: id,
+        detail: JSON.stringify({
+          oldDeadline: project.deadline?.toISOString() ?? null,
+          newDeadline: deadline.toISOString(),
+          reason,
+        }),
+      });
     });
 
     return { id, deadline: deadline.toISOString(), isOverdue, reason };
