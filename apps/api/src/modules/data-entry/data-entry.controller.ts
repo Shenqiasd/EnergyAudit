@@ -125,9 +125,9 @@ export class DataEntryController {
   @Post('records/:id/return')
   async returnRecord(
     @Param('id') id: string,
-    @Body() body: { reason: string },
+    @Body() body: { reason: string; returnedBy?: string },
   ) {
-    return this.recordService.returnRecord(id, body.reason);
+    return this.recordService.returnRecord(id, body.reason, body.returnedBy);
   }
 
   @Post('records/:id/lock')

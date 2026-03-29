@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataReturnBanner } from "@/components/data-return-dialog";
 import { Input } from "@/components/ui/input";
 import { Loading } from "@/components/ui/loading";
 import { Select } from "@/components/ui/select";
@@ -229,6 +230,15 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
           </Badge>
         </div>
       </div>
+
+      {/* Return reason banner */}
+      {recordStatus === "returned" && recordDetail && (
+        <DataReturnBanner
+          returnReason={recordDetail.returnReason ?? null}
+          returnedBy={recordDetail.returnedBy ?? null}
+          returnedAt={recordDetail.returnedAt ?? null}
+        />
+      )}
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (

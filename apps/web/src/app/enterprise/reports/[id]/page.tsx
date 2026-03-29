@@ -7,7 +7,8 @@ import { PageLoading } from "@/components/ui/loading";
 import { EnergyBarChart } from "@/components/charts/energy-bar-chart";
 import { EnergyPieChart } from "@/components/charts/energy-pie-chart";
 import { SankeyDiagram } from "@/components/charts/sankey-diagram";
-import { useReport, useReportVersions } from "@/lib/api/hooks/use-reports";
+import { ReportVersionHistory } from "@/components/report-version-history";
+import { useReport } from "@/lib/api/hooks/use-reports";
 import { useChartData } from "@/lib/api/hooks/use-charts";
 import { ChevronLeft, Download, FileText, Upload } from "lucide-react";
 import Link from "next/link";
@@ -79,7 +80,6 @@ export default function EnterpriseReportDetailPage() {
   const params = useParams();
   const reportId = params.id as string;
   const { data: report, isLoading } = useReport(reportId);
-  const { data: versions } = useReportVersions(reportId);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   if (isLoading) return <PageLoading />;
@@ -182,41 +182,8 @@ export default function EnterpriseReportDetailPage() {
             </Card>
           )}
 
-          {/* Version history */}
-          {versions && versions.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>版本历史</CardTitle>
-              </CardHeader>
-              <div className="space-y-2">
-                {versions.map((v) => (
-                  <div
-                    key={v.id}
-                    className="flex items-center justify-between rounded-lg border border-[var(--color-border)] p-3"
-                  >
-                    <div>
-                      <span className="text-sm font-medium">
-                        {v.versionType === "system_draft"
-                          ? "系统草稿"
-                          : v.versionType === "enterprise_revision"
-                            ? "企业修订"
-                            : "终版"}{" "}
-                        v{v.versionNumber}
-                      </span>
-                      <span className="ml-3 text-xs text-[var(--color-text-secondary)]">
-                        {new Date(v.createdAt).toLocaleString("zh-CN")}
-                      </span>
-                    </div>
-                    {v.fileUrl && (
-                      <Button variant="ghost" size="sm">
-                        <Download size={14} />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
+          {/* Version history with comparison and activation */}
+          <ReportVersionHistory reportId={reportId} />
         </div>
       </div>
     </div>

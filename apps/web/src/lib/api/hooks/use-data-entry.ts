@@ -43,6 +43,8 @@ interface DataRecord {
   templateVersionId: string | null;
   submittedAt: string | null;
   returnReason: string | null;
+  returnedBy: string | null;
+  returnedAt: string | null;
   lockHolderId: string | null;
   lockAcquiredAt: string | null;
   createdAt: string;
@@ -204,11 +206,12 @@ export function useSubmitRecord(id: string) {
 export function useReturnRecord(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { reason: string }) =>
+    mutationFn: (data: { reason: string; returnedBy?: string }) =>
       apiClient.post<DataRecord>(`/data-entry/records/${id}/return`, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
       void queryClient.invalidateQueries({ queryKey: ["data-records"] });
+      void queryClient.invalidateQueries({ queryKey: ["data-modules"] });
     },
   });
 }

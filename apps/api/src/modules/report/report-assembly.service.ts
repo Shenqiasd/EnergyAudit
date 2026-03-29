@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import { DRIZZLE } from '../../db/database.module';
 import * as schema from '../../db/schema';
-import { ReportService } from './report.service';
+import { ReportVersionService } from './report-version.service';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
@@ -29,7 +29,7 @@ const STANDARD_SECTIONS: SectionTemplate[] = [
 export class ReportAssemblyService {
   constructor(
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
-    private readonly reportService: ReportService,
+    private readonly versionService: ReportVersionService,
   ) {}
 
   async generateReport(projectId: string, createdBy?: string) {
@@ -63,10 +63,10 @@ export class ReportAssemblyService {
         })
         .where(eq(schema.reports.id, reportId));
 
-      // Delete old sections
+      // Delete old current sections only (preserve version snapshots)
       await this.db
         .delete(schema.reportSections)
-        .where(eq(schema.reportSections.reportId, reportId));
+        .where(and(eq(schema.reportSections.reportId, reportId), isNull(schema.reportSections.reportVersionId)));
     } else {
       reportId = `rpt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       await this.db.insert(schema.reports).values({
@@ -143,8 +143,8 @@ export class ReportAssemblyService {
       });
     }
 
-    // Create version record
-    await this.reportService.createVersion(reportId, 'system_draft', undefined, createdBy);
+    // Create version record with section snapshots
+    await this.versionService.createVersion(reportId, 'system_draft', undefined, createdBy);
 
     return { reportId, status: 'system_draft', sectionsCount: STANDARD_SECTIONS.length };
   }
