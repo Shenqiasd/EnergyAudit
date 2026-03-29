@@ -231,7 +231,7 @@ export class DataRecordService {
     return updated;
   }
 
-  async returnRecord(id: string, reason: string) {
+  async returnRecord(id: string, reason: string, returnedBy?: string) {
     const [record] = await this.db
       .select()
       .from(schema.dataRecords)
@@ -249,11 +249,17 @@ export class DataRecordService {
       );
     }
 
+    if (!reason || reason.trim().length === 0) {
+      throw new HttpException('退回原因不能为空', HttpStatus.BAD_REQUEST);
+    }
+
     const [updated] = await this.db
       .update(schema.dataRecords)
       .set({
         status: 'returned',
         returnReason: reason,
+        returnedBy: returnedBy ?? null,
+        returnedAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(schema.dataRecords.id, id))

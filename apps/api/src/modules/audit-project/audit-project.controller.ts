@@ -72,4 +72,14 @@ export class AuditProjectController {
   ) {
     return this.projectService.extendDeadline(id, body.newDeadline, body.reason, req.user?.id, req.user?.role);
   }
+
+  @Get(':id/enterprise-profile')
+  async getEnterpriseProfile(@Param('id') id: string) {
+    return this.projectService.getProjectProfile(id);
+  }
+
+  @Post(':id/snapshot-profile')
+  async snapshotProfile(@Param('id') id: string) {
+    return this.projectService.snapshotEnterpriseProfile(id);
+  }
 }

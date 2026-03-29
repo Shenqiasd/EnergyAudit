@@ -307,6 +307,76 @@ export class AuditProjectService {
     return { id, deadline: deadline.toISOString(), isOverdue, reason };
   }
 
+  async snapshotEnterpriseProfile(projectId: string) {
+    const [project] = await this.db
+      .select()
+      .from(schema.auditProjects)
+      .where(eq(schema.auditProjects.id, projectId))
+      .limit(1);
+
+    if (!project) {
+      throw new HttpException('项目不存在', HttpStatus.NOT_FOUND);
+    }
+
+    // Check if snapshot already exists
+    const [existing] = await this.db
+      .select()
+      .from(schema.enterpriseProfiles)
+      .where(eq(schema.enterpriseProfiles.auditProjectId, projectId))
+      .limit(1);
+
+    if (existing) {
+      return existing;
+    }
+
+    // Get enterprise data
+    const [enterprise] = await this.db
+      .select()
+      .from(schema.enterprises)
+      .where(eq(schema.enterprises.id, project.enterpriseId))
+      .limit(1);
+
+    if (!enterprise) {
+      throw new HttpException('企业不存在', HttpStatus.NOT_FOUND);
+    }
+
+    const profileId = `ep_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+    const [profile] = await this.db
+      .insert(schema.enterpriseProfiles)
+      .values({
+        id: profileId,
+        auditProjectId: projectId,
+        enterpriseId: enterprise.id,
+        name: enterprise.name,
+        unifiedSocialCreditCode: enterprise.unifiedSocialCreditCode,
+        industryCode: enterprise.industryCode ?? null,
+        contactPerson: enterprise.contactPerson ?? null,
+        contactPhone: enterprise.contactPhone ?? null,
+        contactEmail: enterprise.contactEmail ?? null,
+        address: enterprise.address ?? null,
+        snapshotAt: new Date(),
+      })
+      .returning();
+
+    return profile;
+  }
+
+  async getProjectProfile(projectId: string) {
+    const [profile] = await this.db
+      .select()
+      .from(schema.enterpriseProfiles)
+      .where(eq(schema.enterpriseProfiles.auditProjectId, projectId))
+      .limit(1);
+
+    if (!profile) {
+      // Try to create snapshot on-demand
+      return this.snapshotEnterpriseProfile(projectId);
+    }
+
+    return profile;
+  }
+
   async updateOverdueStatus() {
     const now = new Date();
     await this.db

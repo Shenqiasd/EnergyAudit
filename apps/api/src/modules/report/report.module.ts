@@ -6,12 +6,13 @@ import { NotificationModule } from '../notification/notification.module';
 import { ReportAssemblyService } from './report-assembly.service';
 import { ReportController } from './report.controller';
 import { ReportService } from './report.service';
+import { ReportVersionService } from './report-version.service';
 
 @Module({
   imports: [JobsModule, NotificationModule],
   controllers: [ReportController],
-  providers: [ReportService, ReportAssemblyService],
-  exports: [ReportService, ReportAssemblyService],
+  providers: [ReportService, ReportAssemblyService, ReportVersionService],
+  exports: [ReportService, ReportAssemblyService, ReportVersionService],
 })
 export class ReportModule implements OnModuleInit {
   constructor(

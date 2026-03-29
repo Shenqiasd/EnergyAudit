@@ -26,6 +26,7 @@ import {
   Users,
   Trash2,
 } from "lucide-react";
+import { EnterpriseProfileCard } from "@/components/enterprise-profile-card";
 import {
   useAuditProject,
   useTransitionProject,
@@ -204,6 +205,9 @@ export default function ProjectDetailPage() {
           </div>
         )}
       </Card>
+
+      {/* Enterprise Profile Snapshot */}
+      <EnterpriseProfileCard projectId={projectId} />
 
       <Card>
         <CardHeader>
