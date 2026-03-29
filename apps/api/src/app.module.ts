@@ -23,6 +23,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ExportModule } from './modules/export/export.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { AuthModule } from './modules/auth/auth.module';
     StatisticsModule,
     LedgerModule,
     NotificationModule,
+    ExportModule,
   ],
 })
 export class AppModule {}
