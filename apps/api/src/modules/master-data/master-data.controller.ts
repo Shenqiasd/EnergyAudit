@@ -16,12 +16,14 @@ import { ProductDefinitionService } from './product-definition.service';
 import { UnitDefinitionService } from './unit-definition.service';
 import { CarbonEmissionFactorService } from './carbon-emission-factor.service';
 import { ConfigCompletenessService } from './config-completeness.service';
+import { ConfigOverrideService } from './config-override.service';
 
 import type { CreateDictionaryDto, UpdateDictionaryDto } from './dictionary.service';
 import type { CreateEnergyDefinitionDto, UpdateEnergyDefinitionDto } from './energy-definition.service';
 import type { CreateProductDefinitionDto, UpdateProductDefinitionDto } from './product-definition.service';
 import type { CreateUnitDefinitionDto, UpdateUnitDefinitionDto } from './unit-definition.service';
 import type { CreateCarbonEmissionFactorDto, UpdateCarbonEmissionFactorDto } from './carbon-emission-factor.service';
+import type { SetOverrideDto } from './config-override.service';
 
 @Roles('enterprise_user', 'manager')
 @Controller()
@@ -33,6 +35,7 @@ export class MasterDataController {
     private readonly unitDefinitionService: UnitDefinitionService,
     private readonly carbonEmissionFactorService: CarbonEmissionFactorService,
     private readonly configCompletenessService: ConfigCompletenessService,
+    private readonly configOverrideService: ConfigOverrideService,
   ) {}
 
   // ==================== Dictionaries ====================
@@ -179,5 +182,40 @@ export class MasterDataController {
   @Get('enterprises/:enterpriseId/config-completeness')
   getConfigCompleteness(@Param('enterpriseId') enterpriseId: string) {
     return this.configCompletenessService.check(enterpriseId);
+  }
+
+  // ==================== Config Overrides ====================
+
+  @Get('config-overrides')
+  getConfigOverrides(
+    @Query('scopeType') scopeType: string,
+    @Query('scopeId') scopeId?: string,
+    @Query('targetType') targetType?: string,
+  ) {
+    return this.configOverrideService.getOverrides(scopeType, scopeId, targetType);
+  }
+
+  @Put('config-overrides')
+  setConfigOverride(@Body() dto: SetOverrideDto) {
+    return this.configOverrideService.setOverride(dto);
+  }
+
+  @Delete('config-overrides/:id')
+  deleteConfigOverride(@Param('id') id: string) {
+    return this.configOverrideService.deleteOverride(id);
+  }
+
+  @Get('config-effective/:moduleCode')
+  getEffectiveConfig(
+    @Param('moduleCode') moduleCode: string,
+    @Query('enterpriseId') enterpriseId?: string,
+    @Query('batchId') batchId?: string,
+    @Query('industryCode') industryCode?: string,
+  ) {
+    return this.configOverrideService.getEffectiveConfig(moduleCode, {
+      enterpriseId,
+      batchId,
+      industryCode,
+    });
   }
 }

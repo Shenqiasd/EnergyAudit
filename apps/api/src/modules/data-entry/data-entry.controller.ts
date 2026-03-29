@@ -20,10 +20,12 @@ import { DataImportService } from './data-import.service';
 import { DataLockService } from './data-lock.service';
 import { DataRecordService } from './data-record.service';
 import { DataValidationService } from './data-validation.service';
+import { DataExceptionService } from './data-exception.service';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { ImportDataDto } from './data-import.service';
 import type { CreateRecordDto, RecordListQuery, SaveRecordDto } from './data-record.service';
+import type { SubmitExceptionDto } from './data-exception.service';
 
 @Roles('enterprise_user', 'manager')
 @Controller('data-entry')
@@ -34,6 +36,7 @@ export class DataEntryController {
     private readonly calculationService: DataCalculationService,
     private readonly importService: DataImportService,
     private readonly lockService: DataLockService,
+    private readonly exceptionService: DataExceptionService,
     @Inject(DRIZZLE) private readonly db: PostgresJsDatabase<typeof schema>,
   ) {}
 
@@ -159,5 +162,41 @@ export class DataEntryController {
   @Post('import')
   async importData(@Body() dto: ImportDataDto) {
     return this.importService.importData(dto);
+  }
+
+  // ==================== Validation Exceptions ====================
+
+  @Post('records/:id/exceptions')
+  async submitExceptions(
+    @Param('id') id: string,
+    @Body() body: { exceptions: SubmitExceptionDto[]; userId: string },
+  ) {
+    return this.exceptionService.submitExceptions(id, body.exceptions, body.userId);
+  }
+
+  @Get('records/:id/exceptions')
+  async listExceptions(@Param('id') id: string) {
+    return this.exceptionService.listExceptions(id);
+  }
+
+  @Get('exceptions/pending')
+  async listPendingExceptions() {
+    return this.exceptionService.listPendingExceptions();
+  }
+
+  @Post('exceptions/:id/approve')
+  async approveException(
+    @Param('id') id: string,
+    @Body() body: { approverId: string },
+  ) {
+    return this.exceptionService.approveException(id, body.approverId);
+  }
+
+  @Post('exceptions/:id/reject')
+  async rejectException(
+    @Param('id') id: string,
+    @Body() body: { approverId: string; reason?: string },
+  ) {
+    return this.exceptionService.rejectException(id, body.approverId, body.reason);
   }
 }
