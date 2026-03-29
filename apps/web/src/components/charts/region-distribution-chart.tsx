@@ -3,6 +3,7 @@
 import { ChartContainer } from "./chart-container";
 
 interface RegionDataItem {
+  regionCode: string;
   regionName: string;
   enterpriseCount: number;
   totalEnergyConsumption: number;
@@ -47,7 +48,7 @@ export function RegionDistributionChart({
             <div
               key={i}
               className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1 transition-colors"
-              onClick={() => onClick?.(d.regionName)}
+              onClick={() => onClick?.(d.regionCode)}
             >
               <span className="w-20 truncate text-sm text-[var(--color-text)]">
                 {d.regionName}

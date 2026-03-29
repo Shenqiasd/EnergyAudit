@@ -21,7 +21,7 @@ export default function EnterpriseBenchmarkPage() {
   const params = useParams();
   const projectId = params.id as string;
   const { user } = useAuth();
-  const enterpriseId = user?.id ?? "";
+  const enterpriseId = user?.enterpriseId ?? "";
 
   const { data: comparisons, isLoading } = useBenchmarkComparison(
     enterpriseId,

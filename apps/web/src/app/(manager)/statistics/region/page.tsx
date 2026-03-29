@@ -130,11 +130,12 @@ export default function RegionStatisticsPage() {
           <RegionDistributionChart
             title="区域企业分布"
             data={distribution.map((d) => ({
+              regionCode: d.regionCode,
               regionName: d.regionName,
               enterpriseCount: d.enterpriseCount,
               totalEnergyConsumption: d.totalEnergyConsumption,
             }))}
-            onClick={(regionName) => setSelectedRegion(regionName)}
+            onClick={(regionCode) => setSelectedRegion(regionCode)}
           />
         )}
 
