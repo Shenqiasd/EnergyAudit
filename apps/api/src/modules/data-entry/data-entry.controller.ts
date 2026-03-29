@@ -164,6 +164,22 @@ export class DataEntryController {
     return this.importService.importData(dto);
   }
 
+  // ==================== Import Rollback ====================
+
+  @Get('import-jobs/:id/can-rollback')
+  async canRollback(@Param('id') id: string) {
+    return this.importService.canRollback(id);
+  }
+
+  @Roles('manager')
+  @Post('import-jobs/:id/rollback')
+  async rollbackImport(
+    @Param('id') id: string,
+    @Body() body: { userId: string },
+  ) {
+    return this.importService.rollbackImport(id, body.userId);
+  }
+
   // ==================== Validation Exceptions ====================
 
   @Post('records/:id/exceptions')
