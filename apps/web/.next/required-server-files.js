@@ -332,7 +332,7 @@ self.__SERVER_FILES_MANIFEST={
       "afterFiles": [
         {
           "source": "/api/:path*",
-          "destination": "http://localhost:3001/api/:path*"
+          "destination": "http://localhost:4000/api/:path*"
         }
       ],
       "fallback": []

@@ -61,4 +61,15 @@ The frontend uses a "Deep Slate Indigo" design system (redesigned in v0.2.0):
 
 - Shared packages (`config-engine`, `reporting`, `integrations`) must be built before starting the API
 - The API's `nest start --watch` takes ~10 seconds to compile TypeScript before opening port 3001
-- API proxying: Next.js rewrites `/api/*` to `http://localhost:3001/api/*`
+- Dev API proxying: Next.js rewrites `/api/*` to `http://localhost:3001/api/*`
+
+## Production Deployment Architecture
+
+The `.replit` port mapping is fixed: `localPort = 3001 → externalPort = 80`. This means all external HTTPS traffic (port 80/443) routes to local port 3001. The deployment is configured accordingly:
+
+- **Frontend**: `next start --port 3001` (receives all external traffic)
+- **API**: `node dist/main` with `API_PORT=4000` (internal only, no external exposure)
+- **Build-time**: `INTERNAL_API_URL=http://localhost:4000` so Next.js rewrites are compiled to target port 4000
+- **Result**: external request → port 80 → port 3001 (Next.js) → proxies `/api/*` → port 4000 (NestJS)
+
+Do NOT change the API port or INTERNAL_API_URL in production without also updating the Next.js build step (rewrites are compiled at build time, not runtime).
