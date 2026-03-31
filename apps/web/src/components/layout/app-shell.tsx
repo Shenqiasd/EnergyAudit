@@ -17,7 +17,7 @@ export function AppShell({ children }: AppShellProps) {
   if (!user) return <>{children}</>;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-[hsl(var(--background))]">
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
@@ -59,7 +59,10 @@ export function AppShell({ children }: AppShellProps) {
             }
           }}
         />
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-[hsl(var(--background))] p-4 lg:p-6">
+          {children}
+        </main>
+        {/* TODO: Mobile bottom tab navigation (Wave 14+) */}
       </div>
     </div>
   );

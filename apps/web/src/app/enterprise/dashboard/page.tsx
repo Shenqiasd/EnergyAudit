@@ -1,15 +1,14 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/layout/page-header";
 import { LayoutDashboard } from "lucide-react";
 
 export default function EnterpriseDashboardPage() {
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">工作台</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-          企业端工作台 — 查看审计进度、待办事项和数据概览
-        </p>
-      </div>
+      <PageHeader
+        title="工作台"
+        description="企业端工作台 — 查看审计进度、待办事项和数据概览"
+      />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[

@@ -1,6 +1,7 @@
 "use client";
 
-import { clsx } from "clsx";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth/use-auth";
 import {
   Activity,
   BarChart3,
@@ -10,22 +11,25 @@ import {
   ClipboardCheck,
   Cpu,
   Database,
-  FileBarChart,
   FileText,
   History,
   Home,
   Layers,
   LayoutDashboard,
   ListChecks,
+  LogOut,
   MapPin,
   Settings,
   Shield,
   Target,
   Wrench,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, type ElementType } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { UserRole } from "@/lib/auth/auth-provider";
 
 interface MenuItem {
@@ -126,8 +130,22 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
+const roleLabels: Record<UserRole, string> = {
+  enterprise_user: "企业端",
+  manager: "管理端",
+  reviewer: "审核端",
+};
+
+const roleBadgeColors: Record<UserRole, string> = {
+  enterprise_user: "bg-blue-100 text-blue-700",
+  manager: "bg-emerald-100 text-emerald-700",
+  reviewer: "bg-amber-100 text-amber-700",
+};
+
 export function Sidebar({ role, collapsed }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
   const menus = menusByRole[role] || [];
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () => {
@@ -151,80 +169,149 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const roleLabels: Record<UserRole, string> = {
-    enterprise_user: "企业端",
-    manager: "管理端",
-    reviewer: "审核端",
-  };
+  const userInitial = user?.name ? user.name.charAt(0) : "U";
 
   return (
     <aside
-      className={clsx(
-        "flex h-full flex-col bg-[var(--color-sidebar)] text-white transition-all duration-300",
-        collapsed ? "w-16" : "w-60",
+      className={cn(
+        "flex h-full flex-col border-r border-[hsl(var(--sidebar-border))] bg-[hsl(var(--sidebar))] backdrop-blur-xl transition-all duration-300",
+        collapsed ? "w-16" : "w-64",
       )}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-4">
-        <FileBarChart size={24} className="shrink-0 text-blue-400" />
+      {/* Brand area */}
+      <div className="flex h-16 items-center gap-3 border-b border-[hsl(var(--sidebar-border))] px-4">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--primary))]">
+          <Zap size={18} className="text-white" />
+        </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <div className="truncate text-sm font-bold">能源审计平台</div>
-            <div className="truncate text-xs text-white/60">
-              {roleLabels[role]}
+            <div className="truncate text-sm font-semibold text-[hsl(var(--sidebar-foreground))]">
+              能源审计平台
             </div>
+            <span
+              className={cn(
+                "inline-block rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight",
+                roleBadgeColors[role],
+              )}
+            >
+              {roleLabels[role]}
+            </span>
           </div>
         )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 py-4">
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
         {menus.map((group) => (
-          <div key={group.label} className="mb-2">
+          <div key={group.label} className="mb-4">
+            {/* Group header */}
             {!collapsed && (
               <button
                 onClick={() => toggleGroup(group.label)}
-                className="flex w-full items-center justify-between px-2 py-1.5 text-xs font-medium uppercase tracking-wider text-white/40 hover:text-white/60"
+                className="mb-1 flex w-full items-center gap-2 px-2 py-1.5 text-xs font-medium tracking-wider text-[hsl(var(--sidebar-muted))] hover:text-[hsl(var(--sidebar-foreground))]"
               >
+                <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--sidebar-muted))]" />
                 {group.label}
                 <ChevronDown
                   size={14}
-                  className={clsx(
-                    "transition-transform",
+                  className={cn(
+                    "ml-auto transition-transform duration-200",
                     expandedGroups[group.label] ? "rotate-0" : "-rotate-90",
                   )}
                 />
               </button>
             )}
-            {(collapsed || expandedGroups[group.label]) && (
-              <ul className="space-y-0.5">
-                {group.items.map((item) => {
-                  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-                  const Icon = item.icon;
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={clsx(
-                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                          isActive
-                            ? "bg-[var(--color-sidebar-active)] text-white font-medium"
-                            : "text-white/70 hover:bg-[var(--color-sidebar-hover)] hover:text-white",
-                          collapsed && "justify-center px-2",
-                        )}
-                        title={collapsed ? item.label : undefined}
-                      >
-                        <Icon size={18} className="shrink-0" />
-                        {!collapsed && <span>{item.label}</span>}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+            <AnimatePresence initial={false}>
+              {(collapsed || expandedGroups[group.label]) && (
+                <motion.ul
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="space-y-0.5 overflow-hidden"
+                >
+                  {group.items.map((item) => {
+                    const isActive =
+                      pathname === item.href ||
+                      pathname.startsWith(item.href + "/");
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          className={cn(
+                            "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                            isActive
+                              ? "bg-[hsl(var(--primary)/0.08)] font-medium text-[hsl(var(--primary))]"
+                              : "text-[hsl(var(--sidebar-muted))] hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-foreground))]",
+                            collapsed && "justify-center px-2",
+                          )}
+                          title={collapsed ? item.label : undefined}
+                        >
+                          {/* Active indicator bar */}
+                          {isActive && (
+                            <motion.div
+                              layoutId="activeIndicator"
+                              className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-[hsl(var(--primary))]"
+                              transition={{
+                                type: "spring",
+                                stiffness: 350,
+                                damping: 30,
+                              }}
+                            />
+                          )}
+                          <Icon size={18} className="shrink-0" />
+                          {!collapsed && <span>{item.label}</span>}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </motion.ul>
+              )}
+            </AnimatePresence>
           </div>
         ))}
       </nav>
+
+      {/* Bottom user info */}
+      <div className="border-t border-[hsl(var(--sidebar-border))] p-3">
+        {collapsed ? (
+          <div className="flex justify-center">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(var(--primary))] text-xs font-medium text-white">
+              {userInitial}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--primary))] text-sm font-medium text-white">
+              {userInitial}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-medium text-[hsl(var(--sidebar-foreground))]">
+                {user?.name || "未登录"}
+              </div>
+              <span
+                className={cn(
+                  "inline-block rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight",
+                  roleBadgeColors[role],
+                )}
+              >
+                {roleLabels[role]}
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                logout();
+                router.push("/");
+              }}
+              className="rounded-lg p-1.5 text-[hsl(var(--sidebar-muted))] transition-colors hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--destructive))]"
+              title="退出登录"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        )}
+      </div>
     </aside>
   );
 }

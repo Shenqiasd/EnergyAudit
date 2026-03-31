@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* Legacy color tokens (keep for backward compat) */
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;
   --color-primary-light: #dbeafe;
@@ -17,6 +18,36 @@
   --color-text: #0f172a;
   --color-text-secondary: #64748b;
   --color-border: #e2e8f0;
+
+  /* HSL Design Tokens (Phase 2) */
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --ring: 221 83% 53%;
+  --radius: 0.5rem;
+
+  /* Sidebar HSL Tokens */
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 215 25% 27%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-accent: 210 40% 96%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-muted: 215 16% 47%;
 }
 
 body {
