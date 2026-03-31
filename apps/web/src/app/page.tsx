@@ -56,14 +56,14 @@ export default function HomePage() {
   const { loginDev } = useAuth();
   const router = useRouter();
 
-  const handleRoleSelect = (card: RoleCard) => {
+  const handleRoleSelect = async (card: RoleCard) => {
     const defaultUsers: Record<UserRole, { id: string; name: string }> = {
       enterprise_user: { id: "dev-enterprise-001", name: "测试企业用户" },
       manager: { id: "dev-manager-001", name: "测试管理员" },
       reviewer: { id: "dev-reviewer-001", name: "测试审核员" },
     };
     const u = defaultUsers[card.role];
-    loginDev({ ...u, role: card.role });
+    await loginDev({ ...u, role: card.role });
     router.push(card.dashboard);
   };
 
