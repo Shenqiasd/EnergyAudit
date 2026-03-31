@@ -139,6 +139,12 @@ SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
 /* ────────── Backward-compatible wrapper ────────── */
 
+// Radix Select does not support empty-string values ("" means "no selection").
+// We use a sentinel to represent empty-string options (e.g. "全部" / "select all").
+const EMPTY_SENTINEL = "__EMPTY__";
+const toRadix = (v: string) => (v === "" ? EMPTY_SENTINEL : v);
+const fromRadix = (v: string) => (v === EMPTY_SENTINEL ? "" : v);
+
 interface SelectOption {
   value: string;
   label: string;
@@ -174,8 +180,9 @@ function Select({
   name,
 }: SelectProps) {
   const handleValueChange = (val: string) => {
-    onValueChange?.(val);
-    onChange?.({ target: { value: val } });
+    const real = fromRadix(val);
+    onValueChange?.(real);
+    onChange?.({ target: { value: real } });
   };
 
   return (
@@ -189,8 +196,8 @@ function Select({
         </label>
       )}
       <SelectRoot
-        value={value}
-        defaultValue={defaultValue}
+        value={value !== undefined ? toRadix(value) : undefined}
+        defaultValue={defaultValue !== undefined ? toRadix(defaultValue) : undefined}
         onValueChange={handleValueChange}
         disabled={disabled}
         name={name}
@@ -206,7 +213,7 @@ function Select({
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem key={option.value || EMPTY_SENTINEL} value={toRadix(option.value)}>
               {option.label}
             </SelectItem>
           ))}
