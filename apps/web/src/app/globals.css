@@ -3,66 +3,66 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* 品牌色 */
-  --primary: 217 91% 60%;
+  /* Brand - Deep Slate Indigo for authoritative vibe */
+  --primary: 226 45% 35%;
   --primary-foreground: 0 0% 100%;
 
-  /* 背景 */
-  --background: 210 40% 98%;
+  /* Backgrounds */
+  --background: 210 20% 98%;
   --foreground: 222 47% 11%;
 
-  /* 卡片 */
+  /* Cards */
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
 
-  /* 边框 */
-  --border: 214 32% 91%;
-  --ring: 217 91% 60%;
+  /* Borders & Rings */
+  --border: 220 20% 90%;
+  --ring: 226 45% 35%;
 
-  /* 侧边栏 */
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 215 25% 27%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-accent: 217 91% 97%;
-  --sidebar-accent-foreground: 217 91% 50%;
-  --sidebar-muted: 215 16% 47%;
+  /* Sidebar - Dark authoritative */
+  --sidebar: 222 47% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-border: 222 47% 15%;
+  --sidebar-accent: 222 47% 18%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-muted: 215 20% 65%;
 
   /* Muted */
-  --muted: 210 40% 96%;
+  --muted: 220 20% 94%;
   --muted-foreground: 215 16% 47%;
 
-  /* 语义色 */
-  --success: 142 71% 45%;
+  /* Semantic - Warm accents for warnings/alerts */
+  --success: 160 84% 39%;
   --success-foreground: 0 0% 100%;
-  --warning: 21 90% 48%;
+  --warning: 35 92% 52%;
   --warning-foreground: 0 0% 100%;
-  --danger: 0 72% 51%;
+  --danger: 0 84% 60%;
   --danger-foreground: 0 0% 100%;
-  --info: 189 94% 43%;
+  --info: 200 90% 40%;
   --info-foreground: 0 0% 100%;
 
-  /* 输入 */
-  --input: 214 32% 91%;
+  /* Inputs */
+  --input: 220 20% 90%;
   --input-foreground: 222 47% 11%;
 
-  /* 弹出层 */
+  /* Popovers */
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
 
-  /* 二级色 */
-  --secondary: 210 40% 96%;
+  /* Secondary */
+  --secondary: 220 20% 94%;
   --secondary-foreground: 222 47% 11%;
 
-  /* 破坏性 */
-  --destructive: 0 72% 51%;
+  /* Destructive */
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  /* 强调 */
-  --accent: 210 40% 96%;
+  /* Accent */
+  --accent: 220 20% 94%;
   --accent-foreground: 222 47% 11%;
 
-  /* 圆角 */
-  --radius: 0.75rem;
+  /* Radius */
+  --radius: 0.5rem;
 }
 
 .dark {
@@ -83,27 +83,27 @@
   --sidebar-foreground: 215 20% 65%;
   --sidebar-border: 217 33% 17%;
   --sidebar-accent: 217 33% 14%;
-  --sidebar-accent-foreground: 217 91% 70%;
+  --sidebar-accent-foreground: 210 40% 98%;
   --sidebar-muted: 215 16% 47%;
   --muted: 217 33% 14%;
   --muted-foreground: 215 20% 55%;
-  --ring: 217 91% 60%;
-  --primary: 217 91% 60%;
+  --ring: 226 45% 45%;
+  --primary: 226 45% 55%;
   --primary-foreground: 0 0% 100%;
-  --success: 142 71% 45%;
+  --success: 160 84% 39%;
   --success-foreground: 0 0% 100%;
-  --warning: 21 90% 48%;
+  --warning: 35 92% 52%;
   --warning-foreground: 0 0% 100%;
-  --danger: 0 72% 51%;
+  --danger: 0 84% 60%;
   --danger-foreground: 0 0% 100%;
-  --info: 189 94% 43%;
+  --info: 200 90% 40%;
   --info-foreground: 0 0% 100%;
-  --destructive: 0 72% 51%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 }
 
 body {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   color: hsl(var(--foreground));
   background-color: hsl(var(--background));
 }
@@ -113,4 +113,20 @@ body {
   padding: 0;
   box-sizing: border-box;
   border-color: hsl(var(--border));
+}
+
+/* Custom Scrollbar for Dense Tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }

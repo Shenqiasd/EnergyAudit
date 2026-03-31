@@ -48,6 +48,15 @@ pnpm 10.26.1 (monorepo with Turborepo)
 11. **Next.js worker patch**: `scripts/patch-next.js` runs as `postinstall` hook — patches `next/dist/export/worker.js` to convert uncaught `TypeError` to `ExportPageError` and reset `result = undefined` so `_global-error` prerender failure is silently skipped without blocking the build. Uses Node.js string replacement (no diff/patch command) so it works reliably after fresh `pnpm install`.
 12. **Removed Google font**: Removed `next/font/google` (Inter) from root layout to avoid potential module initialization issues during `_global-error` prerender
 
+## UI Design
+
+The frontend uses a "Deep Slate Indigo" design system (redesigned in v0.2.0):
+- **Color palette**: Primary `224 71% 40%` (deep slate-indigo), distinct sidebar dark background
+- **Redesigned pages**: Home role-selector, Login (split-screen dark/light layout)
+- **Layout**: Dark solid sidebar with strong active states; polished header with breadcrumbs
+- **Components**: Button, Card, Badge, Input, Table, StatCard — all with refined shadows/hover states
+- **Dashboards**: Enterprise workbench and Manager analytics hub both visually upgraded
+
 ## Development Notes
 
 - Shared packages (`config-engine`, `reporting`, `integrations`) must be built before starting the API

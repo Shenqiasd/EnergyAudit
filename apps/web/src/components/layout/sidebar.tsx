@@ -47,12 +47,12 @@ const enterpriseMenus: MenuGroup[] = [
   {
     label: "工作台",
     items: [
-      { label: "工作台", href: "/enterprise/dashboard", icon: LayoutDashboard },
-      { label: "消息通知", href: "/enterprise/notifications", icon: Bell },
+      { label: "总览", href: "/enterprise/dashboard", icon: LayoutDashboard },
+      { label: "消息", href: "/enterprise/notifications", icon: Bell },
     ],
   },
   {
-    label: "业务管理",
+    label: "业务办理",
     items: [
       { label: "企业配置", href: "/enterprise/config", icon: Settings },
       { label: "数据填报", href: "/enterprise/filing", icon: Database },
@@ -64,56 +64,56 @@ const enterpriseMenus: MenuGroup[] = [
 
 const managerMenus: MenuGroup[] = [
   {
-    label: "工作台",
+    label: "监管中心",
     items: [
       { label: "工作台", href: "/manager/dashboard", icon: Home },
-      { label: "消息通知", href: "/manager/notifications", icon: Bell },
+      { label: "消息", href: "/manager/notifications", icon: Bell },
     ],
   },
   {
     label: "业务管理",
     items: [
-      { label: "企业管理", href: "/manager/enterprises", icon: Building2 },
-      { label: "批次管理", href: "/manager/batches", icon: Layers },
-      { label: "项目管理", href: "/manager/projects", icon: ClipboardCheck },
-      { label: "业务类型", href: "/manager/business-types", icon: Settings },
-      { label: "计算管理", href: "/manager/calculations", icon: Cpu },
+      { label: "企业名录", href: "/manager/enterprises", icon: Building2 },
+      { label: "批次计划", href: "/manager/batches", icon: Layers },
+      { label: "项目追踪", href: "/manager/projects", icon: ClipboardCheck },
+      { label: "类型配置", href: "/manager/business-types", icon: Settings },
+      { label: "核算规则", href: "/manager/calculations", icon: Cpu },
     ],
   },
   {
-    label: "数据管理",
+    label: "数据资产",
     items: [
-      { label: "填报概览", href: "/manager/data-overview", icon: Database },
-    ],
-  },
-  {
-    label: "审核与监管",
-    items: [
-      { label: "审核管理", href: "/manager/reviews", icon: Shield },
-      { label: "整改监管", href: "/manager/rectifications", icon: Wrench },
-      { label: "统计分析", href: "/manager/statistics", icon: BarChart3 },
+      { label: "填报大盘", href: "/manager/data-overview", icon: Database },
+      { label: "统计洞察", href: "/manager/statistics", icon: BarChart3 },
       { label: "能效对标", href: "/manager/benchmarks", icon: Target },
-      { label: "区域统计", href: "/manager/statistics/region", icon: MapPin },
-      { label: "台账管理", href: "/manager/ledgers", icon: FileText },
+      { label: "区域分布", href: "/manager/statistics/region", icon: MapPin },
+      { label: "基础台账", href: "/manager/ledgers", icon: FileText },
     ],
   },
   {
-    label: "运维管理",
+    label: "核查与督办",
     items: [
-      { label: "同步管理", href: "/manager/sync", icon: Activity },
-      { label: "操作日志", href: "/manager/audit-logs", icon: FileText },
-      { label: "任务监控", href: "/manager/jobs", icon: Cpu },
+      { label: "审核统筹", href: "/manager/reviews", icon: Shield },
+      { label: "整改督办", href: "/manager/rectifications", icon: Wrench },
+    ],
+  },
+  {
+    label: "系统运维",
+    items: [
+      { label: "同步监控", href: "/manager/sync", icon: Activity },
+      { label: "系统日志", href: "/manager/audit-logs", icon: FileText },
+      { label: "任务调度", href: "/manager/jobs", icon: Cpu },
     ],
   },
 ];
 
 const reviewerMenus: MenuGroup[] = [
   {
-    label: "审核工作",
+    label: "专家工作",
     items: [
-      { label: "我的审核", href: "/reviewer/tasks", icon: ListChecks },
-      { label: "审核历史", href: "/reviewer/history", icon: History },
-      { label: "消息通知", href: "/reviewer/notifications", icon: Bell },
+      { label: "待审任务", href: "/reviewer/tasks", icon: ListChecks },
+      { label: "已审记录", href: "/reviewer/history", icon: History },
+      { label: "通知公告", href: "/reviewer/notifications", icon: Bell },
     ],
   },
 ];
@@ -131,31 +131,24 @@ interface SidebarProps {
 }
 
 const roleLabels: Record<UserRole, string> = {
-  enterprise_user: "企业端",
-  manager: "管理端",
-  reviewer: "审核端",
+  enterprise_user: "重点用能单位",
+  manager: "监管机构",
+  reviewer: "评审专家",
 };
 
 const roleBadgeColors: Record<UserRole, string> = {
-  enterprise_user: "bg-blue-100 text-blue-700",
-  manager: "bg-emerald-100 text-emerald-700",
-  reviewer: "bg-amber-100 text-amber-700",
+  enterprise_user: "bg-blue-500/20 text-blue-200 border border-blue-500/30",
+  manager: "bg-emerald-500/20 text-emerald-200 border border-emerald-500/30",
+  reviewer: "bg-indigo-500/20 text-indigo-200 border border-indigo-500/30",
 };
 
-/** Collect all href values from menu groups into a flat set for precise active matching */
 function getAllHrefs(groups: MenuGroup[]): string[] {
   return groups.flatMap((g) => g.items.map((item) => item.href));
 }
 
-/**
- * Determine if a menu item should be active.
- * Uses exact match first; for prefix matches, ensures no more-specific sibling href also matches.
- * This prevents both "/manager/statistics" and "/manager/statistics/region" from being active simultaneously.
- */
 function isItemActive(pathname: string, itemHref: string, allHrefs: string[]): boolean {
   if (pathname === itemHref) return true;
   if (!pathname.startsWith(itemHref + "/")) return false;
-  // Check if a more specific href also matches — if so, this item should not be active
   const hasMoreSpecificMatch = allHrefs.some(
     (href) => href !== itemHref && href.startsWith(itemHref + "/") && (pathname === href || pathname.startsWith(href + "/")),
   );
@@ -184,7 +177,7 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       initial[group.label] = true;
     });
     setExpandedGroups(initial);
-  }, [role]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [role]); 
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -195,23 +188,23 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-[hsl(var(--sidebar-border))] bg-[hsl(var(--sidebar))] backdrop-blur-xl transition-all duration-300",
-        collapsed ? "w-16" : "w-64",
+        "flex h-full flex-col border-r border-transparent bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] transition-all duration-300 shadow-xl",
+        collapsed ? "w-[72px]" : "w-64",
       )}
     >
       {/* Brand area */}
-      <div className="flex h-16 items-center gap-3 border-b border-[hsl(var(--sidebar-border))] px-4">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--primary))]">
+      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-4 shrink-0 bg-black/10">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--primary))] shadow-sm">
           <Zap size={18} className="text-white" />
         </div>
         {!collapsed && (
-          <div className="overflow-hidden">
-            <div className="truncate text-sm font-semibold text-[hsl(var(--sidebar-foreground))]">
-              能源审计平台
+          <div className="overflow-hidden flex-1">
+            <div className="truncate text-sm font-bold text-white tracking-wide">
+              EAP 能源审计
             </div>
             <span
               className={cn(
-                "inline-block rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight",
+                "inline-block rounded px-1.5 py-0.5 text-[10px] font-medium leading-none mt-1",
                 roleBadgeColors[role],
               )}
             >
@@ -222,21 +215,20 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-3 py-6 custom-scrollbar">
         {menus.map((group) => (
-          <div key={group.label} className="mb-4">
+          <div key={group.label} className="mb-6">
             {/* Group header */}
             {!collapsed && (
               <button
                 onClick={() => toggleGroup(group.label)}
-                className="mb-1 flex w-full items-center gap-2 px-2 py-1.5 text-xs font-medium tracking-wider text-[hsl(var(--sidebar-muted))] hover:text-[hsl(var(--sidebar-foreground))]"
+                className="mb-2 flex w-full items-center justify-between px-2 py-1 text-xs font-semibold tracking-widest text-[hsl(var(--sidebar-muted))] hover:text-white transition-colors"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--sidebar-muted))]" />
-                {group.label}
+                <span>{group.label}</span>
                 <ChevronDown
                   size={14}
                   className={cn(
-                    "ml-auto transition-transform duration-200",
+                    "transition-transform duration-200 opacity-50",
                     expandedGroups[group.label] ? "rotate-0" : "-rotate-90",
                   )}
                 />
@@ -249,7 +241,7 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="space-y-0.5 overflow-hidden"
+                  className="space-y-1 overflow-hidden"
                 >
                   {group.items.map((item) => {
                     const isActive = isItemActive(pathname, item.href, allHrefs);
@@ -259,27 +251,15 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                         <Link
                           href={item.href}
                           className={cn(
-                            "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                            "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 group outline-none",
                             isActive
-                              ? "bg-[hsl(var(--primary)/0.08)] font-medium text-[hsl(var(--primary))]"
-                              : "text-[hsl(var(--sidebar-muted))] hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--sidebar-foreground))]",
+                              ? "bg-[hsl(var(--primary))] text-white font-medium shadow-md shadow-[hsl(var(--primary))]/20"
+                              : "text-[hsl(var(--sidebar-muted))] hover:bg-white/5 hover:text-white",
                             collapsed && "justify-center px-2",
                           )}
                           title={collapsed ? item.label : undefined}
                         >
-                          {/* Active indicator bar */}
-                          {isActive && (
-                            <motion.div
-                              layoutId="activeIndicator"
-                              className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-[hsl(var(--primary))]"
-                              transition={{
-                                type: "spring",
-                                stiffness: 350,
-                                damping: 30,
-                              }}
-                            />
-                          )}
-                          <Icon size={18} className="shrink-0" />
+                          <Icon size={18} className={cn("shrink-0", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100 transition-opacity")} />
                           {!collapsed && <span>{item.label}</span>}
                         </Link>
                       </li>
@@ -293,40 +273,42 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       </nav>
 
       {/* Bottom user info */}
-      <div className="border-t border-[hsl(var(--sidebar-border))] p-3">
+      <div className="border-t border-white/10 p-4 bg-black/20 mt-auto shrink-0">
         {collapsed ? (
           <div className="flex justify-center">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(var(--primary))] text-xs font-medium text-white">
-              {userInitial}
-            </div>
+            <button
+               onClick={() => {
+                logout();
+                router.push("/");
+              }}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-[hsl(var(--sidebar-muted))] hover:bg-red-500/20 hover:text-red-400 transition-colors"
+              title="退出登录"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--primary))] text-sm font-medium text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[hsl(var(--primary))] to-indigo-600 text-sm font-bold text-white shadow-inner">
               {userInitial}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-[hsl(var(--sidebar-foreground))]">
+              <div className="truncate text-sm font-medium text-white">
                 {user?.name || "未登录"}
               </div>
-              <span
-                className={cn(
-                  "inline-block rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight",
-                  roleBadgeColors[role],
-                )}
-              >
-                {roleLabels[role]}
-              </span>
+              <div className="truncate text-xs text-[hsl(var(--sidebar-muted))] mt-0.5">
+                {user?.id || "N/A"}
+              </div>
             </div>
             <button
               onClick={() => {
                 logout();
                 router.push("/");
               }}
-              className="rounded-lg p-1.5 text-[hsl(var(--sidebar-muted))] transition-colors hover:bg-[hsl(var(--sidebar-accent))] hover:text-[hsl(var(--destructive))]"
+              className="rounded-lg p-2 text-[hsl(var(--sidebar-muted))] transition-colors hover:bg-red-500/20 hover:text-red-400"
               title="退出登录"
             >
-              <LogOut size={16} />
+              <LogOut size={18} />
             </button>
           </div>
         )}

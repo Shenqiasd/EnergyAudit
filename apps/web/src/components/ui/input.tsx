@@ -12,18 +12,18 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, startIcon, endIcon, className, id, ...props }, ref) => {
     return (
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {label && (
           <label
             htmlFor={id}
-            className="block text-sm font-medium text-[hsl(var(--foreground))]"
+            className="block text-sm font-semibold text-[hsl(var(--foreground))]"
           >
             {label}
           </label>
         )}
-        <div className="relative">
+        <div className="relative flex items-center">
           {startIcon && (
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-[hsl(var(--muted-foreground))]">
+            <div className="pointer-events-none absolute left-3 flex items-center text-[hsl(var(--muted-foreground))]">
               {startIcon}
             </div>
           )}
@@ -31,8 +31,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={id}
             className={cn(
-              "block w-full rounded-lg border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] focus:border-[hsl(var(--ring))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
-              error && "border-[hsl(var(--danger))] focus:border-[hsl(var(--danger))] focus:ring-[hsl(var(--danger))]",
+              "flex w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm text-[hsl(var(--foreground))] shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50",
+              error && "border-[hsl(var(--danger))] focus-visible:ring-[hsl(var(--danger))]",
               startIcon && "pl-10",
               endIcon && "pr-10",
               className,
@@ -40,16 +40,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {endIcon && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-[hsl(var(--muted-foreground))]">
+            <div className="pointer-events-none absolute right-3 flex items-center text-[hsl(var(--muted-foreground))]">
               {endIcon}
             </div>
           )}
         </div>
         {error && (
-          <p className="text-sm text-[hsl(var(--danger))]">{error}</p>
+          <p className="text-xs font-medium text-[hsl(var(--danger))]">{error}</p>
         )}
         {helperText && !error && (
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">{helperText}</p>
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">{helperText}</p>
         )}
       </div>
     );

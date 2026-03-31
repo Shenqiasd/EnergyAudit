@@ -25,9 +25,9 @@ interface HeaderProps {
 }
 
 const roleLabels: Record<UserRole, string> = {
-  enterprise_user: "企业端",
-  manager: "管理端",
-  reviewer: "审核端",
+  enterprise_user: "重点用能单位",
+  manager: "监管机构",
+  reviewer: "评审专家",
 };
 
 const roleBadgeVariants: Record<UserRole, "primary" | "success" | "warning"> = {
@@ -37,32 +37,32 @@ const roleBadgeVariants: Record<UserRole, "primary" | "success" | "warning"> = {
 };
 
 const breadcrumbMap: Record<string, string> = {
-  enterprise: "企业端",
-  manager: "管理端",
-  reviewer: "审核端",
-  dashboard: "工作台",
-  config: "企业配置",
+  enterprise: "企业平台",
+  manager: "监管平台",
+  reviewer: "专家平台",
+  dashboard: "总览工作台",
+  config: "参数配置",
   filing: "数据填报",
-  reports: "报告管理",
-  rectification: "整改任务",
-  enterprises: "企业管理",
-  batches: "批次管理",
-  projects: "项目管理",
-  reviews: "审核管理",
-  statistics: "统计分析",
-  tasks: "我的审核",
-  history: "审核历史",
-  notifications: "消息通知",
+  reports: "审计报告",
+  rectification: "整改办理",
+  enterprises: "名录管理",
+  batches: "计划下发",
+  projects: "项目追踪",
+  reviews: "专家评审",
+  statistics: "全局统计",
+  tasks: "审核任务",
+  history: "审核档案",
+  notifications: "消息中心",
   "business-types": "业务类型",
-  calculations: "计算管理",
-  "data-overview": "填报概览",
-  rectifications: "整改监管",
-  benchmarks: "能效对标",
-  region: "区域统计",
-  ledgers: "台账管理",
-  sync: "同步管理",
-  "audit-logs": "操作日志",
-  jobs: "任务监控",
+  calculations: "核算规则",
+  "data-overview": "填报大盘",
+  rectifications: "整改督办",
+  benchmarks: "行业对标",
+  region: "区域分布",
+  ledgers: "系统台账",
+  sync: "数据同步",
+  "audit-logs": "操作审计",
+  jobs: "任务调度",
 };
 
 function buildBreadcrumbHref(segments: string[], index: number): string {
@@ -99,33 +99,33 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const userInitial = user?.name ? user.name.charAt(0) : "U";
 
   return (
-    <header className="flex h-16 items-center justify-between bg-[hsl(var(--card))] px-4 shadow-sm lg:px-6">
+    <header className="flex h-16 shrink-0 items-center justify-between bg-[hsl(var(--card))] px-4 shadow-sm border-b border-[hsl(var(--border))] lg:px-8">
       {/* Left: menu toggle + breadcrumb */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5">
         <button
           onClick={onMenuToggle}
-          className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))]"
+          className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))] transition-colors"
         >
           <Menu size={20} />
         </button>
-        <nav className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] sm:flex">
+        <nav className="hidden items-center text-sm font-medium text-[hsl(var(--muted-foreground))] sm:flex">
           <Link
             href="/"
-            className="transition-colors hover:text-[hsl(var(--foreground))]"
+            className="transition-colors hover:text-[hsl(var(--primary))]"
           >
             首页
           </Link>
           {breadcrumbs.map((crumb) => (
-            <span key={crumb.href} className="flex items-center gap-1">
-              <ChevronRight size={14} className="text-[hsl(var(--muted-foreground))]" />
+            <span key={crumb.href} className="flex items-center">
+              <ChevronRight size={16} className="mx-1.5 opacity-50" />
               {crumb.isLast ? (
-                <span className="font-medium text-[hsl(var(--foreground))]">
+                <span className="text-[hsl(var(--foreground))]">
                   {crumb.label}
                 </span>
               ) : (
                 <Link
                   href={crumb.href}
-                  className="transition-colors hover:text-[hsl(var(--foreground))]"
+                  className="transition-colors hover:text-[hsl(var(--primary))]"
                 >
                   {crumb.label}
                 </Link>
@@ -136,17 +136,15 @@ export function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       {/* Right: search trigger + notification bell + user dropdown */}
-      <div className="flex items-center gap-2">
-        {/* Global search trigger (Wave 14 - Command palette placeholder) */}
+      <div className="flex items-center gap-3">
+        {/* Global search trigger */}
         <button
-          className="hidden items-center gap-2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--accent))] md:flex"
-          onClick={() => {
-            /* Command palette - Wave 14 */
-          }}
+          className="hidden items-center gap-2 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--muted))/50] px-4 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-all hover:bg-[hsl(var(--accent))] hover:border-[hsl(var(--primary))/50] md:flex mr-2"
+          onClick={() => {}}
         >
           <Search size={14} />
-          <span>搜索...</span>
-          <kbd className="ml-2 rounded border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-1.5 py-0.5 text-[10px] font-medium text-[hsl(var(--muted-foreground))]">
+          <span className="mr-4">检索项目、企业或政策...</span>
+          <kbd className="rounded border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-1.5 py-0.5 text-[10px] font-bold text-[hsl(var(--muted-foreground))] shadow-sm">
             ⌘K
           </kbd>
         </button>
@@ -155,7 +153,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button
-              className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]"
+              className="rounded-full p-2.5 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]"
               aria-label="切换主题"
             >
               {theme === "dark" ? (
@@ -171,10 +169,10 @@ export function Header({ onMenuToggle }: HeaderProps) {
             <DropdownMenu.Content
               align="end"
               sideOffset={8}
-              className="z-50 min-w-[140px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-lg"
+              className="z-50 min-w-[140px] rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-lg font-medium"
             >
-              <DropdownMenu.Label className="px-3 py-1.5 text-xs font-medium text-[hsl(var(--muted-foreground))]">
-                主题模式
+              <DropdownMenu.Label className="px-3 py-2 text-xs text-[hsl(var(--muted-foreground))]">
+                视觉偏好
               </DropdownMenu.Label>
               {themeOptions.map((option) => (
                 <DropdownMenu.Item
@@ -182,10 +180,10 @@ export function Header({ onMenuToggle }: HeaderProps) {
                   onSelect={() => setTheme(option.value)}
                   className={cn(
                     "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-[hsl(var(--accent))]",
-                    theme === option.value && "bg-[hsl(var(--accent))] font-medium",
+                    theme === option.value && "bg-[hsl(var(--primary))/10] text-[hsl(var(--primary))]",
                   )}
                 >
-                  <option.icon size={14} />
+                  <option.icon size={16} />
                   {option.label}
                 </DropdownMenu.Item>
               ))}
@@ -195,21 +193,23 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
         <NotificationBell />
 
+        <div className="w-px h-6 bg-[hsl(var(--border))] mx-1 hidden sm:block" />
+
         {/* User dropdown with Radix DropdownMenu */}
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
-            <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[hsl(var(--accent))]">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(var(--primary))] text-xs font-medium text-white">
+            <button className="flex items-center gap-3 rounded-full pl-2 pr-4 py-1.5 text-sm transition-colors hover:bg-[hsl(var(--accent))] outline-none">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr from-[hsl(var(--primary))] to-indigo-500 text-sm font-bold text-white shadow-sm">
                 {userInitial}
               </div>
-              <span className="hidden max-w-[120px] truncate sm:inline">
-                {user?.name || "未登录"}
-              </span>
-              {user?.role && (
-                <Badge variant={roleBadgeVariants[user.role]}>
-                  {roleLabels[user.role]}
-                </Badge>
-              )}
+              <div className="hidden flex-col items-start sm:flex">
+                <span className="max-w-[120px] truncate font-medium text-[hsl(var(--foreground))] leading-none mb-1">
+                  {user?.name || "未登录"}
+                </span>
+                <span className="text-[10px] text-[hsl(var(--muted-foreground))] leading-none">
+                  {user?.role ? roleLabels[user.role] : ""}
+                </span>
+              </div>
             </button>
           </DropdownMenu.Trigger>
 
@@ -217,11 +217,11 @@ export function Header({ onMenuToggle }: HeaderProps) {
             <DropdownMenu.Content
               align="end"
               sideOffset={8}
-              className="z-50 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-lg"
+              className="z-50 min-w-[240px] rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-xl"
             >
               {/* User info header */}
-              <div className="px-3 py-2">
-                <div className="text-sm font-medium text-[hsl(var(--foreground))]">
+              <div className="px-4 py-3 bg-[hsl(var(--muted))/30] rounded-lg m-1 mb-2">
+                <div className="text-sm font-bold text-[hsl(var(--foreground))] mb-1">
                   {user?.name || "未登录"}
                 </div>
                 {user?.email && (
@@ -231,11 +231,9 @@ export function Header({ onMenuToggle }: HeaderProps) {
                 )}
               </div>
 
-              <DropdownMenu.Separator className="my-1 h-px bg-[hsl(var(--border))]" />
-
               {/* Role switcher */}
-              <DropdownMenu.Label className="px-3 py-1.5 text-xs font-medium text-[hsl(var(--muted-foreground))]">
-                切换角色
+              <DropdownMenu.Label className="px-3 py-2 text-xs font-semibold text-[hsl(var(--muted-foreground))] tracking-wider">
+                切换视图视角
               </DropdownMenu.Label>
               {roles.map((role) => (
                 <DropdownMenu.Item
@@ -245,18 +243,19 @@ export function Header({ onMenuToggle }: HeaderProps) {
                     router.push(roleDashboards[role]);
                   }}
                   className={cn(
-                    "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-[hsl(var(--accent))]",
-                    user?.role === role && "bg-[hsl(var(--accent))] font-medium",
+                    "flex cursor-pointer items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium outline-none transition-colors hover:bg-[hsl(var(--accent))]",
+                    user?.role === role && "bg-[hsl(var(--primary))/10] text-[hsl(var(--primary))]",
                   )}
                 >
-                  <Shield size={14} />
-                  <Badge variant={roleBadgeVariants[role]}>
+                  <div className="flex items-center gap-2">
+                    <Shield size={16} className={user?.role === role ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--muted-foreground))]"} />
                     {roleLabels[role]}
-                  </Badge>
+                  </div>
+                  {user?.role === role && <div className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--primary))]" />}
                 </DropdownMenu.Item>
               ))}
 
-              <DropdownMenu.Separator className="my-1 h-px bg-[hsl(var(--border))]" />
+              <DropdownMenu.Separator className="my-2 h-px bg-[hsl(var(--border))]" />
 
               {/* Logout */}
               <DropdownMenu.Item
@@ -264,10 +263,10 @@ export function Header({ onMenuToggle }: HeaderProps) {
                   logout();
                   router.push("/");
                 }}
-                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-[hsl(var(--destructive))] outline-none transition-colors hover:bg-[hsl(var(--destructive)/0.1)]"
+                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-[hsl(var(--danger))] outline-none transition-colors hover:bg-[hsl(var(--danger))/10]"
               >
-                <LogOut size={14} />
-                退出登录
+                <LogOut size={16} />
+                安全退出
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>

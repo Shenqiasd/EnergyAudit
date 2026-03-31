@@ -11,10 +11,11 @@ import {
   Users,
   BarChart3,
   ArrowRight,
+  Activity
 } from "lucide-react";
 import { StatCard } from "@/components/ui/stat-card";
 import { DashboardSkeleton } from "@/components/skeleton/dashboard-skeleton";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { PageHeader } from "@/components/layout/page-header";
@@ -64,12 +65,12 @@ const statusLabels: Record<string, string> = {
   review_in_progress: "审核中",
   review_completed: "审核完成",
   rectification: "整改中",
-  rectification_verified: "整改已验收",
+  rectification_verified: "整改验收",
   completed: "已完成",
   closed: "已关闭",
 };
 
-// Mock data for charts (will be replaced by API data when available)
+// Mock data for charts
 const mockStatusDistribution = [
   { status: "pending_start", count: 5 },
   { status: "data_collecting", count: 12 },
@@ -97,48 +98,48 @@ const mockMonthlyTrend = [
 const quickActions = [
   {
     icon: Plus,
-    label: "创建批次",
-    description: "新建审计批次",
+    label: "创建计划批次",
+    description: "下达新一期审计任务",
     href: "/manager/batches",
   },
   {
     icon: Users,
-    label: "企业管理",
-    description: "管理企业准入",
+    label: "企业名录管理",
+    description: "维护重点用能单位库",
     href: "/manager/enterprises",
   },
   {
     icon: FileText,
-    label: "项目管理",
-    description: "查看所有项目",
+    label: "审计项目追踪",
+    description: "监控全局审计进度",
     href: "/manager/projects",
   },
   {
     icon: BarChart3,
-    label: "统计分析",
-    description: "查看统计报表",
+    label: "能效数据分析",
+    description: "查看区域双碳报表",
     href: "/manager/statistics",
   },
 ];
 
-const alertTypeIcons: Record<string, { color: string; borderColor: string }> = {
-  overdue_project: { color: "text-red-500", borderColor: "border-l-red-500" },
-  delayed_rectification: { color: "text-red-500", borderColor: "border-l-red-500" },
-  approaching_deadline: { color: "text-orange-500", borderColor: "border-l-orange-500" },
-  low_score: { color: "text-orange-500", borderColor: "border-l-orange-500" },
-  overdue_batch: { color: "text-red-500", borderColor: "border-l-red-500" },
+const alertTypeIcons: Record<string, { color: string; bg: string; border: string }> = {
+  overdue_project: { color: "text-red-600", bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-200 dark:border-red-900" },
+  delayed_rectification: { color: "text-red-600", bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-200 dark:border-red-900" },
+  approaching_deadline: { color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-900/20", border: "border-orange-200 dark:border-orange-900" },
+  low_score: { color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-900/20", border: "border-orange-200 dark:border-orange-900" },
+  overdue_batch: { color: "text-red-600", bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-200 dark:border-red-900" },
 };
 
 const roleLabels: Record<string, string> = {
-  manager: "管理员",
+  manager: "监管",
   enterprise_user: "企业",
-  reviewer: "审核员",
+  reviewer: "专家",
 };
 
 const roleColors: Record<string, string> = {
   manager: "bg-blue-100 text-blue-700",
-  enterprise_user: "bg-green-100 text-green-700",
-  reviewer: "bg-purple-100 text-purple-700",
+  enterprise_user: "bg-emerald-100 text-emerald-700",
+  reviewer: "bg-indigo-100 text-indigo-700",
 };
 
 function formatRelativeTime(dateStr: string): string {
@@ -178,293 +179,309 @@ export default function ManagerDashboardPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <PageHeader
-        title="工作台"
-        description="管理端工作台 — 审计工作总览、项目进度、审核状态统计"
+        title="监管指挥大屏"
+        description="纵览全市重点用能单位审计态势，监控异常指标与超期任务"
       />
 
       {/* KPI StatCards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={Building2}
-          label="企业总数"
+          label="监管企业库"
           value={totalEnterprises}
           accentColor="blue"
-          trend={{ direction: "up", value: "+12%", text: "较上月" }}
+          trend={{ direction: "up", value: "+12%", text: "较上月增长" }}
           sparklineData={[20, 25, 30, 28, 35, 40, 45]}
         />
         <StatCard
-          icon={TrendingUp}
-          label="进行中项目"
+          icon={Activity}
+          label="活跃项目"
           value={activeProjects}
           accentColor="green"
-          trend={{ direction: "up", value: "+8%", text: "较上月" }}
+          trend={{ direction: "up", value: "+8%", text: "环比攀升" }}
           sparklineData={[10, 15, 12, 18, 20, 22, 25]}
         />
         <StatCard
           icon={ClipboardCheck}
-          label="待审核任务"
+          label="待评审项"
           value={summary?.pendingReviewTasks ?? 0}
-          accentColor="orange"
-          trend={{ direction: "down", value: "-5%", text: "较上月" }}
+          accentColor="purple"
+          trend={{ direction: "down", value: "-5%", text: "积压减轻" }}
           sparklineData={[15, 12, 18, 14, 10, 8, 6]}
         />
         <StatCard
           icon={AlertTriangle}
-          label="超期预警"
+          label="高危预警"
           value={summary?.overdueAlerts ?? 0}
-          accentColor="purple"
-          trend={{ direction: "flat", value: "0%", text: "较上月" }}
+          accentColor="orange"
+          trend={{ direction: "flat", value: "0%", text: "态势平稳" }}
           sparklineData={[5, 6, 4, 7, 5, 6, 5]}
         />
       </div>
 
       {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Pie Chart: Project Status Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>项目状态分布</CardTitle>
+        {/* Monthly Trend */}
+        <Card className="border-[hsl(var(--border))] shadow-sm">
+          <CardHeader className="border-b border-[hsl(var(--border))] pb-4 mb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TrendingUp size={18} className="text-[hsl(var(--primary))]" />
+              审计业务走势 (近半年)
+            </CardTitle>
           </CardHeader>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={mockStatusDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
-                  dataKey="count"
-                  nameKey="status"
-                >
-                  {mockStatusDistribution.map((entry) => (
-                    <Cell
-                      key={entry.status}
-                      fill={statusColors[entry.status] ?? "#94a3b8"}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value, name) => [
-                    `${value} 个`,
-                    statusLabels[String(name)] ?? String(name),
-                  ]}
-                />
-                <Legend
-                  formatter={(value: string) => statusLabels[value] ?? value}
-                  wrapperStyle={{ fontSize: "12px" }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <CardContent>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={mockMonthlyTrend}>
+                  <defs>
+                    <linearGradient id="gradProjects" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gradReviews" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gradRectifications" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="projects"
+                    name="项目数"
+                    stroke="#3b82f6"
+                    fill="url(#gradProjects)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="reviews"
+                    name="审核数"
+                    stroke="#10b981"
+                    fill="url(#gradReviews)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="rectifications"
+                    name="整改数"
+                    stroke="#f59e0b"
+                    fill="url(#gradRectifications)"
+                    strokeWidth={2}
+                  />
+                  <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} iconType="circle" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
         </Card>
 
-        {/* Area Chart: Monthly Trend */}
-        <Card>
-          <CardHeader>
-            <CardTitle>月度趋势（近6个月）</CardTitle>
+        {/* Project Status Distribution */}
+        <Card className="border-[hsl(var(--border))] shadow-sm">
+          <CardHeader className="border-b border-[hsl(var(--border))] pb-4 mb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <BarChart3 size={18} className="text-[hsl(var(--primary))]" />
+              全局状态透视
+            </CardTitle>
           </CardHeader>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={mockMonthlyTrend}>
-                <defs>
-                  <linearGradient id="gradProjects" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="gradReviews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="gradRectifications" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dataKey="projects"
-                  name="项目数"
-                  stroke="#3b82f6"
-                  fill="url(#gradProjects)"
-                  strokeWidth={2}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="reviews"
-                  name="审核数"
-                  stroke="#10b981"
-                  fill="url(#gradReviews)"
-                  strokeWidth={2}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="rectifications"
-                  name="整改数"
-                  stroke="#f59e0b"
-                  fill="url(#gradRectifications)"
-                  strokeWidth={2}
-                />
-                <Legend wrapperStyle={{ fontSize: "12px" }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <CardContent>
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={mockStatusDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={95}
+                    paddingAngle={3}
+                    dataKey="count"
+                    nameKey="status"
+                    stroke="none"
+                  >
+                    {mockStatusDistribution.map((entry) => (
+                      <Cell
+                        key={entry.status}
+                        fill={statusColors[entry.status] ?? "#94a3b8"}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
+                    formatter={(value, name) => [
+                      `${value} 项`,
+                      statusLabels[String(name)] ?? String(name),
+                    ]}
+                  />
+                  <Legend
+                    formatter={(value: string) => statusLabels[value] ?? value}
+                    wrapperStyle={{ fontSize: "12px" }}
+                    layout="vertical"
+                    verticalAlign="middle"
+                    align="right"
+                    iconType="circle"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
         </Card>
       </div>
 
-      {/* Alert List + Activity Timeline */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Alert List with colored left border */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle size={18} className="text-orange-500" />
-              预警列表
-            </CardTitle>
-            <Badge variant="danger">{(alerts ?? []).length}</Badge>
-          </CardHeader>
-          <div className="max-h-80 space-y-3 overflow-y-auto">
-            {(alerts ?? []).length === 0 ? (
-              <div className="flex h-32 items-center justify-center text-sm text-[hsl(var(--muted-foreground))]">
-                暂无预警
-              </div>
-            ) : (
-              (alerts ?? []).map((alert) => {
-                const style = alertTypeIcons[alert.type] ?? {
-                  color: "text-orange-500",
-                  borderColor: "border-l-orange-500",
-                };
-                return (
-                  <Link
-                    key={alert.id}
-                    href={
-                      alert.relatedId
-                        ? `/manager/projects?highlight=${alert.relatedId}`
-                        : "#"
-                    }
-                    className={`flex items-start gap-3 rounded-lg border border-[hsl(var(--border))] border-l-4 ${style.borderColor} p-3 transition-colors hover:bg-[hsl(var(--muted))]/50`}
-                  >
-                    <AlertTriangle
-                      size={16}
-                      className={`mt-0.5 shrink-0 ${style.color}`}
-                    />
+      {/* Bottom Row */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Quick Actions - 1 col */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-[hsl(var(--foreground))] tracking-tight pl-1">
+            指挥调度中心
+          </h3>
+          <div className="space-y-3">
+            {quickActions.map((action) => (
+              <Link key={action.label} href={action.href} className="block">
+                <Card className="group cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md border-[hsl(var(--border))] hover:border-[hsl(var(--primary))/40]">
+                  <div className="flex items-center gap-4 p-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--primary))/10] text-[hsl(var(--primary))] transition-colors group-hover:bg-[hsl(var(--primary))] group-hover:text-white">
+                      <action.icon size={22} />
+                    </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-sm font-medium text-[hsl(var(--foreground))]">
-                          {alert.title}
-                        </span>
-                        <span className="shrink-0 text-xs text-[hsl(var(--muted-foreground))]">
-                          {formatRelativeTime(alert.createdAt)}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-[hsl(var(--foreground))]">
+                          {action.label}
                         </span>
                       </div>
-                      <p className="mt-0.5 text-xs text-[hsl(var(--muted-foreground))]">
-                        {alert.description}
+                      <p className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
+                        {action.description}
                       </p>
                     </div>
-                  </Link>
-                );
-              })
-            )}
+                  </div>
+                </Card>
+              </Link>
+            ))}
           </div>
+        </div>
+
+        {/* Alert List - 1 col */}
+        <Card className="border-[hsl(var(--border))] shadow-sm">
+          <CardHeader className="border-b border-[hsl(var(--border))] pb-4 mb-4 flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <AlertTriangle size={18} className="text-orange-500" />
+              风险预警
+            </CardTitle>
+            <Badge variant="danger">{(alerts ?? []).length} 项</Badge>
+          </CardHeader>
+          <CardContent className="p-0 px-4 pb-4">
+            <div className="max-h-[340px] space-y-3 overflow-y-auto pr-2 custom-scrollbar">
+              {(alerts ?? []).length === 0 ? (
+                <div className="flex h-32 items-center justify-center text-sm text-[hsl(var(--muted-foreground))]">
+                  暂无风险告警，运行良好
+                </div>
+              ) : (
+                (alerts ?? []).map((alert) => {
+                  const style = alertTypeIcons[alert.type] ?? {
+                    color: "text-orange-600",
+                    bg: "bg-orange-50",
+                    border: "border-orange-200"
+                  };
+                  return (
+                    <Link
+                      key={alert.id}
+                      href={
+                        alert.relatedId
+                          ? `/manager/projects?highlight=${alert.relatedId}`
+                          : "#"
+                      }
+                      className={`flex items-start gap-3 rounded-xl border ${style.border} ${style.bg} p-3 transition-colors hover:shadow-sm`}
+                    >
+                      <AlertTriangle
+                        size={16}
+                        className={`mt-0.5 shrink-0 ${style.color}`}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm font-bold text-[hsl(var(--foreground))]">
+                            {alert.title}
+                          </span>
+                          <span className="shrink-0 text-[10px] font-medium text-[hsl(var(--muted-foreground))]">
+                            {formatRelativeTime(alert.createdAt)}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))] leading-relaxed">
+                          {alert.description}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          </CardContent>
         </Card>
 
-        {/* Activity Timeline with Avatar */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        {/* Activity Timeline - 1 col */}
+        <Card className="border-[hsl(var(--border))] shadow-sm">
+          <CardHeader className="border-b border-[hsl(var(--border))] pb-4 mb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
               <Clock size={18} className="text-blue-500" />
-              最近活动
+              全网动态
             </CardTitle>
           </CardHeader>
-          <div className="max-h-80 space-y-0 overflow-y-auto">
-            {(timeline ?? []).length === 0 ? (
-              <div className="flex h-32 items-center justify-center text-sm text-[hsl(var(--muted-foreground))]">
-                暂无活动记录
-              </div>
-            ) : (
-              (timeline ?? []).map((item, index) => (
-                <div key={item.id} className="flex gap-3">
-                  {/* Vertical timeline */}
-                  <div className="flex flex-col items-center">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback
-                        className={`text-xs ${roleColors[item.userRole] ?? "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))]"}`}
-                      >
-                        {(roleLabels[item.userRole] ?? "用")[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    {index < (timeline ?? []).length - 1 && (
-                      <div className="w-px flex-1 bg-[hsl(var(--border))]" />
-                    )}
-                  </div>
-                  {/* Content */}
-                  <div className="min-w-0 flex-1 pb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[hsl(var(--foreground))]">
-                        {item.action}
-                      </span>
-                      <Badge variant="secondary" className="text-[10px]">
-                        {roleLabels[item.userRole] ?? item.userRole}
-                      </Badge>
+          <CardContent className="p-0 px-6 pb-4">
+            <div className="max-h-[340px] space-y-0 overflow-y-auto custom-scrollbar">
+              {(timeline ?? []).length === 0 ? (
+                <div className="flex h-32 items-center justify-center text-sm text-[hsl(var(--muted-foreground))]">
+                  暂无活动记录
+                </div>
+              ) : (
+                (timeline ?? []).map((item, index) => (
+                  <div key={item.id} className="flex gap-4">
+                    {/* Vertical timeline */}
+                    <div className="flex flex-col items-center">
+                      <Avatar className="h-8 w-8 border-2 border-[hsl(var(--background))] shadow-sm">
+                        <AvatarFallback
+                          className={`text-xs font-bold ${roleColors[item.userRole] ?? "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))]"}`}
+                        >
+                          {(roleLabels[item.userRole] ?? "用")[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      {index < (timeline ?? []).length - 1 && (
+                        <div className="w-[2px] flex-1 bg-[hsl(var(--border))] my-1 rounded-full" />
+                      )}
                     </div>
-                    {item.detail && (
-                      <p className="mt-0.5 text-xs text-[hsl(var(--muted-foreground))]">
-                        {item.detail}
+                    {/* Content */}
+                    <div className="min-w-0 flex-1 pb-6 pt-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-bold text-[hsl(var(--foreground))]">
+                          {item.action}
+                        </span>
+                        <Badge variant="outline" className="text-[10px] h-5 px-1.5 border-[hsl(var(--border))]">
+                          {roleLabels[item.userRole] ?? item.userRole}
+                        </Badge>
+                      </div>
+                      {item.detail && (
+                        <p className="text-xs text-[hsl(var(--muted-foreground))] mb-1.5 leading-relaxed">
+                          {item.detail}
+                        </p>
+                      )}
+                      <p className="text-[10px] font-medium text-[hsl(var(--muted-foreground))/70]">
+                        {formatRelativeTime(item.createdAt)}
                       </p>
-                    )}
-                    <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
-                      {formatRelativeTime(item.createdAt)}
-                    </p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <h3 className="mb-4 text-lg font-semibold text-[hsl(var(--foreground))]">
-          快捷操作
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.map((action) => (
-            <Link key={action.label} href={action.href}>
-              <Card className="group cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--primary))]/10">
-                    <action.icon
-                      size={24}
-                      className="text-[hsl(var(--primary))]"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-[hsl(var(--foreground))]">
-                        {action.label}
-                      </span>
-                      <ArrowRight
-                        size={16}
-                        className="text-[hsl(var(--muted-foreground))] transition-transform group-hover:translate-x-1"
-                      />
                     </div>
-                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                      {action.description}
-                    </p>
                   </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { forwardRef, type HTMLAttributes, type ReactNode, type TdHTMLAttributes,
 
 const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
+    <div className="relative w-full overflow-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
       <table
         ref={ref}
         className={cn("w-full caption-bottom text-sm", className)}
@@ -17,7 +17,7 @@ Table.displayName = "Table";
 
 const TableHeader = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
-    <thead ref={ref} className={cn("border-b border-[hsl(var(--border))] [&_tr]:border-b", className)} {...props} />
+    <thead ref={ref} className={cn("bg-[hsl(var(--muted))/50] border-b border-[hsl(var(--border))]", className)} {...props} />
   )
 );
 TableHeader.displayName = "TableHeader";
@@ -26,7 +26,7 @@ const TableBody = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSe
   ({ className, ...props }, ref) => (
     <tbody
       ref={ref}
-      className={cn("[&_tr:last-child]:border-0 [&_tr:nth-child(even)]:bg-[hsl(var(--muted))]/50", className)}
+      className={cn("[&_tr:last-child]:border-0", className)}
       {...props}
     />
   )
@@ -37,7 +37,7 @@ const TableFooter = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTable
   ({ className, ...props }, ref) => (
     <tfoot
       ref={ref}
-      className={cn("border-t border-[hsl(var(--border))] bg-[hsl(var(--muted))]/50 font-medium", className)}
+      className={cn("border-t border-[hsl(var(--border))] bg-[hsl(var(--muted))/50] font-medium", className)}
       {...props}
     />
   )
@@ -49,7 +49,7 @@ const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElem
     <tr
       ref={ref}
       className={cn(
-        "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))]/50 data-[state=selected]:bg-[hsl(var(--muted))]",
+        "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))/30] data-[state=selected]:bg-[hsl(var(--muted))]",
         className,
       )}
       {...props}
@@ -71,8 +71,8 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
     <th
       ref={ref}
       className={cn(
-        "h-12 px-4 text-left align-middle font-medium text-[hsl(var(--muted-foreground))]",
-        sortable && "cursor-pointer select-none",
+        "h-12 px-4 text-left align-middle font-semibold text-[hsl(var(--muted-foreground))]",
+        sortable && "cursor-pointer select-none hover:text-[hsl(var(--foreground))] transition-colors",
         className,
       )}
       onClick={sortable ? onSort : undefined}
@@ -81,10 +81,10 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       <div className="flex items-center gap-1">
         {children}
         {sortable && (
-          <span className="ml-1 inline-flex">
+          <span className="ml-1 inline-flex text-inherit">
             {sortDirection === "asc" && <ArrowUp className="h-4 w-4" />}
             {sortDirection === "desc" && <ArrowDown className="h-4 w-4" />}
-            {!sortDirection && <ArrowUpDown className="h-4 w-4 opacity-40" />}
+            {!sortDirection && <ArrowUpDown className="h-4 w-4 opacity-30" />}
           </span>
         )}
       </div>
@@ -126,10 +126,10 @@ interface TableEmptyProps {
 function TableEmpty({ colSpan, icon, message = "暂无数据" }: TableEmptyProps) {
   return (
     <TableRow>
-      <TableCell colSpan={colSpan} className="h-24 text-center">
+      <TableCell colSpan={colSpan} className="h-32 text-center">
         <div className="flex flex-col items-center justify-center gap-2 text-[hsl(var(--muted-foreground))]">
           {icon}
-          <span>{message}</span>
+          <span className="text-sm font-medium">{message}</span>
         </div>
       </TableCell>
     </TableRow>
