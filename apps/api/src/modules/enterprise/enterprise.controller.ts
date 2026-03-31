@@ -13,9 +13,10 @@ import { AdmissionService } from './admission.service';
 import { EnterpriseService } from './enterprise.service';
 import { ExternalBindingService } from './external-binding.service';
 
+import { CreateEnterpriseDto } from './dto/create-enterprise.dto';
+import { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
+
 import type { EnterpriseListQuery } from './enterprise.service';
-import type { CreateEnterpriseDto } from './dto/create-enterprise.dto';
-import type { UpdateEnterpriseDto } from './dto/update-enterprise.dto';
 
 @Roles('enterprise_user', 'manager')
 @Controller('enterprises')
