@@ -18,7 +18,6 @@ import {
   useModuleFields,
   useSaveRecord,
   useSubmitRecord,
-  useValidateRecord,
 } from "@/lib/api/hooks/use-data-entry";
 import {
   AlertCircle,
@@ -70,7 +69,6 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
   const createRecord = useCreateRecord();
   const saveRecord = useSaveRecord(recordId);
   const submitRecord = useSubmitRecord(recordId);
-  const validateRecord = useValidateRecord(recordId);
 
   const [formValues, setFormValues] = useState<Record<string, string>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
