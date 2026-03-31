@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, Upload } from "lucide-react";
+import { useParams } from "next/navigation";
+import { AlertCircle, Send, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Loading } from "@/components/ui/loading";
+import { DetailHeader } from "@/components/detail/detail-header";
+import { InfoGrid } from "@/components/detail/info-grid";
+import { Timeline } from "@/components/detail/timeline";
+import type { TimelineItem } from "@/components/detail/timeline";
 import {
   useRectificationTask,
   useClaimRectification,
@@ -27,7 +30,6 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function EnterpriseRectificationDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const taskId = params.id as string;
 
   const [progressPercent, setProgressPercent] = useState(0);
@@ -41,49 +43,68 @@ export default function EnterpriseRectificationDetailPage() {
   if (isLoading) return <Loading />;
   if (!task) return <div>整改任务不存在</div>;
 
+  const actionButtons = (
+    <div className="flex items-center gap-2">
+      {task.status === "pending_claim" && (
+        <Button
+          onClick={() => claimTask.mutate()}
+          disabled={claimTask.isPending}
+        >
+          认领任务
+        </Button>
+      )}
+    </div>
+  );
+
+  const progressItems: TimelineItem[] = (task.progress ?? []).map((entry) => ({
+    id: entry.id,
+    avatar: (
+      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100">
+        <span className="text-[8px] font-bold text-blue-600">{entry.progressPercent}%</span>
+      </div>
+    ),
+    title: `进度 ${entry.progressPercent}%`,
+    description: entry.note,
+    timestamp: new Date(entry.createdAt).toLocaleString("zh-CN"),
+    type: entry.progressPercent >= 100 ? "success" as const : "default" as const,
+  }));
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="secondary" size="sm" onClick={() => router.push("/enterprise/rectification")}>
-          <ArrowLeft size={16} className="mr-1" />
-          返回
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{task.title}</h1>
-          <div className="flex items-center gap-2 mt-1">
+      <DetailHeader
+        icon={<AlertCircle size={20} />}
+        title={task.title}
+        subtitle={`项目: ${task.auditProjectId}`}
+        badges={
+          <>
             <Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>
             {task.isOverdue && <Badge variant="danger">已延期</Badge>}
-          </div>
-        </div>
-      </div>
+          </>
+        }
+        metadata={[
+          { label: "截止日期", value: task.deadline ? new Date(task.deadline).toLocaleDateString("zh-CN") : "未设置" },
+        ]}
+        actions={actionButtons}
+        backHref="/enterprise/rectification"
+        backLabel="返回列表"
+      />
 
-      <Card className="p-4 space-y-3">
-        <CardHeader className="p-0">
+      <Card>
+        <CardHeader>
           <CardTitle>任务信息</CardTitle>
         </CardHeader>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">项目 ID: </span>
-            <span className="text-[hsl(var(--foreground))]">{task.auditProjectId}</span>
-          </div>
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">截止日期: </span>
-            <span className="text-[hsl(var(--foreground))]">
-              {task.deadline ? new Date(task.deadline).toLocaleDateString("zh-CN") : "未设置"}
-            </span>
-          </div>
-        </div>
+        <InfoGrid
+          columns={2}
+          items={[
+            { label: "项目 ID", value: task.auditProjectId },
+            { label: "截止日期", value: task.deadline ? new Date(task.deadline).toLocaleDateString("zh-CN") : "未设置" },
+            { label: "当前状态", value: STATUS_LABELS[task.status] ?? task.status },
+          ]}
+        />
         {task.description && (
-          <p className="text-sm text-[hsl(var(--foreground))]">{task.description}</p>
-        )}
-
-        {task.status === "pending_claim" && (
-          <Button
-            onClick={() => claimTask.mutate()}
-            disabled={claimTask.isPending}
-          >
-            认领任务
-          </Button>
+          <div className="mt-4 rounded-lg bg-[hsl(var(--muted))] p-3">
+            <p className="text-sm text-[hsl(var(--foreground))]">{task.description}</p>
+          </div>
         )}
       </Card>
 
@@ -140,28 +161,12 @@ export default function EnterpriseRectificationDetailPage() {
         </Card>
       )}
 
-      {task.progress && task.progress.length > 0 && (
-        <Card className="p-4 space-y-3">
-          <CardHeader className="p-0">
+      {progressItems.length > 0 && (
+        <Card>
+          <CardHeader>
             <CardTitle>进度时间线</CardTitle>
           </CardHeader>
-          <div className="space-y-3">
-            {task.progress.map((entry) => (
-              <div key={entry.id} className="flex gap-3 p-3 rounded border border-[hsl(var(--border))]">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-sm font-bold text-blue-600">
-                    {entry.progressPercent}%
-                  </span>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-[hsl(var(--foreground))]">{entry.note}</p>
-                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                    {new Date(entry.createdAt).toLocaleString("zh-CN")}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Timeline items={progressItems} />
         </Card>
       )}
     </div>
