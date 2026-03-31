@@ -51,8 +51,8 @@ export function ActivityTimeline({ title, items }: ActivityTimelineProps) {
         <CardHeader>
           <CardTitle>{title}</CardTitle>
         </CardHeader>
-        <div className="flex h-32 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无活动记录
+        <div className="flex h-32 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无活动记录
         </div>
       </Card>
     );
@@ -68,28 +68,28 @@ export function ActivityTimeline({ title, items }: ActivityTimelineProps) {
           <div key={item.id} className="flex gap-3">
             {/* Timeline line */}
             <div className="flex flex-col items-center">
-              <div className="h-2.5 w-2.5 rounded-full bg-[var(--color-primary)]" />
+              <div className="h-2.5 w-2.5 rounded-full bg-[hsl(var(--primary))]" />
               {index < items.length - 1 && (
-                <div className="w-px flex-1 bg-[var(--color-border)]" />
+                <div className="w-px flex-1 bg-[hsl(var(--border))]" />
               )}
             </div>
             {/* Content */}
             <div className="min-w-0 flex-1 pb-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-[var(--color-text)]">
-                  {item.action}
+                <span className=                "text-sm font-medium text-[hsl(var(--foreground))]">
+                                  {item.action}
                 </span>
-                <span className="text-xs text-[var(--color-text-secondary)]">
-                  {roleLabels[item.userRole] ?? item.userRole}
+                <span className=                "text-xs text-[hsl(var(--muted-foreground))]">
+                                  {roleLabels[item.userRole] ?? item.userRole}
                 </span>
               </div>
               {item.detail && (
-                <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
-                  {item.detail}
+                <p className=                "mt-0.5 text-xs text-[hsl(var(--muted-foreground))]">
+                                  {item.detail}
                 </p>
               )}
-              <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
-                {formatTime(item.createdAt)}
+              <p className=              "mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+                              {formatTime(item.createdAt)}
               </p>
             </div>
           </div>

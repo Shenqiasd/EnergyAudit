@@ -76,7 +76,7 @@ export default function EnterpriseReportDetailPage() {
     return (
       <Card>
         <div className="py-12 text-center">
-          <p className="text-[var(--color-text-secondary)]">报告不存在</p>
+          <p className="text-[hsl(var(--muted-foreground))]">报告不存在</p>
         </div>
       </Card>
     );
@@ -86,8 +86,8 @@ export default function EnterpriseReportDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">审计报告</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审计报告</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             版本 V{report.version} · {statusLabels[report.status] ?? report.status}
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function EnterpriseReportDetailPage() {
             </Badge>
           </CardTitle>
         </CardHeader>
-        <div className="px-6 pb-6 text-sm text-[var(--color-text-secondary)]">
+        <div className="px-6 pb-6 text-sm text-[hsl(var(--muted-foreground))]">
           <p>生成时间：{report.generatedAt ? new Date(report.generatedAt).toLocaleString("zh-CN") : "未生成"}</p>
           <p>创建时间：{new Date(report.createdAt).toLocaleString("zh-CN")}</p>
         </div>
@@ -147,7 +147,7 @@ export default function EnterpriseReportDetailPage() {
                 <TableRow key={section.id}>
                   <TableCell>{section.sortOrder}</TableCell>
                   <TableCell className="font-medium">{section.sectionName}</TableCell>
-                  <TableCell className="max-w-xs truncate text-[var(--color-text-secondary)]">
+                  <TableCell className="max-w-xs truncate text-[hsl(var(--muted-foreground))]">
                     {section.content ?? "暂无内容"}
                   </TableCell>
                   <TableCell>

@@ -50,8 +50,8 @@ export default function EnterpriseLedgerPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">企业台账</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">企业台账</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             企业审计项目总览，支持筛选和导出
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function EnterpriseLedgerPage() {
       <Card>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-[var(--color-text-secondary)]">批次ID:</label>
+            <label className="text-sm text-[hsl(var(--muted-foreground))]">批次ID:</label>
             <input
               type="text"
               placeholder="输入批次ID"
@@ -72,11 +72,11 @@ export default function EnterpriseLedgerPage() {
               onChange={(e) =>
                 setQuery((prev) => ({ ...prev, batchId: e.target.value || undefined, page: 1 }))
               }
-              className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-sm"
+              className="rounded-lg border border-[hsl(var(--border))] px-3 py-1.5 text-sm"
             />
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm text-[var(--color-text-secondary)]">行业:</label>
+            <label className="text-sm text-[hsl(var(--muted-foreground))]">行业:</label>
             <input
               type="text"
               placeholder="行业代码"
@@ -84,17 +84,17 @@ export default function EnterpriseLedgerPage() {
               onChange={(e) =>
                 setQuery((prev) => ({ ...prev, industryCode: e.target.value || undefined, page: 1 }))
               }
-              className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-sm"
+              className="rounded-lg border border-[hsl(var(--border))] px-3 py-1.5 text-sm"
             />
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm text-[var(--color-text-secondary)]">状态:</label>
+            <label className="text-sm text-[hsl(var(--muted-foreground))]">状态:</label>
             <select
               value={query.status ?? ""}
               onChange={(e) =>
                 setQuery((prev) => ({ ...prev, status: e.target.value || undefined, page: 1 }))
               }
-              className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-sm"
+              className="rounded-lg border border-[hsl(var(--border))] px-3 py-1.5 text-sm"
             >
               <option value="">全部</option>
               {Object.entries(statusLabels).map(([value, label]) => (
@@ -165,7 +165,7 @@ export default function EnterpriseLedgerPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={7}>
-                    <div className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+                    <div className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
                       暂无数据
                     </div>
                   </TableCell>
@@ -177,7 +177,7 @@ export default function EnterpriseLedgerPage() {
           {/* Pagination */}
           {data && data.total > data.pageSize && (
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm text-[var(--color-text-secondary)]">
+              <span className="text-sm text-[hsl(var(--muted-foreground))]">
                 共 {data.total} 条，第 {data.page} 页
               </span>
               <div className="flex gap-2">

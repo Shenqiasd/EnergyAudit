@@ -157,7 +157,7 @@ export function NotificationListPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-[var(--color-text)]">消息通知</h1>
+        <h1 className="text-xl font-bold text-[hsl(var(--foreground))]">消息通知</h1>
         <Button
           variant="secondary"
           size="sm"
@@ -180,8 +180,8 @@ export function NotificationListPage() {
               }}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 readFilter === filter.value
-                  ? "bg-[var(--color-primary)] text-white"
-                  : "bg-gray-100 text-[var(--color-text-secondary)] hover:bg-gray-200"
+                  ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"
+                  : "bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]/80"
               }`}
             >
               {filter.label}
@@ -194,7 +194,7 @@ export function NotificationListPage() {
             setTypeFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs"
+          className="rounded-lg border border-[hsl(var(--input))] px-3 py-1.5 text-xs"
         >
           {notificationTypes.map((t) => (
             <option key={t.value} value={t.value}>
@@ -205,17 +205,17 @@ export function NotificationListPage() {
       </div>
 
       {/* Notification list */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-white">
+      <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
         {isLoading ? (
-          <div className="px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]">
-            加载中...
+          <div className=          "px-4 py-12 text-center text-sm text-[hsl(var(--muted-foreground))]">
+                      加载中...
           </div>
         ) : notifications.length === 0 ? (
-          <div className="px-4 py-12 text-center text-sm text-[var(--color-text-secondary)]">
-            暂无通知
+          <div className=          "px-4 py-12 text-center text-sm text-[hsl(var(--muted-foreground))]">
+                      暂无通知
           </div>
         ) : (
-          <div className="divide-y divide-[var(--color-border)]">
+          <div className="divide-y divide-[hsl(var(--border))]">
             {notifications.map((notification) => {
               const config =
                 typeConfig[notification.type] ?? typeConfig.system;
@@ -235,8 +235,8 @@ export function NotificationListPage() {
                     className="min-w-0 flex-1 text-left"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-[var(--color-text)]">
-                        {notification.title}
+                      <span className=                      "text-sm font-medium text-[hsl(var(--foreground))]">
+                                              {notification.title}
                       </span>
                       <span
                         className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${config.color} bg-gray-100`}
@@ -244,21 +244,21 @@ export function NotificationListPage() {
                         {config.label}
                       </span>
                       {!notification.isRead && (
-                        <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-[hsl(var(--primary))]" />
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-                      {notification.content}
+                    <p className=                    "mt-1 text-sm text-[hsl(var(--muted-foreground))]">
+                                          {notification.content}
                     </p>
-                    <span className="mt-1.5 text-xs text-[var(--color-text-secondary)]">
-                      {formatDate(notification.createdAt)}
+                    <span className=                    "mt-1.5 text-xs text-[hsl(var(--muted-foreground))]">
+                                          {formatDate(notification.createdAt)}
                     </span>
                   </button>
                   <div className="flex shrink-0 items-center gap-2">
                     {!notification.isRead && (
                       <button
                         onClick={() => markAsRead.mutate(notification.id)}
-                        className="rounded p-1 text-[var(--color-text-secondary)] hover:bg-gray-100 hover:text-[var(--color-primary)]"
+                        className="rounded p-1 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--primary))]"
                         title="标为已读"
                       >
                         <CheckCircle2 size={16} />
@@ -268,7 +268,7 @@ export function NotificationListPage() {
                       onClick={() =>
                         deleteNotification.mutate(notification.id)
                       }
-                      className="rounded p-1 text-[var(--color-text-secondary)] hover:bg-gray-100 hover:text-[var(--color-danger)]"
+                      className="rounded p-1 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--danger))]"
                       title="删除"
                     >
                       <Trash2 size={16} />
@@ -284,24 +284,24 @@ export function NotificationListPage() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-xs text-[var(--color-text-secondary)]">
-            共 {total} 条通知
+          <span className=          "text-xs text-[hsl(var(--muted-foreground))]">
+                      共 {total} 条通知
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="rounded-lg border border-[var(--color-border)] px-3 py-1 text-xs disabled:opacity-50"
+              className="rounded-lg border border-[hsl(var(--border))] px-3 py-1 text-xs disabled:opacity-50"
             >
               上一页
             </button>
-            <span className="text-xs text-[var(--color-text-secondary)]">
-              {page} / {totalPages}
+            <span className=            "text-xs text-[hsl(var(--muted-foreground))]">
+                          {page} / {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="rounded-lg border border-[var(--color-border)] px-3 py-1 text-xs disabled:opacity-50"
+              className="rounded-lg border border-[hsl(var(--border))] px-3 py-1 text-xs disabled:opacity-50"
             >
               下一页
             </button>

@@ -61,8 +61,8 @@ export default function ManagerRectificationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">整改监控</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">整改监控</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看和管理整改任务，导出整改报告
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function ManagerRectificationsPage() {
                     {task.isOverdue ? (
                       <Badge variant="danger">是</Badge>
                     ) : (
-                      <span className="text-[var(--color-text-secondary)]">否</span>
+                      <span className="text-[hsl(var(--muted-foreground))]">否</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -126,7 +126,7 @@ export default function ManagerRectificationsPage() {
           </Table>
         ) : (
           <div className="py-12 text-center">
-            <p className="text-[var(--color-text-secondary)]">暂无整改任务</p>
+            <p className="text-[hsl(var(--muted-foreground))]">暂无整改任务</p>
           </div>
         )}
       </Card>

@@ -131,8 +131,8 @@ export default function BenchmarksPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">能效对标管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">能效对标管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理各行业能效对标值，用于企业能效对比分析
         </p>
       </div>
@@ -142,7 +142,7 @@ export default function BenchmarksPage() {
           <CardTitle>对标值列表</CardTitle>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Filter size={16} className="text-[var(--color-text-secondary)]" />
+              <Filter size={16} className="text-[hsl(var(--muted-foreground))]" />
               <Input
                 placeholder="行业代码"
                 value={filterIndustry}
@@ -218,7 +218,7 @@ export default function BenchmarksPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无对标数据
           </p>
         )}

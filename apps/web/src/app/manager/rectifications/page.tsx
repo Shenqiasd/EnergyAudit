@@ -51,8 +51,8 @@ export default function ManagerRectificationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">整改监管</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">整改监管</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           监控所有整改任务进度，跟踪完成情况
         </p>
       </div>
@@ -60,22 +60,22 @@ export default function ManagerRectificationsPage() {
       {stats && (
         <div className="grid grid-cols-4 gap-4">
           <Card className="p-4 text-center">
-            <div className="text-2xl font-bold text-[var(--color-text)]">{stats.total}</div>
-            <div className="text-sm text-[var(--color-text-secondary)]">总计</div>
+            <div className="text-2xl font-bold text-[hsl(var(--foreground))]">{stats.total}</div>
+            <div className="text-sm text-[hsl(var(--muted-foreground))]">总计</div>
           </Card>
           <Card className="p-4 text-center">
             <div className="text-2xl font-bold text-green-500">{stats.completionRate}</div>
-            <div className="text-sm text-[var(--color-text-secondary)]">完成率</div>
+            <div className="text-sm text-[hsl(var(--muted-foreground))]">完成率</div>
           </Card>
           <Card className="p-4 text-center">
             <div className="text-2xl font-bold text-red-500">{stats.overdueCount}</div>
-            <div className="text-sm text-[var(--color-text-secondary)]">延期数</div>
+            <div className="text-sm text-[hsl(var(--muted-foreground))]">延期数</div>
           </Card>
           <Card className="p-4 text-center">
             <div className="text-2xl font-bold text-blue-500">
               {stats.statusCounts["in_progress"] ?? 0}
             </div>
-            <div className="text-sm text-[var(--color-text-secondary)]">进行中</div>
+            <div className="text-sm text-[hsl(var(--muted-foreground))]">进行中</div>
           </Card>
         </div>
       )}
@@ -111,7 +111,7 @@ export default function ManagerRectificationsPage() {
           {items.map((task) => (
             <Card key={task.id} className="p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-medium text-sm text-[var(--color-text)] truncate">
+                <span className="font-medium text-sm text-[hsl(var(--foreground))] truncate">
                   {task.title}
                 </span>
                 <Badge variant={STATUS_VARIANTS[task.status] ?? "default"}>
@@ -119,11 +119,11 @@ export default function ManagerRectificationsPage() {
                 </Badge>
               </div>
               {task.description && (
-                <p className="text-xs text-[var(--color-text-secondary)] line-clamp-2">
+                <p className="text-xs text-[hsl(var(--muted-foreground))] line-clamp-2">
                   {task.description}
                 </p>
               )}
-              <div className="flex items-center justify-between text-xs text-[var(--color-text-secondary)]">
+              <div className="flex items-center justify-between text-xs text-[hsl(var(--muted-foreground))]">
                 <span>项目: {task.auditProjectId}</span>
                 {task.deadline && (
                   <span>截止: {new Date(task.deadline).toLocaleDateString("zh-CN")}</span>

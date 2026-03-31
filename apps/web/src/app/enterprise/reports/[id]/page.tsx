@@ -85,7 +85,7 @@ export default function EnterpriseReportDetailPage() {
   if (isLoading) return <PageLoading />;
   if (!report) {
     return (
-      <div className="p-8 text-center text-[var(--color-text-secondary)]">
+      <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">
         报告不存在
       </div>
     );
@@ -107,14 +107,14 @@ export default function EnterpriseReportDetailPage() {
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
             审计报告
           </h1>
           <div className="mt-1 flex items-center gap-3">
             <Badge variant={STATUS_VARIANTS[report.status] ?? "default"}>
               {STATUS_LABELS[report.status] ?? report.status}
             </Badge>
-            <span className="text-sm text-[var(--color-text-secondary)]">
+            <span className="text-sm text-[hsl(var(--muted-foreground))]">
               版本 v{report.version}
             </span>
           </div>
@@ -142,8 +142,8 @@ export default function EnterpriseReportDetailPage() {
               onClick={() => setActiveSection(section.sectionCode)}
               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                 (activeSection ?? report.sections[0]?.sectionCode) === section.sectionCode
-                  ? "bg-[var(--color-primary-light)] text-[var(--color-primary)] font-medium"
-                  : "text-[var(--color-text-secondary)] hover:bg-gray-50"
+                  ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] font-medium"
+                  : "text-[hsl(var(--muted-foreground))] hover:bg-gray-50"
               }`}
             >
               {section.sectionName}
@@ -163,7 +163,7 @@ export default function EnterpriseReportDetailPage() {
                   </span>
                 </CardTitle>
               </CardHeader>
-              <div className="whitespace-pre-wrap text-sm text-[var(--color-text)]">
+              <div className="whitespace-pre-wrap text-sm text-[hsl(var(--foreground))]">
                 {currentSection.content ?? "暂无内容"}
               </div>
 

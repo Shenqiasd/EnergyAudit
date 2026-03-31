@@ -41,18 +41,18 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       />
       <div
         className={clsx(
-          "relative z-50 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl",
+          "relative z-50 w-full max-w-lg rounded-xl bg-[hsl(var(--card))] p-6 shadow-xl",
           className,
         )}
       >
         {title && (
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[var(--color-text)]">
+            <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="rounded-lg p-1 text-[var(--color-text-secondary)] hover:bg-gray-100"
+              className="rounded-lg p-1 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
             >
               <X size={20} />
             </button>

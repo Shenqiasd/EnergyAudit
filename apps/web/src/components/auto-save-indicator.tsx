@@ -50,7 +50,7 @@ export function AutoSaveIndicator({
 
   if (isSaving) {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
+      <div className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))]">
         <Loader2 size={14} className="animate-spin" />
         <span>保存中...</span>
       </div>
@@ -59,7 +59,7 @@ export function AutoSaveIndicator({
 
   if (lastSaved) {
     return (
-      <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
+      <div className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))]">
         <Check size={14} className="text-green-500" />
         <span>已自动保存 ({formatRelativeTime(lastSaved)})</span>
       </div>
@@ -67,7 +67,7 @@ export function AutoSaveIndicator({
   }
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
+    <div className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))]">
       <Cloud size={14} />
       <span>自动保存已启用</span>
     </div>

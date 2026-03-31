@@ -12,13 +12,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] shadow-sm",
+    "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90 shadow-sm",
   secondary:
-    "bg-white text-[var(--color-text)] border border-[var(--color-border)] hover:bg-gray-50 shadow-sm",
+    "bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] border border-[hsl(var(--border))] hover:bg-[hsl(var(--secondary))]/80 shadow-sm",
   danger:
-    "bg-[var(--color-danger)] text-white hover:bg-red-700 shadow-sm",
+    "bg-[hsl(var(--danger))] text-[hsl(var(--danger-foreground))] hover:bg-[hsl(var(--danger))]/90 shadow-sm",
   ghost:
-    "bg-transparent text-[var(--color-text-secondary)] hover:bg-gray-100",
+    "bg-transparent text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -38,7 +38,7 @@ export function Button({
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[hsl(var(--ring))] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none",
         variantStyles[variant],
         sizeStyles[size],
         className,

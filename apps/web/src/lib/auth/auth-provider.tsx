@@ -24,7 +24,7 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginDev: (user: AuthUser) => void;
+  loginDev: (user: AuthUser) => Promise<void>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
   getAccessToken: () => string | null;
@@ -99,11 +99,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = localStorage.getItem(USER_KEY);
-      if (stored) {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (stored && token) {
         setUser(JSON.parse(stored));
+      } else {
+        // No valid token — clear stale session
+        clearTokens();
       }
     } catch {
-      // ignore parse errors
+      clearTokens();
     }
     setIsLoading(false);
   }, []);
@@ -120,9 +124,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   }, []);
 
-  const loginDev = useCallback((u: AuthUser) => {
-    setUser(u);
-    localStorage.setItem(USER_KEY, JSON.stringify(u));
+  const loginDev = useCallback(async (u: AuthUser) => {
+    const devEmail = `${u.role}@dev.local`;
+    const devPassword = "dev123456";
+
+    try {
+      // Try login first
+      const data = await apiClient.post<{
+        accessToken: string;
+        refreshToken: string;
+        user: AuthUser;
+      }>("/auth/login", { email: devEmail, password: devPassword });
+
+      storeTokens(data.accessToken, data.refreshToken);
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      setUser(data.user);
+    } catch {
+      try {
+        // If login fails, register then use returned tokens
+        const data = await apiClient.post<{
+          accessToken: string;
+          refreshToken: string;
+          user: AuthUser;
+        }>("/auth/register", {
+          email: devEmail,
+          password: devPassword,
+          name: u.name,
+          role: u.role,
+        });
+
+        storeTokens(data.accessToken, data.refreshToken);
+        localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+        setUser(data.user);
+      } catch {
+        // Fallback: store user without token (some APIs may fail)
+        setUser(u);
+        localStorage.setItem(USER_KEY, JSON.stringify(u));
+      }
+    }
   }, []);
 
   const logout = useCallback(() => {
@@ -131,9 +170,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const switchRole = useCallback(
-    (role: UserRole) => {
+    async (role: UserRole) => {
       const newUser = DEFAULT_USERS[role];
-      loginDev(newUser);
+      await loginDev(newUser);
     },
     [loginDev],
   );

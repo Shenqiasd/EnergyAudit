@@ -79,17 +79,17 @@ export default function ReviewerTasksPage() {
                 <div className="flex items-center justify-between p-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-[var(--color-text)]">
+                      <span className="font-medium text-[hsl(var(--foreground))]">
                         审核任务
                       </span>
                       <Badge variant={STATUS_VARIANTS[task.status] ?? "default"}>
                         {STATUS_LABELS[task.status] ?? task.status}
                       </Badge>
                     </div>
-                    <div className="text-sm text-[var(--color-text-secondary)]">
+                    <div className="text-sm text-[hsl(var(--muted-foreground))]">
                       项目 ID: {task.auditProjectId}
                     </div>
-                    <div className="text-xs text-[var(--color-text-secondary)]">
+                    <div className="text-xs text-[hsl(var(--muted-foreground))]">
                       分配时间: {task.assignedAt ? new Date(task.assignedAt).toLocaleDateString("zh-CN") : "未分配"}
                     </div>
                   </div>

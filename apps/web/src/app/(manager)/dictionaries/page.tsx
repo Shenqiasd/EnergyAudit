@@ -62,17 +62,17 @@ function TreeNode({
         {hasChildren ? (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="shrink-0 text-[var(--color-text-secondary)]"
+            className="shrink-0 text-[hsl(var(--muted-foreground))]"
           >
             {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
         ) : (
           <span className="w-4" />
         )}
-        <span className="flex-1 text-sm text-[var(--color-text)]">
+        <span className="flex-1 text-sm text-[hsl(var(--foreground))]">
           {item.name}
         </span>
-        <span className="font-mono text-xs text-[var(--color-text-secondary)]">
+        <span className="font-mono text-xs text-[hsl(var(--muted-foreground))]">
           {item.code}
         </span>
         <Badge variant={item.isActive ? "success" : "default"} className="text-xs">
@@ -83,7 +83,7 @@ function TreeNode({
             <Pencil size={12} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onDelete(item)}>
-            <Trash2 size={12} className="text-[var(--color-danger)]" />
+            <Trash2 size={12} className="text-[hsl(var(--danger))]" />
           </Button>
         </div>
       </div>
@@ -180,13 +180,13 @@ export default function DictionariesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">字典管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">字典管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理平台基础字典数据，包括行业分类、能源品种、计量单位等
         </p>
       </div>
 
-      <div className="flex gap-2 border-b border-[var(--color-border)]">
+      <div className="flex gap-2 border-b border-[hsl(var(--border))]">
         {categories.map((cat) => (
           <button
             key={cat.value}
@@ -196,8 +196,8 @@ export default function DictionariesPage() {
             }}
             className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
               activeCategory === cat.value
-                ? "border-[var(--color-primary)] text-[var(--color-primary)]"
-                : "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                ? "border-[hsl(var(--primary))] text-[hsl(var(--primary))]"
+                : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
             }`}
           >
             {cat.label}
@@ -214,14 +214,14 @@ export default function DictionariesPage() {
             <div className="relative">
               <Search
                 size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[hsl(var(--muted-foreground))]"
               />
               <input
                 type="text"
                 placeholder="搜索..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="rounded-lg border border-[var(--color-border)] bg-white py-1.5 pl-9 pr-3 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                className="rounded-lg border border-[hsl(var(--border))] bg-white py-1.5 pl-9 pr-3 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               />
             </div>
             <Button size="sm" onClick={handleOpenCreate}>
@@ -234,7 +234,7 @@ export default function DictionariesPage() {
         {isLoading ? (
           <Loading text="加载字典数据..." className="py-8" />
         ) : filteredItems.length > 0 ? (
-          <div className="divide-y divide-[var(--color-border)]">
+          <div className="divide-y divide-[hsl(var(--border))]">
             {filteredItems.map((item) => (
               <TreeNode
                 key={item.id}
@@ -245,7 +245,7 @@ export default function DictionariesPage() {
             ))}
           </div>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             {searchQuery ? "未找到匹配的字典项" : "暂无字典数据"}
           </p>
         )}
@@ -301,10 +301,10 @@ export default function DictionariesPage() {
         onClose={() => setDeleteConfirmItem(null)}
         title="确认删除"
       >
-        <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
           确定要删除字典项 &ldquo;{deleteConfirmItem?.name}&rdquo; 吗？
           {deleteConfirmItem?.children && deleteConfirmItem.children.length > 0 && (
-            <span className="mt-1 block text-[var(--color-danger)]">
+            <span className="mt-1 block text-[hsl(var(--danger))]">
               该项下有 {deleteConfirmItem.children.length} 个子项，删除后子项将失去父级关联。
             </span>
           )}

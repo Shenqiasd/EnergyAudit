@@ -88,7 +88,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const userInitial = user?.name ? user.name.charAt(0) : "U";
 
   return (
-    <header className="flex h-16 items-center justify-between bg-white px-4 shadow-sm lg:px-6">
+    <header className="flex h-16 items-center justify-between bg-[hsl(var(--card))] px-4 shadow-sm lg:px-6">
       {/* Left: menu toggle + breadcrumb */}
       <div className="flex items-center gap-4">
         <button
@@ -164,7 +164,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             <DropdownMenu.Content
               align="end"
               sideOffset={8}
-              className="z-50 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-white p-1 shadow-lg"
+              className="z-50 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-lg"
             >
               {/* User info header */}
               <div className="px-3 py-2">

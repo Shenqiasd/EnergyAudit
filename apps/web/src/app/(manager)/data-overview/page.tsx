@@ -45,7 +45,7 @@ function RollbackAction({
 
   if (job.isRolledBack) {
     return (
-      <span className="text-xs text-[var(--color-text-secondary)]">
+      <span className="text-xs text-[hsl(var(--muted-foreground))]">
         已回滚 ({job.rolledBackAt ? new Date(job.rolledBackAt).toLocaleDateString() : ""})
       </span>
     );
@@ -53,7 +53,7 @@ function RollbackAction({
 
   if (!rollbackCheck?.canRollback) {
     return (
-      <span className="text-xs text-[var(--color-text-secondary)]">
+      <span className="text-xs text-[hsl(var(--muted-foreground))]">
         {rollbackCheck?.reason ?? "不可回滚"}
       </span>
     );
@@ -103,8 +103,8 @@ export default function DataOverviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">数据概览</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">数据概览</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看数据记录状态和导入历史，支持导入回滚操作
         </p>
       </div>
@@ -144,14 +144,14 @@ export default function DataOverviewPage() {
                         : record.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                   {new Date(record.updatedAt).toLocaleString()}
                 </TableCell>
               </TableRow>
             ))}
             {(!recordsData?.items || recordsData.items.length === 0) && (
               <TableRow>
-                <TableCell colSpan={3} className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+                <TableCell colSpan={3} className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
                   暂无数据记录
                 </TableCell>
               </TableRow>
@@ -164,7 +164,7 @@ export default function DataOverviewPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <FileUp size={18} className="text-[var(--color-primary)]" />
+            <FileUp size={18} className="text-[hsl(var(--primary))]" />
             <CardTitle>导入历史</CardTitle>
           </div>
         </CardHeader>
@@ -212,7 +212,7 @@ export default function DataOverviewPage() {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                   {new Date(job.createdAt).toLocaleString()}
                 </TableCell>
                 <TableCell>
@@ -226,7 +226,7 @@ export default function DataOverviewPage() {
             ))}
             {importJobs.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+                <TableCell colSpan={6} className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
                   暂无导入记录
                 </TableCell>
               </TableRow>

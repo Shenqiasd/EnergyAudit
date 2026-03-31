@@ -44,8 +44,8 @@ export default function EnterpriseReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">报告管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">报告管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看和管理审计报告，上传终版报告
         </p>
       </div>
@@ -63,7 +63,7 @@ export default function EnterpriseReportsPage() {
         {isLoading ? (
           <Loading text="加载中..." />
         ) : !data?.items?.length ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             暂无报告数据。报告将在管理员发起计算和生成后显示。
           </p>
         ) : (
@@ -89,7 +89,7 @@ export default function EnterpriseReportsPage() {
                       {STATUS_LABELS[report.status] ?? report.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                     {report.generatedAt
                       ? new Date(report.generatedAt).toLocaleString("zh-CN")
                       : "-"}

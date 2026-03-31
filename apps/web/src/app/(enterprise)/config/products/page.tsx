@@ -127,8 +127,8 @@ export default function ProductConfigPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">产品定义配置</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">产品定义配置</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             配置企业生产的产品类型及其计量单位
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function ProductConfigPage() {
                         <Pencil size={14} />
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => setDeleteConfirmId(item.id)}>
-                        <Trash2 size={14} className="text-[var(--color-danger)]" />
+                        <Trash2 size={14} className="text-[hsl(var(--danger))]" />
                       </Button>
                     </div>
                   </TableCell>
@@ -184,7 +184,7 @@ export default function ProductConfigPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无产品定义，请点击"新增产品"开始配置
           </p>
         )}
@@ -248,7 +248,7 @@ export default function ProductConfigPage() {
         onClose={() => setDeleteConfirmId(null)}
         title="确认删除"
       >
-        <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
           确定要删除该产品定义吗？此操作不可恢复。
         </p>
         <div className="flex justify-end gap-3">

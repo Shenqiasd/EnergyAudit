@@ -41,8 +41,8 @@ export default function EnterpriseBenchmarkPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">能效对标分析</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">能效对标分析</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           将企业实际能效指标与行业对标值进行对比分析
         </p>
       </div>
@@ -105,7 +105,7 @@ export default function EnterpriseBenchmarkPage() {
       ) : (
         <Card>
           <div className="py-12 text-center">
-            <p className="text-[var(--color-text-secondary)]">
+            <p className="text-[hsl(var(--muted-foreground))]">
               暂无对标数据，请联系管理员配置行业对标值
             </p>
           </div>

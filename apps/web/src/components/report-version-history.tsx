@@ -52,8 +52,8 @@ export function ReportVersionHistory({ reportId }: ReportVersionHistoryProps) {
               key={v.id}
               className={`flex items-center justify-between rounded-lg border p-3 ${
                 v.isActive
-                  ? "border-[var(--color-primary)] bg-[var(--color-primary-light)]"
-                  : "border-[var(--color-border)]"
+                  ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10"
+                  : "border-[hsl(var(--border))]"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -67,7 +67,7 @@ export function ReportVersionHistory({ reportId }: ReportVersionHistoryProps) {
                       当前版本
                     </Badge>
                   )}
-                  <div className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
+                  <div className="mt-0.5 text-xs text-[hsl(var(--muted-foreground))]">
                     {new Date(v.createdAt).toLocaleString("zh-CN")}
                     {v.createdBy && ` · ${v.createdBy}`}
                   </div>
@@ -136,16 +136,16 @@ function VersionCompareModal({
   return (
     <Modal open onClose={onClose} title="版本对比" className="max-w-2xl">
       {isLoading ? (
-        <p className="text-sm text-[var(--color-text-secondary)]">加载中...</p>
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">加载中...</p>
       ) : !comparison ? (
-        <p className="text-sm text-[var(--color-text-secondary)]">无法加载对比数据</p>
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">无法加载对比数据</p>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
             <span>
               v{comparison.version1.versionNumber} vs v{comparison.version2.versionNumber}
             </span>
-            <span className="text-[var(--color-text-secondary)]">
+            <span className="text-[hsl(var(--muted-foreground))]">
               {comparison.changedSections}/{comparison.totalSections} 个章节有变更
             </span>
           </div>
@@ -156,8 +156,8 @@ function VersionCompareModal({
                 key={diff.sectionCode}
                 className={`rounded-lg border p-3 ${
                   diff.changed
-                    ? "border-[var(--color-warning)] bg-yellow-50"
-                    : "border-[var(--color-border)]"
+                    ? "border-[hsl(var(--warning))] bg-yellow-50"
+                    : "border-[hsl(var(--border))]"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ function VersionCompareModal({
                       <div className="mb-1 font-medium text-red-600">
                         v{comparison.version1.versionNumber}
                       </div>
-                      <div className="whitespace-pre-wrap text-[var(--color-text-secondary)]">
+                      <div className="whitespace-pre-wrap text-[hsl(var(--muted-foreground))]">
                         {diff.v1Content ?? "（无内容）"}
                       </div>
                     </div>
@@ -182,7 +182,7 @@ function VersionCompareModal({
                       <div className="mb-1 font-medium text-green-600">
                         v{comparison.version2.versionNumber}
                       </div>
-                      <div className="whitespace-pre-wrap text-[var(--color-text-secondary)]">
+                      <div className="whitespace-pre-wrap text-[hsl(var(--muted-foreground))]">
                         {diff.v2Content ?? "（无内容）"}
                       </div>
                     </div>

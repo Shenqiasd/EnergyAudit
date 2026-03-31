@@ -42,8 +42,8 @@ export default function EnterpriseRectificationPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">整改任务</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">整改任务</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看审核发现的问题，提交整改方案和完成情况
         </p>
       </div>
@@ -106,18 +106,18 @@ function RectificationTaskCard({ task }: {
         <div className="flex items-center justify-between p-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-[var(--color-text)]">{task.title}</span>
+              <span className="font-medium text-[hsl(var(--foreground))]">{task.title}</span>
               <Badge variant={STATUS_VARIANTS[task.status] ?? "default"}>
                 {STATUS_LABELS[task.status] ?? task.status}
               </Badge>
               {task.isOverdue && <Badge variant="danger">延期</Badge>}
             </div>
             {task.description && (
-              <p className="text-sm text-[var(--color-text-secondary)] line-clamp-1">
+              <p className="text-sm text-[hsl(var(--muted-foreground))] line-clamp-1">
                 {task.description}
               </p>
             )}
-            <div className="text-xs text-[var(--color-text-secondary)]">
+            <div className="text-xs text-[hsl(var(--muted-foreground))]">
               {task.deadline && (
                 <span>截止: {new Date(task.deadline).toLocaleDateString("zh-CN")}</span>
               )}

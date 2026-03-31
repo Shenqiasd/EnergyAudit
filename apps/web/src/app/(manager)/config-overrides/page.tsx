@@ -109,15 +109,15 @@ export default function ConfigOverridesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
           配置优先级覆盖管理
         </h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理4层配置覆盖：平台默认 &lt; 批次模板 &lt; 企业类型 &lt; 企业特例
         </p>
       </div>
 
-      <div className="flex gap-2 border-b border-[var(--color-border)]">
+      <div className="flex gap-2 border-b border-[hsl(var(--border))]">
         {scopeTypes.map((scope) => (
           <button
             key={scope.value}
@@ -127,8 +127,8 @@ export default function ConfigOverridesPage() {
             }}
             className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
               activeScopeType === scope.value
-                ? "border-[var(--color-primary)] text-[var(--color-primary)]"
-                : "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                ? "border-[hsl(var(--primary))] text-[hsl(var(--primary))]"
+                : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
             }`}
           >
             {scope.label}
@@ -173,7 +173,7 @@ export default function ConfigOverridesPage() {
         {isLoading ? (
           <Loading text="加载配置覆盖..." className="py-8" />
         ) : overrides && overrides.length > 0 ? (
-          <div className="divide-y divide-[var(--color-border)]">
+          <div className="divide-y divide-[hsl(var(--border))]">
             {overrides.map((item) => (
               <div
                 key={item.id}
@@ -182,15 +182,15 @@ export default function ConfigOverridesPage() {
                 <Badge variant="default" className="text-xs">
                   {targetTypes.find((t) => t.value === item.targetType)?.label}
                 </Badge>
-                <span className="font-mono text-sm text-[var(--color-text)]">
+                <span className="font-mono text-sm text-[hsl(var(--foreground))]">
                   {item.targetCode}
                 </span>
                 {item.scopeId && (
-                  <span className="text-xs text-[var(--color-text-secondary)]">
+                  <span className="text-xs text-[hsl(var(--muted-foreground))]">
                     范围: {item.scopeId}
                   </span>
                 )}
-                <span className="flex-1 truncate font-mono text-xs text-[var(--color-text-secondary)]">
+                <span className="flex-1 truncate font-mono text-xs text-[hsl(var(--muted-foreground))]">
                   {JSON.stringify(item.configJson)}
                 </span>
                 <Badge
@@ -204,13 +204,13 @@ export default function ConfigOverridesPage() {
                   size="sm"
                   onClick={() => setDeleteConfirm(item)}
                 >
-                  <Trash2 size={12} className="text-[var(--color-danger)]" />
+                  <Trash2 size={12} className="text-[hsl(var(--danger))]" />
                 </Button>
               </div>
             ))}
           </div>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无配置覆盖
           </p>
         )}
@@ -224,13 +224,13 @@ export default function ConfigOverridesPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+            <label className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]">
               范围类型
             </label>
             <select
               value={form.scopeType}
               onChange={(e) => setForm({ ...form, scopeType: e.target.value })}
-              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm"
             >
               {scopeTypes.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -256,7 +256,7 @@ export default function ConfigOverridesPage() {
           )}
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+            <label className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]">
               目标类型
             </label>
             <select
@@ -264,7 +264,7 @@ export default function ConfigOverridesPage() {
               onChange={(e) =>
                 setForm({ ...form, targetType: e.target.value })
               }
-              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm"
             >
               {targetTypes.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -282,7 +282,7 @@ export default function ConfigOverridesPage() {
           />
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+            <label className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]">
               覆盖配置 (JSON)
             </label>
             <textarea
@@ -292,11 +292,11 @@ export default function ConfigOverridesPage() {
                 setJsonError(null);
               }}
               rows={6}
-              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 font-mono text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 font-mono text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               placeholder='{"isEnabled": false}'
             />
             {jsonError && (
-              <p className="mt-1 text-xs text-[var(--color-danger)]">
+              <p className="mt-1 text-xs text-[hsl(var(--danger))]">
                 {jsonError}
               </p>
             )}
@@ -353,12 +353,12 @@ export default function ConfigOverridesPage() {
             <Loading text="加载有效配置..." className="py-4" />
           ) : effectiveConfig ? (
             <div className="max-h-80 overflow-auto rounded-lg bg-gray-50 p-3">
-              <pre className="whitespace-pre-wrap font-mono text-xs text-[var(--color-text)]">
+              <pre className="whitespace-pre-wrap font-mono text-xs text-[hsl(var(--foreground))]">
                 {JSON.stringify(effectiveConfig, null, 2)}
               </pre>
             </div>
           ) : previewModule ? (
-            <p className="text-sm text-[var(--color-text-secondary)]">
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">
               输入模块编码后查看有效配置
             </p>
           ) : null}
@@ -377,7 +377,7 @@ export default function ConfigOverridesPage() {
         onClose={() => setDeleteConfirm(null)}
         title="确认删除"
       >
-        <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
           确定要删除此配置覆盖吗？目标：{deleteConfirm?.targetCode}
         </p>
         <div className="flex justify-end gap-3">

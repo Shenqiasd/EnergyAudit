@@ -117,9 +117,9 @@ export default function ReviewWorkbenchPage() {
           返回
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">审核工作台</h1>
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审核工作台</h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm text-[var(--color-text-secondary)]">
+            <span className="text-sm text-[hsl(var(--muted-foreground))]">
               项目: {task.auditProjectId}
             </span>
             <Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>
@@ -135,7 +135,7 @@ export default function ReviewWorkbenchPage() {
         </Card>
       )}
 
-      <div className="flex gap-2 border-b border-[var(--color-border)]">
+      <div className="flex gap-2 border-b border-[hsl(var(--border))]">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -143,7 +143,7 @@ export default function ReviewWorkbenchPage() {
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.key
                 ? "border-blue-500 text-blue-600"
-                : "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
             }`}
           >
             {tab.label}
@@ -160,10 +160,10 @@ export default function ReviewWorkbenchPage() {
             {scores.map((score, index) => (
               <div key={score.category} className="grid grid-cols-[1fr_120px_1fr] gap-4 items-start">
                 <div>
-                  <label className="text-sm font-medium text-[var(--color-text)]">
+                  <label className="text-sm font-medium text-[hsl(var(--foreground))]">
                     {score.category}
                   </label>
-                  <p className="text-xs text-[var(--color-text-secondary)]">
+                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
                     满分 {score.maxScore} 分
                   </p>
                 </div>
@@ -183,8 +183,8 @@ export default function ReviewWorkbenchPage() {
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
-            <span className="text-lg font-bold text-[var(--color-text)]">
+          <div className="flex items-center justify-between pt-4 border-t border-[hsl(var(--border))]">
+            <span className="text-lg font-bold text-[hsl(var(--foreground))]">
               总分: {totalScore} / 100
             </span>
             <Button
@@ -195,8 +195,8 @@ export default function ReviewWorkbenchPage() {
             </Button>
           </div>
           {scoresData && scoresData.scores.length > 0 && (
-            <div className="mt-4 p-3 bg-[var(--color-bg-secondary)] rounded">
-              <p className="text-sm text-[var(--color-text-secondary)]">
+            <div className="mt-4 p-3 bg-[hsl(var(--muted))] rounded">
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">
                 已保存评分 - 总分: {scoresData.totalScore} / {scoresData.totalMaxScore}，
                 平均分: {scoresData.averageScore.toFixed(1)}
               </p>
@@ -276,7 +276,7 @@ export default function ReviewWorkbenchPage() {
             value={conclusion}
             onChange={(e) => setConclusion(e.target.value)}
             placeholder="请输入审核结论..."
-            className="w-full min-h-[200px] p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] resize-y"
+            className="w-full min-h-[200px] p-3 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] text-[hsl(var(--foreground))] resize-y"
           />
           <div className="flex gap-2">
             <Button
@@ -293,9 +293,9 @@ export default function ReviewWorkbenchPage() {
             </Button>
           </div>
           {task.conclusion && (
-            <div className="mt-4 p-3 bg-[var(--color-bg-secondary)] rounded">
-              <p className="text-sm font-medium text-[var(--color-text)]">已提交的结论:</p>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            <div className="mt-4 p-3 bg-[hsl(var(--muted))] rounded">
+              <p className="text-sm font-medium text-[hsl(var(--foreground))]">已提交的结论:</p>
+              <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
                 {task.conclusion}
               </p>
             </div>
@@ -310,16 +310,16 @@ function IssueItem({ issue }: { issue: { id: string; description: string; severi
   const resolveIssue = useResolveIssue(issue.id);
 
   return (
-    <div className="flex items-start justify-between p-3 rounded border border-[var(--color-border)]">
+    <div className="flex items-start justify-between p-3 rounded border border-[hsl(var(--border))]">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--color-text)]">{issue.description}</span>
+          <span className="text-sm text-[hsl(var(--foreground))]">{issue.description}</span>
           <Badge variant={SEVERITY_VARIANTS[issue.severity] ?? "default"}>
             {SEVERITY_LABELS[issue.severity] ?? issue.severity}
           </Badge>
         </div>
         {issue.suggestion && (
-          <p className="text-xs text-[var(--color-text-secondary)]">
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">
             建议: {issue.suggestion}
           </p>
         )}

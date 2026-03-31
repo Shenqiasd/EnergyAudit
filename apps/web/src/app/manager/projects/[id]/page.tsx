@@ -107,7 +107,7 @@ export default function ProjectDetailPage() {
   const extendDeadline = useExtendProjectDeadline(projectId);
 
   if (isLoading) return <PageLoading />;
-  if (!project) return <div className="p-8 text-center text-[var(--color-text-secondary)]">项目不存在</div>;
+  if (!project) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">项目不存在</div>;
 
   const handleTransition = async (targetStatus: string) => {
     await transitionProject.mutateAsync({ targetStatus });
@@ -144,9 +144,9 @@ export default function ProjectDetailPage() {
       </div>
 
       {project.isOverdue && (
-        <div className="flex items-center gap-2 rounded-lg border-2 border-[var(--color-danger)] bg-red-50 p-4">
-          <AlertTriangle size={20} className="text-[var(--color-danger)]" />
-          <span className="text-sm font-medium text-[var(--color-danger)]">
+        <div className="flex items-center gap-2 rounded-lg border-2 border-[hsl(var(--danger))] bg-red-50 p-4">
+          <AlertTriangle size={20} className="text-[hsl(var(--danger))]" />
+          <span className="text-sm font-medium text-[hsl(var(--danger))]">
             该项目已逾期，截止日期为 {formatDate(project.deadline)}
           </span>
           <Button size="sm" variant="secondary" onClick={() => setShowExtendDeadline(true)}>
@@ -168,29 +168,29 @@ export default function ProjectDetailPage() {
         </CardHeader>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-[var(--color-text-secondary)]">批次：</span>
-            <span className="text-[var(--color-text)]">{project.batchName ?? "-"}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">批次：</span>
+            <span className="text-[hsl(var(--foreground))]">{project.batchName ?? "-"}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[var(--color-text-secondary)]">截止日期：</span>
-            <span className="text-[var(--color-text)]">{formatDate(project.deadline)}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">截止日期：</span>
+            <span className="text-[hsl(var(--foreground))]">{formatDate(project.deadline)}</span>
             <Button size="sm" variant="ghost" onClick={() => setShowExtendDeadline(true)}>
               延期
             </Button>
           </div>
           <div>
-            <span className="text-[var(--color-text-secondary)]">创建时间：</span>
-            <span className="text-[var(--color-text)]">{formatDateTime(project.createdAt)}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">创建时间：</span>
+            <span className="text-[hsl(var(--foreground))]">{formatDateTime(project.createdAt)}</span>
           </div>
           <div>
-            <span className="text-[var(--color-text-secondary)]">模板版本：</span>
-            <span className="text-[var(--color-text)]">{project.templateVersionId ?? "未绑定"}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">模板版本：</span>
+            <span className="text-[hsl(var(--foreground))]">{project.templateVersionId ?? "未绑定"}</span>
           </div>
         </div>
 
         {project.validNextStates && project.validNextStates.length > 0 && (
           <div className="mt-4 flex items-center gap-2">
-            <span className="text-sm text-[var(--color-text-secondary)]">状态流转：</span>
+            <span className="text-sm text-[hsl(var(--muted-foreground))]">状态流转：</span>
             {project.validNextStates.map((next) => (
               <Button
                 key={next}
@@ -225,7 +225,7 @@ export default function ProjectDetailPage() {
                 <div key={t.id} className="relative flex items-start gap-3">
                   <div className="absolute -left-6 top-1 flex h-4 w-4 items-center justify-center">
                     <div
-                      className={`h-3 w-3 rounded-full ${idx === 0 ? "bg-[var(--color-primary)]" : "bg-gray-300"}`}
+                      className={`h-3 w-3 rounded-full ${idx === 0 ? "bg-[hsl(var(--primary))]" : "bg-gray-300"}`}
                     />
                   </div>
                   {idx < timeline.length - 1 && (
@@ -236,12 +236,12 @@ export default function ProjectDetailPage() {
                       <Badge variant={STATUS_VARIANTS[t.fromStatus] ?? "default"}>
                         {STATUS_LABELS[t.fromStatus] ?? t.fromStatus}
                       </Badge>
-                      <span className="text-[var(--color-text-secondary)]">→</span>
+                      <span className="text-[hsl(var(--muted-foreground))]">→</span>
                       <Badge variant={STATUS_VARIANTS[t.toStatus] ?? "default"}>
                         {STATUS_LABELS[t.toStatus] ?? t.toStatus}
                       </Badge>
                     </div>
-                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                    <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
                       {formatDateTime(t.transitionedAt)}
                       {t.reason && ` · ${t.reason}`}
                     </p>
@@ -250,7 +250,7 @@ export default function ProjectDetailPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-[var(--color-text-secondary)]">暂无流转记录</p>
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">暂无流转记录</p>
           )}
         </div>
       </Card>
@@ -302,7 +302,7 @@ export default function ProjectDetailPage() {
             ))}
             {(!members || members.length === 0) && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-[var(--color-text-secondary)]">
+                <TableCell colSpan={5} className="text-center text-[hsl(var(--muted-foreground))]">
                   暂无成员
                 </TableCell>
               </TableRow>

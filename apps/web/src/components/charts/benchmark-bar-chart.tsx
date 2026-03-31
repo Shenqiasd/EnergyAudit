@@ -25,8 +25,8 @@ export function BenchmarkBarChart({ title, data }: BenchmarkBarChartProps) {
   if (data.length === 0) {
     return (
       <ChartContainer title={title}>
-        <div className="flex h-48 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无对标数据
+        <div className="flex h-48 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无对标数据
         </div>
       </ChartContainer>
     );
@@ -44,11 +44,11 @@ export function BenchmarkBarChart({ title, data }: BenchmarkBarChartProps) {
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-1">
             <div className="h-3 w-3 rounded" style={{ backgroundColor: "#3B82F6" }} />
-            <span className="text-[var(--color-text-secondary)]">实际值</span>
+            <span className="text-[hsl(var(--muted-foreground))]">实际值</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="h-3 w-3 rounded" style={{ backgroundColor: "#F59E0B" }} />
-            <span className="text-[var(--color-text-secondary)]">对标值</span>
+            <span className="text-[hsl(var(--muted-foreground))]">对标值</span>
           </div>
           <div className="ml-auto flex items-center gap-3 text-xs">
             <span className="flex items-center gap-1">
@@ -70,17 +70,17 @@ export function BenchmarkBarChart({ title, data }: BenchmarkBarChartProps) {
             return (
               <div key={i} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-[var(--color-text)]">
-                    {d.indicatorName}
+                  <span className=                  "font-medium text-[hsl(var(--foreground))]">
+                                      {d.indicatorName}
                   </span>
-                  <span className="text-[var(--color-text-secondary)]">
-                    {d.unit}
+                  <span className=                  "text-[hsl(var(--muted-foreground))]">
+                                      {d.unit}
                   </span>
                 </div>
                 {/* Actual bar */}
                 <div className="flex items-center gap-2">
-                  <span className="w-10 text-right text-xs text-[var(--color-text-secondary)]">
-                    实际
+                  <span className=                  "w-10 text-right text-xs text-[hsl(var(--muted-foreground))]">
+                                      实际
                   </span>
                   <div className="flex-1 h-5 rounded bg-gray-100 relative">
                     <div
@@ -98,8 +98,8 @@ export function BenchmarkBarChart({ title, data }: BenchmarkBarChartProps) {
                 </div>
                 {/* Benchmark bar */}
                 <div className="flex items-center gap-2">
-                  <span className="w-10 text-right text-xs text-[var(--color-text-secondary)]">
-                    对标
+                  <span className=                  "w-10 text-right text-xs text-[hsl(var(--muted-foreground))]">
+                                      对标
                   </span>
                   <div className="flex-1 h-5 rounded bg-gray-100 relative">
                     <div
