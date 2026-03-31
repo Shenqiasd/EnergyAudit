@@ -138,9 +138,21 @@ export default function ProjectDetailPage() {
     return new Date(dateStr).toLocaleDateString("zh-CN");
   };
 
-  const statusOrder = Object.keys(STATUS_LABELS);
-  const currentIndex = statusOrder.indexOf(project.status);
-  const progressPercent = currentIndex >= 0 ? Math.round(((currentIndex + 1) / statusOrder.length) * 100) : 0;
+  const STATUS_PROGRESS: Record<string, number> = {
+    pending_start: 0,
+    configuring: 10,
+    filing: 25,
+    pending_submit: 40,
+    pending_report: 50,
+    report_processing: 60,
+    pending_review: 70,
+    in_review: 80,
+    pending_rectification: 85,
+    in_rectification: 90,
+    completed: 100,
+    closed: 100,
+  };
+  const progressPercent = STATUS_PROGRESS[project.status] ?? 0;
 
   const timelineItems: TimelineItem[] = (timeline ?? []).map((t) => ({
     id: t.id,
