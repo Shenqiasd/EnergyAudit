@@ -210,7 +210,7 @@ export default function ManagerEnterprisesPage() {
           description={'点击右上角"新增企业"按钮添加企业'}
         />
       ) : viewMode === "table" ? (
-        <DataTable columns={columns} data={items} pageSize={20} />
+        <DataTable columns={columns} data={items} pageSize={20} hidePagination />
       ) : (
         <ListCardView
           data={items}
