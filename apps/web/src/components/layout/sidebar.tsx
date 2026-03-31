@@ -142,11 +142,32 @@ const roleBadgeColors: Record<UserRole, string> = {
   reviewer: "bg-amber-100 text-amber-700",
 };
 
+/** Collect all href values from menu groups into a flat set for precise active matching */
+function getAllHrefs(groups: MenuGroup[]): string[] {
+  return groups.flatMap((g) => g.items.map((item) => item.href));
+}
+
+/**
+ * Determine if a menu item should be active.
+ * Uses exact match first; for prefix matches, ensures no more-specific sibling href also matches.
+ * This prevents both "/manager/statistics" and "/manager/statistics/region" from being active simultaneously.
+ */
+function isItemActive(pathname: string, itemHref: string, allHrefs: string[]): boolean {
+  if (pathname === itemHref) return true;
+  if (!pathname.startsWith(itemHref + "/")) return false;
+  // Check if a more specific href also matches — if so, this item should not be active
+  const hasMoreSpecificMatch = allHrefs.some(
+    (href) => href !== itemHref && href.startsWith(itemHref + "/") && (pathname === href || pathname.startsWith(href + "/")),
+  );
+  return !hasMoreSpecificMatch;
+}
+
 export function Sidebar({ role, collapsed }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
   const menus = menusByRole[role] || [];
+  const allHrefs = getAllHrefs(menus);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () => {
       const initial: Record<string, boolean> = {};
@@ -231,9 +252,7 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                   className="space-y-0.5 overflow-hidden"
                 >
                   {group.items.map((item) => {
-                    const isActive =
-                      pathname === item.href ||
-                      pathname.startsWith(item.href + "/");
+                    const isActive = isItemActive(pathname, item.href, allHrefs);
                     const Icon = item.icon;
                     return (
                       <li key={item.href}>
