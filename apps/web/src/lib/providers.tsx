@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { AuthProvider } from "./auth/auth-provider";
 import { getQueryClient } from "./api/query-client";
 import { ThemeProvider } from "./theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 export function Providers({ children }: { children: ReactNode }) {
   const queryClient = getQueryClient();
@@ -12,7 +13,10 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
