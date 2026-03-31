@@ -56,7 +56,7 @@ function TreeNode({
   return (
     <div>
       <div
-        className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-50"
+        className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-[hsl(var(--muted))]"
         style={{ paddingLeft: `${level * 24 + 12}px` }}
       >
         {hasChildren ? (
@@ -221,7 +221,7 @@ export default function DictionariesPage() {
                 placeholder="搜索..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="rounded-lg border border-[hsl(var(--border))] bg-white py-1.5 pl-9 pr-3 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
+                className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] py-1.5 pl-9 pr-3 text-sm text-[hsl(var(--foreground))] focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               />
             </div>
             <Button size="sm" onClick={handleOpenCreate}>

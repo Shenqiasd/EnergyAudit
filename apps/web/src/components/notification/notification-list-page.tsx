@@ -49,7 +49,7 @@ const typeConfig: Record<
     color: "text-orange-500",
     label: "整改任务",
   },
-  system: { icon: Bell, color: "text-gray-500", label: "系统通知" },
+  system: { icon: Bell, color: "text-[hsl(var(--muted-foreground))]", label: "系统通知" },
 };
 
 const notificationTypes = [
@@ -237,8 +237,8 @@ export function NotificationListPage() {
               return (
                 <div
                   key={notification.id}
-                  className={`flex items-start gap-4 px-4 py-4 transition-colors hover:bg-gray-50 ${
-                    !notification.isRead ? "bg-blue-50/30" : ""
+                  className={`flex items-start gap-4 px-4 py-4 transition-colors hover:bg-[hsl(var(--muted))] ${
+                    !notification.isRead ? "bg-[hsl(var(--primary)/0.05)]" : ""
                   }`}
                 >
                   <div className={`mt-0.5 shrink-0 ${config.color}`}>
@@ -253,7 +253,7 @@ export function NotificationListPage() {
                                               {notification.title}
                       </span>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${config.color} bg-gray-100`}
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${config.color} bg-[hsl(var(--muted))]`}
                       >
                         {config.label}
                       </span>

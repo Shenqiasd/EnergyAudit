@@ -267,7 +267,7 @@ function EditBusinessTypeModal({
             aria-checked={form.isActive}
             onClick={() => setForm({ ...form, isActive: !form.isActive })}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              form.isActive ? "bg-blue-600" : "bg-gray-300"
+              form.isActive ? "bg-[hsl(var(--primary))]" : "bg-[hsl(var(--muted-foreground)/0.3)]"
             }`}
           >
             <span
@@ -379,7 +379,7 @@ function ModuleVisibilityModal({
                         type="checkbox"
                         checked={mod?.isVisible ?? true}
                         onChange={() => toggleVisible(am.code)}
-                        className="h-4 w-4 rounded border-gray-300"
+                        className="h-4 w-4 rounded border-[hsl(var(--border))] accent-[hsl(var(--primary))]"
                       />
                     </TableCell>
                     <TableCell>
@@ -388,7 +388,7 @@ function ModuleVisibilityModal({
                         checked={mod?.isRequired ?? false}
                         disabled={!mod?.isVisible}
                         onChange={() => toggleRequired(am.code)}
-                        className="h-4 w-4 rounded border-gray-300"
+                        className="h-4 w-4 rounded border-[hsl(var(--border))] accent-[hsl(var(--primary))]"
                       />
                     </TableCell>
                   </TableRow>

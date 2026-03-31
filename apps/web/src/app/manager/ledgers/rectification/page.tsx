@@ -168,7 +168,7 @@ export default function RectificationLedgerPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-16 overflow-hidden rounded-full bg-gray-100">
+                        <div className="h-2 w-16 overflow-hidden rounded-full bg-[hsl(var(--muted))]">
                           <div
                             className="h-full rounded-full bg-[hsl(var(--primary))]"
                             style={{ width: `${item.progressPercent}%` }}

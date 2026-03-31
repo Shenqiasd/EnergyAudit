@@ -95,7 +95,7 @@ export default function DataExceptionsPage() {
                     <p className="text-sm text-[hsl(var(--foreground))]">
                       {item.validationResult?.message}
                     </p>
-                    <div className="rounded-lg bg-gray-50 p-3">
+                    <div className="rounded-lg bg-[hsl(var(--muted))] p-3">
                       <p className="text-xs font-medium text-[hsl(var(--muted-foreground))]">
                         例外说明：
                       </p>
@@ -152,7 +152,7 @@ export default function DataExceptionsPage() {
             确定要驳回此例外申请吗？
           </p>
           {rejectModal?.validationResult && (
-            <div className="rounded-lg bg-gray-50 p-3">
+            <div className="rounded-lg bg-[hsl(var(--muted))] p-3">
               <p className="text-sm text-[hsl(var(--foreground))]">
                 {rejectModal.validationResult.message}
               </p>
@@ -169,7 +169,7 @@ export default function DataExceptionsPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--foreground))] focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               placeholder="输入驳回原因..."
             />
           </div>

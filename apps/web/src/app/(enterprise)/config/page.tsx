@@ -103,7 +103,7 @@ export default function EnterpriseConfigPage() {
             </span>
             <span className="font-medium text-[hsl(var(--foreground))]">{progressPercent}%</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-[hsl(var(--muted))]">
             <div
               className="h-full rounded-full bg-[hsl(var(--primary))] transition-all duration-500"
               style={{ width: `${progressPercent}%` }}

@@ -49,7 +49,7 @@ const typeConfig: Record<
   },
   system: {
     icon: Bell,
-    color: "text-gray-500",
+    color: "text-[hsl(var(--muted-foreground))]",
     label: "系统通知",
   },
 };
@@ -177,8 +177,8 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
               <button
                 key={notification.id}
                 onClick={() => handleClick(notification)}
-                className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 ${
-                  !notification.isRead ? "bg-blue-50/50" : ""
+                className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[hsl(var(--muted))] ${
+                  !notification.isRead ? "bg-[hsl(var(--primary)/0.05)]" : ""
                 }`}
               >
                 <div className={`mt-0.5 shrink-0 ${config.color}`}>

@@ -15,7 +15,7 @@ interface TimelineProps {
 }
 
 const dotColors: Record<string, string> = {
-  default: "bg-gray-400",
+  default: "bg-[hsl(var(--muted-foreground))]",
   success: "bg-[hsl(var(--success))]",
   warning: "bg-[hsl(var(--warning))]",
   danger: "bg-[hsl(var(--danger))]",

@@ -9,9 +9,13 @@ import {
   ChevronRight,
   LogOut,
   Menu,
+  Monitor,
+  Moon,
   Search,
   Shield,
+  Sun,
 } from "lucide-react";
+import { useThemeStore } from "@/lib/stores/theme-store";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -65,10 +69,17 @@ function buildBreadcrumbHref(segments: string[], index: number): string {
   return "/" + segments.slice(0, index + 1).join("/");
 }
 
+const themeOptions = [
+  { value: "light" as const, label: "浅色", icon: Sun },
+  { value: "dark" as const, label: "深色", icon: Moon },
+  { value: "system" as const, label: "系统", icon: Monitor },
+];
+
 export function Header({ onMenuToggle }: HeaderProps) {
   const { user, logout, switchRole } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, setTheme } = useThemeStore();
 
   const roleDashboards: Record<UserRole, string> = {
     enterprise_user: "/enterprise/dashboard",
@@ -135,10 +146,52 @@ export function Header({ onMenuToggle }: HeaderProps) {
         >
           <Search size={14} />
           <span>搜索...</span>
-          <kbd className="ml-2 rounded border border-[hsl(var(--border))] bg-white px-1.5 py-0.5 text-[10px] font-medium text-[hsl(var(--muted-foreground))]">
+          <kbd className="ml-2 rounded border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-1.5 py-0.5 text-[10px] font-medium text-[hsl(var(--muted-foreground))]">
             ⌘K
           </kbd>
         </button>
+
+        {/* Theme switcher */}
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button
+              className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]"
+              aria-label="切换主题"
+            >
+              {theme === "dark" ? (
+                <Moon size={18} />
+              ) : theme === "system" ? (
+                <Monitor size={18} />
+              ) : (
+                <Sun size={18} />
+              )}
+            </button>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              align="end"
+              sideOffset={8}
+              className="z-50 min-w-[140px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-lg"
+            >
+              <DropdownMenu.Label className="px-3 py-1.5 text-xs font-medium text-[hsl(var(--muted-foreground))]">
+                主题模式
+              </DropdownMenu.Label>
+              {themeOptions.map((option) => (
+                <DropdownMenu.Item
+                  key={option.value}
+                  onSelect={() => setTheme(option.value)}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-[hsl(var(--accent))]",
+                    theme === option.value && "bg-[hsl(var(--accent))] font-medium",
+                  )}
+                >
+                  <option.icon size={14} />
+                  {option.label}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
 
         <NotificationBell />
 
@@ -211,7 +264,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                   logout();
                   router.push("/");
                 }}
-                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-[hsl(var(--destructive))] outline-none transition-colors hover:bg-red-50"
+                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-[hsl(var(--destructive))] outline-none transition-colors hover:bg-[hsl(var(--destructive)/0.1)]"
               >
                 <LogOut size={14} />
                 退出登录

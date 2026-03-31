@@ -39,7 +39,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const statCards = [
-  { key: "pending_start", label: "待启动", icon: Clock, color: "text-gray-500" },
+  { key: "pending_start", label: "待启动", icon: Clock, color: "text-[hsl(var(--muted-foreground))]" },
   { key: "filing", label: "填报中", icon: FileText, color: "text-blue-500" },
   { key: "pending_review", label: "待审核", icon: Users, color: "text-orange-500" },
   { key: "completed", label: "已完成", icon: CheckCircle, color: "text-green-500" },
@@ -178,7 +178,7 @@ export default function BatchDetailPage() {
                         type="checkbox"
                         checked={selectedIds.has(ent.id)}
                         onChange={() => toggleSelect(ent.id)}
-                        className="h-4 w-4 rounded border-gray-300"
+                        className="h-4 w-4 rounded border-[hsl(var(--border))] accent-[hsl(var(--primary))]"
                       />
                     </TableCell>
                     <TableCell className="font-medium">{ent.name}</TableCell>

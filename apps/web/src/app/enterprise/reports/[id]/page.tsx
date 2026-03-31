@@ -142,9 +142,9 @@ export default function EnterpriseReportDetailPage() {
         </TabsList>
 
         <TabsContent value="content">
-          <div className="flex gap-6">
+          <div className="flex flex-col gap-6 md:flex-row">
             {/* Section navigation sidebar */}
-            <div className="w-48 shrink-0 space-y-1">
+            <div className="flex gap-1 overflow-x-auto md:w-48 md:shrink-0 md:flex-col md:gap-0 md:space-y-1 md:overflow-x-visible">
               {report.sections.map((section) => (
                 <button
                   key={section.sectionCode}
@@ -152,7 +152,7 @@ export default function EnterpriseReportDetailPage() {
                   className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                     (activeSection ?? report.sections[0]?.sectionCode) === section.sectionCode
                       ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] font-medium"
-                      : "text-[hsl(var(--muted-foreground))] hover:bg-gray-50"
+                      : "text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
                   }`}
                 >
                   {section.sectionName}
