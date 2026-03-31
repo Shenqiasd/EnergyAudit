@@ -5,11 +5,12 @@ import Link from "next/link";
 import { UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
 import { FilterBar } from "@/components/list/filter-bar";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { Shield } from "lucide-react";
 import { useReviewTasks } from "@/lib/api/hooks/use-reviews";
 import type { ReviewTask } from "@/lib/api/hooks/use-reviews";
 
@@ -140,9 +141,13 @@ export default function ManagerReviewsPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} />
       ) : filteredItems.length === 0 ? (
-        <EmptyState title="暂无审核任务" description="审核任务将在项目进入审核阶段后自动创建" />
+        <EmptyState
+          icon={<Shield className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无审核任务"
+          description="还没有需要审核的报告"
+        />
       ) : (
         <DataTable columns={columns} data={filteredItems} />
       )}

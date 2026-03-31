@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { FileText } from "lucide-react";
 import { useReports } from "@/lib/api/hooks/use-reports";
 import type { Report } from "@/lib/api/hooks/use-reports";
 
@@ -91,11 +92,12 @@ export default function EnterpriseReportsPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} />
       ) : items.length === 0 ? (
         <EmptyState
-          title="暂无报告数据"
-          description="报告将在管理员发起计算和生成后显示"
+          icon={<FileText className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无审计报告"
+          description="完成填报后报告将在此显示"
         />
       ) : (
         <DataTable columns={columns} data={items} />

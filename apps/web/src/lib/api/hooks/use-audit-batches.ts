@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface AuditBatch {
   id: string;
@@ -101,6 +102,10 @@ export function useCreateBatch() {
       apiClient.post<AuditBatch>("/audit-batches", data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
+      toast({ title: "创建成功", description: "审计批次已创建", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "创建失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -113,6 +118,10 @@ export function useUpdateBatch(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-batch", id] });
+      toast({ title: "更新成功", description: "批次信息已更新", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "更新失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -126,6 +135,10 @@ export function useAssignEnterprises(batchId: string) {
       void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-batch", batchId] });
       void queryClient.invalidateQueries({ queryKey: ["audit-projects"] });
+      toast({ title: "分配成功", description: "企业已分配到批次", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "分配失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -138,6 +151,10 @@ export function useExtendBatchDeadline(batchId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-batch", batchId] });
+      toast({ title: "延期成功", description: "截止日期已延长", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "延期失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -150,6 +167,10 @@ export function useCloseBatch(batchId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["audit-batches"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-batch", batchId] });
+      toast({ title: "关闭成功", description: "批次已关闭", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "关闭失败", description: error.message, variant: "destructive" });
     },
   });
 }

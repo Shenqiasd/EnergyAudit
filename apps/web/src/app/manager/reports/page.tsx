@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
 import { FilterBar } from "@/components/list/filter-bar";
-import { RefreshCw } from "lucide-react";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { FileText, RefreshCw } from "lucide-react";
 import { useReports } from "@/lib/api/hooks/use-reports";
 import type { Report } from "@/lib/api/hooks/use-reports";
 import { useRouter } from "next/navigation";
@@ -151,9 +151,13 @@ export default function ManagerReportsPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} />
       ) : filteredItems.length === 0 ? (
-        <EmptyState title="暂无报告数据" description="报告将在项目进入报告阶段后自动生成" />
+        <EmptyState
+          icon={<FileText className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无报告"
+          description="完成数据填报后生成报告"
+        />
       ) : (
         <DataTable columns={columns} data={filteredItems} />
       )}

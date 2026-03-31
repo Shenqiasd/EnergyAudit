@@ -3,12 +3,12 @@
 import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
 import { FilterBar } from "@/components/list/filter-bar";
-import { AlertTriangle } from "lucide-react";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { AlertTriangle, ClipboardCheck } from "lucide-react";
 import { useAuditProjects, type AuditProject } from "@/lib/api/hooks/use-audit-projects";
 import { useAuditBatches } from "@/lib/api/hooks/use-audit-batches";
 import { useRouter } from "next/navigation";
@@ -165,11 +165,17 @@ export default function ManagerProjectsPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} />
       ) : items.length === 0 ? (
         <EmptyState
-          title="暂无项目数据"
-          description="项目将在批次分配企业后自动创建"
+          icon={<ClipboardCheck className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无项目"
+          description="在批次中创建审计项目"
+          action={
+            <Button variant="secondary" onClick={() => router.push('/manager/batches')}>
+              查看批次
+            </Button>
+          }
         />
       ) : (
         <DataTable columns={columns} data={items} pageSize={20} />

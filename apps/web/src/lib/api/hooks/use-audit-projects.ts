@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface AuditProject {
   id: string;
@@ -105,6 +106,10 @@ export function useTransitionProject(id: string) {
       void queryClient.invalidateQueries({ queryKey: ["audit-projects"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-project", id] });
       void queryClient.invalidateQueries({ queryKey: ["project-timeline", id] });
+      toast({ title: "操作成功", description: "项目状态已更新", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -124,6 +129,10 @@ export function useAddMember(projectId: string) {
       apiClient.post(`/audit-projects/${projectId}/members`, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["project-members", projectId] });
+      toast({ title: "添加成功", description: "成员已添加", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "添加失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -135,6 +144,10 @@ export function useRemoveMember(projectId: string) {
       apiClient.delete(`/audit-projects/${projectId}/members/${memberId}`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["project-members", projectId] });
+      toast({ title: "移除成功", description: "成员已移除", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "移除失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -150,6 +163,10 @@ export function useExtendProjectDeadline(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["audit-projects"] });
       void queryClient.invalidateQueries({ queryKey: ["audit-project", id] });
+      toast({ title: "延期成功", description: "项目截止日期已延长", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "延期失败", description: error.message, variant: "destructive" });
     },
   });
 }

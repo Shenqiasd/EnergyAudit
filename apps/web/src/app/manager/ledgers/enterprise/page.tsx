@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading } from "@/components/ui/loading";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -108,7 +110,7 @@ export default function EnterpriseLedgerPage() {
       </Card>
 
       {isLoading ? (
-        <Loading />
+        <ListPageSkeleton rows={8} />
       ) : (
         <Card>
           <Table>
@@ -165,9 +167,11 @@ export default function EnterpriseLedgerPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={7}>
-                    <div className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
-                      暂无数据
-                    </div>
+                    <EmptyState
+                      icon={<FileText className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+                      title="暂无台账记录"
+                      description="开始审计后自动生成台账"
+                    />
                   </TableCell>
                 </TableRow>
               )}

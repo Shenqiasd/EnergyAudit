@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
 import { FilterBar } from "@/components/list/filter-bar";
-import { AlertTriangle } from "lucide-react";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { AlertTriangle, Wrench } from "lucide-react";
 import {
   useRectificationTasks,
   useRectificationStats,
@@ -169,9 +169,13 @@ export default function ManagerRectificationsPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} />
       ) : filteredItems.length === 0 ? (
-        <EmptyState title="暂无整改任务" description="整改任务将在审核发现问题后自动生成" />
+        <EmptyState
+          icon={<Wrench className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无整改任务"
+          description="所有问题已处理完毕"
+        />
       ) : (
         <DataTable columns={columns} data={filteredItems} />
       )}

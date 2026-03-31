@@ -12,6 +12,8 @@ import {
   Wrench,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import {
   useNotifications,
   useMarkAsRead,
@@ -207,13 +209,15 @@ export function NotificationListPage() {
       {/* Notification list */}
       <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
         {isLoading ? (
-          <div className=          "px-4 py-12 text-center text-sm text-[hsl(var(--muted-foreground))]">
-                      加载中...
+          <div className="p-4">
+            <ListPageSkeleton rows={4} />
           </div>
         ) : notifications.length === 0 ? (
-          <div className=          "px-4 py-12 text-center text-sm text-[hsl(var(--muted-foreground))]">
-                      暂无通知
-          </div>
+          <EmptyState
+            icon={<Bell className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+            title="暂无通知"
+            description="所有通知已处理"
+          />
         ) : (
           <div className="divide-y divide-[hsl(var(--border))]">
             {notifications.map((notification) => {

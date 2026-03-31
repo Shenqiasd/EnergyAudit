@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface ReviewTask {
   id: string;
@@ -103,6 +104,10 @@ export function useCreateReviewTask() {
       apiClient.post<ReviewTaskDetail>("/reviews", data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-tasks"] });
+      toast({ title: "创建成功", description: "审核任务已创建", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "创建失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -115,6 +120,10 @@ export function useAssignReviewer(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["review-tasks"] });
+      toast({ title: "分配成功", description: "审核员已分配", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "分配失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -127,6 +136,10 @@ export function useStartReview(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["review-tasks"] });
+      toast({ title: "开始审核", description: "审核任务已开始", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -139,6 +152,10 @@ export function useSubmitReview(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["review-tasks"] });
+      toast({ title: "提交成功", description: "审核结论已提交", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "提交失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -151,6 +168,10 @@ export function useConfirmReview(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["review-tasks"] });
+      toast({ title: "确认成功", description: "审核已确认", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "确认失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -163,6 +184,10 @@ export function useReturnReview(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["review-tasks"] });
+      toast({ title: "退回成功", description: "审核已退回", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "退回失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -183,6 +208,10 @@ export function useSubmitScores(taskId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-scores", taskId] });
       void queryClient.invalidateQueries({ queryKey: ["review-task", taskId] });
+      toast({ title: "评分成功", description: "审核评分已保存", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "评分失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -209,6 +238,10 @@ export function useCreateIssue(taskId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-issues", taskId] });
       void queryClient.invalidateQueries({ queryKey: ["review-task", taskId] });
+      toast({ title: "添加成功", description: "问题已记录", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "添加失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -220,6 +253,10 @@ export function useResolveIssue(issueId: string) {
       apiClient.put<ReviewIssue>(`/reviews/issues/${issueId}/resolve`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["review-issues"] });
+      toast({ title: "解决成功", description: "问题已解决", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }

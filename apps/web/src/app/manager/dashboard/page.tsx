@@ -12,8 +12,8 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
-import { Loading } from "@/components/ui/loading";
 import { StatCard } from "@/components/ui/stat-card";
+import { DashboardSkeleton } from "@/components/skeleton/dashboard-skeleton";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -169,7 +169,7 @@ export default function ManagerDashboardPage() {
   const isLoading = summaryLoading || alertsLoading || timelineLoading;
 
   if (isLoading) {
-    return <Loading />;
+    return <DashboardSkeleton />;
   }
 
   const totalEnterprises = (summary?.activeBatches ?? 0) * 10;
