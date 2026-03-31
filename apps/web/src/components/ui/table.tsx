@@ -24,7 +24,7 @@ export function TableHeader({
   ...props
 }: HTMLAttributes<HTMLTableSectionElement> & { children: ReactNode }) {
   return (
-    <thead className={clsx("border-b border-[var(--color-border)]", className)} {...props}>
+    <thead className={clsx("border-b border-[hsl(var(--border))]", className)} {...props}>
       {children}
     </thead>
   );
@@ -50,7 +50,7 @@ export function TableRow({
   return (
     <tr
       className={clsx(
-        "border-b border-[var(--color-border)] transition-colors hover:bg-gray-50",
+        "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))]/50",
         className,
       )}
       {...props}
@@ -68,7 +68,7 @@ export function TableHead({
   return (
     <th
       className={clsx(
-        "h-12 px-4 text-left align-middle font-medium text-[var(--color-text-secondary)]",
+        "h-12 px-4 text-left align-middle font-medium text-[hsl(var(--muted-foreground))]",
         className,
       )}
       {...props}

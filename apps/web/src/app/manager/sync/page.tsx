@@ -59,10 +59,10 @@ export default function ManagerSyncPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
             同步管理
           </h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             管理企业信息同步状态，手动触发同步操作
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function ManagerSyncPage() {
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="text-center text-[var(--color-text-secondary)]"
+                      className="text-center text-[hsl(var(--muted-foreground))]"
                     >
                       暂无企业数据
                     </TableCell>
@@ -121,7 +121,7 @@ export default function ManagerSyncPage() {
 
             {totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)]">
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">
                   共 {data?.total} 条记录
                 </span>
                 <div className="flex gap-2">
@@ -171,7 +171,7 @@ function SyncRow({ enterprise }: { enterprise: Enterprise }) {
       <TableCell>
         <SyncStatusBadge status={displayStatus} />
       </TableCell>
-      <TableCell className="text-sm text-[var(--color-text-secondary)]">
+      <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
         {displayLastSyncedAt
           ? new Date(displayLastSyncedAt).toLocaleString("zh-CN")
           : "-"}

@@ -68,16 +68,16 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-bg)] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[hsl(var(--background))] px-4">
       {/* Header */}
       <div className="mb-12 text-center">
         <div className="mb-4 flex items-center justify-center gap-3">
-          <FileBarChart size={40} className="text-[var(--color-primary)]" />
-          <h1 className="text-3xl font-bold text-[var(--color-text)]">
+          <FileBarChart size={40} className="text-[hsl(var(--primary))]" />
+          <h1 className="text-3xl font-bold text-[hsl(var(--foreground))]">
             能源审计平台
           </h1>
         </div>
-        <p className="text-[var(--color-text-secondary)]">
+        <p className="text-[hsl(var(--muted-foreground))]">
           请选择登录角色进入对应的工作台
         </p>
         <Badge variant="primary" className="mt-2">
@@ -100,10 +100,10 @@ export default function HomePage() {
               >
                 <Icon size={32} />
               </div>
-              <h2 className="mb-2 text-xl font-bold text-[var(--color-text)]">
+              <h2 className="mb-2 text-xl font-bold text-[hsl(var(--foreground))]">
                 {card.label}
               </h2>
-              <p className="text-sm text-[var(--color-text-secondary)]">
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">
                 {card.description}
               </p>
             </button>
@@ -112,7 +112,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <div className="mt-12 text-center text-sm text-[var(--color-text-secondary)]">
+      <div className="mt-12 text-center text-sm text-[hsl(var(--muted-foreground))]">
         <p>能源审计管理平台 v0.1.0</p>
         <p className="mt-1">实际部署时将对接统一身份认证 (OIDC)</p>
       </div>

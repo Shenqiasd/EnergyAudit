@@ -38,8 +38,8 @@ export function SankeyDiagram({ title, nodes, links }: SankeyDiagramProps) {
   if (nodes.length === 0 || links.length === 0) {
     return (
       <ChartContainer title={title}>
-        <div className="flex h-48 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无能源流向数据
+        <div className="flex h-48 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无能源流向数据
         </div>
       </ChartContainer>
     );

@@ -58,8 +58,8 @@ export default function EnterpriseProjectsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">我的项目</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">我的项目</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看分配给本企业的审计项目
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function EnterpriseProjectsPage() {
                     {proj.isOverdue ? (
                       <Badge variant="danger">已逾期</Badge>
                     ) : (
-                      <span className="text-[var(--color-text-secondary)]">-</span>
+                      <span className="text-[hsl(var(--muted-foreground))]">-</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -117,7 +117,7 @@ export default function EnterpriseProjectsPage() {
               ))}
               {(!data?.items || data.items.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-[var(--color-text-secondary)]">
+                  <TableCell colSpan={5} className="text-center text-[hsl(var(--muted-foreground))]">
                     暂无项目
                   </TableCell>
                 </TableRow>

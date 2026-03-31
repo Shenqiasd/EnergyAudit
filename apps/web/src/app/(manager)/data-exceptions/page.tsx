@@ -58,10 +58,10 @@ export default function DataExceptionsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
           例外审核管理
         </h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           审核企业提交的数据校验例外说明，批准或驳回
         </p>
       </div>
@@ -77,7 +77,7 @@ export default function DataExceptionsPage() {
         {isLoading ? (
           <Loading text="加载待审核例外..." className="py-8" />
         ) : pendingItems && pendingItems.length > 0 ? (
-          <div className="divide-y divide-[var(--color-border)]">
+          <div className="divide-y divide-[hsl(var(--border))]">
             {pendingItems.map((item) => (
               <div key={item.exception.id} className="px-4 py-4">
                 <div className="flex items-start justify-between gap-4">
@@ -85,25 +85,25 @@ export default function DataExceptionsPage() {
                     <div className="flex items-center gap-2">
                       {item.validationResult &&
                         severityBadge(item.validationResult.severity)}
-                      <span className="font-mono text-xs text-[var(--color-text-secondary)]">
+                      <span className="font-mono text-xs text-[hsl(var(--muted-foreground))]">
                         {item.validationResult?.ruleCode}
                       </span>
-                      <span className="text-xs text-[var(--color-text-secondary)]">
+                      <span className="text-xs text-[hsl(var(--muted-foreground))]">
                         模块: {item.validationResult?.moduleCode ?? item.dataRecord?.moduleCode}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--color-text)]">
+                    <p className="text-sm text-[hsl(var(--foreground))]">
                       {item.validationResult?.message}
                     </p>
                     <div className="rounded-lg bg-gray-50 p-3">
-                      <p className="text-xs font-medium text-[var(--color-text-secondary)]">
+                      <p className="text-xs font-medium text-[hsl(var(--muted-foreground))]">
                         例外说明：
                       </p>
-                      <p className="mt-1 text-sm text-[var(--color-text)]">
+                      <p className="mt-1 text-sm text-[hsl(var(--foreground))]">
                         {item.exception.explanation}
                       </p>
                     </div>
-                    <p className="text-xs text-[var(--color-text-secondary)]">
+                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
                       提交时间：{new Date(item.exception.createdAt).toLocaleString("zh-CN")}
                     </p>
                   </div>
@@ -135,7 +135,7 @@ export default function DataExceptionsPage() {
             ))}
           </div>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无待审核的例外申请
           </p>
         )}
@@ -148,28 +148,28 @@ export default function DataExceptionsPage() {
         title="驳回例外申请"
       >
         <div className="space-y-4">
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             确定要驳回此例外申请吗？
           </p>
           {rejectModal?.validationResult && (
             <div className="rounded-lg bg-gray-50 p-3">
-              <p className="text-sm text-[var(--color-text)]">
+              <p className="text-sm text-[hsl(var(--foreground))]">
                 {rejectModal.validationResult.message}
               </p>
-              <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+              <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
                 例外说明：{rejectModal.exception.explanation}
               </p>
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+            <label className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]">
               驳回原因（可选）
             </label>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               placeholder="输入驳回原因..."
             />
           </div>

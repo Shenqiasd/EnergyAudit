@@ -36,7 +36,7 @@ const alertLinks: Record<string, (id: string) => string> = {
 };
 
 function AlertItemWrapper({ href, children }: { href?: string; children: React.ReactNode }) {
-  const className = "flex items-start gap-3 rounded-lg border border-[var(--color-border)] p-3 transition-colors hover:bg-[var(--color-bg-secondary)]";
+  const className = "flex items-start gap-3 rounded-lg border border-[hsl(var(--border))] p-3 transition-colors hover:bg-[hsl(var(--muted))]/50";
   if (href) {
     return (
       <Link href={href} className={className}>
@@ -54,8 +54,8 @@ export function AlertList({ title, alerts }: AlertListProps) {
         <CardHeader>
           <CardTitle>{title}</CardTitle>
         </CardHeader>
-        <div className="flex h-32 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无预警
+        <div className="flex h-32 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无预警
         </div>
       </Card>
     );
@@ -76,14 +76,14 @@ export function AlertList({ title, alerts }: AlertListProps) {
               size={16}
               className={
                 alert.severity === "danger"
-                  ? "mt-0.5 shrink-0 text-[var(--color-danger)]"
-                  : "mt-0.5 shrink-0 text-[var(--color-warning)]"
+                  ? "mt-0.5 shrink-0 text-[hsl(var(--danger))]"
+                  : "mt-0.5 shrink-0 text-[hsl(var(--warning))]"
               }
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-[var(--color-text)]">
-                  {alert.title}
+                <span className=                "text-sm font-medium text-[hsl(var(--foreground))]">
+                                  {alert.title}
                 </span>
                 <Badge
                   variant={alert.severity === "danger" ? "danger" : "warning"}
@@ -91,8 +91,8 @@ export function AlertList({ title, alerts }: AlertListProps) {
                   {typeLabels[alert.type] ?? alert.type}
                 </Badge>
               </div>
-              <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
-                {alert.description}
+              <p className=              "mt-0.5 text-xs text-[hsl(var(--muted-foreground))]">
+                              {alert.description}
               </p>
             </div>
           </AlertItemWrapper>

@@ -74,13 +74,13 @@ export function DraftRecoveryBanner({
   if (!draft || dismissed) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-[var(--color-warning)] bg-[var(--color-warning-light)] p-4">
+    <div className="flex items-center gap-3 rounded-xl border border-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10 p-4">
       <AlertTriangle
         size={20}
-        className="mt-0.5 shrink-0 text-[var(--color-warning)]"
+        className="mt-0.5 shrink-0 text-[hsl(var(--warning))]"
       />
       <div className="flex-1">
-        <p className="text-sm font-medium text-[var(--color-text)]">
+        <p className="text-sm font-medium text-[hsl(var(--foreground))]">
           检测到未保存的草稿（保存于 {formatTime(draft.metadata.savedAt)}），是否恢复？
         </p>
       </div>

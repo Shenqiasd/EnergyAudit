@@ -35,7 +35,7 @@ function BatchStatisticsTab() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <label className="text-sm font-medium text-[var(--color-text)]">
+        <label className="text-sm font-medium text-[hsl(var(--foreground))]">
           选择批次:
         </label>
         <input
@@ -43,13 +43,13 @@ function BatchStatisticsTab() {
           placeholder="输入批次 ID"
           value={batchId}
           onChange={(e) => setBatchId(e.target.value)}
-          className="rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none"
+          className="rounded-lg border border-[hsl(var(--border))] px-3 py-2 text-sm focus:border-[hsl(var(--primary))] focus:outline-none"
         />
       </div>
 
       {!batchId && (
         <Card>
-          <div className="flex h-48 items-center justify-center text-sm text-[var(--color-text-secondary)]">
+          <div className="flex h-48 items-center justify-center text-sm text-[hsl(var(--muted-foreground))]">
             请输入批次 ID 查看统计数据
           </div>
         </Card>
@@ -61,34 +61,34 @@ function BatchStatisticsTab() {
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <div className="text-sm text-[var(--color-text-secondary)]">完成率</div>
-              <div className="mt-2 text-3xl font-bold text-[var(--color-primary)]">
+              <div className="text-sm text-[hsl(var(--muted-foreground))]">完成率</div>
+              <div className="mt-2 text-3xl font-bold text-[hsl(var(--primary))]">
                 {(data.completionRate * 100).toFixed(1)}%
               </div>
-              <div className="mt-1 text-xs text-[var(--color-text-secondary)]">
+              <div className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
                 {data.completedProjects}/{data.totalProjects} 个项目
               </div>
             </Card>
             <Card>
-              <div className="text-sm text-[var(--color-text-secondary)]">超期率</div>
-              <div className="mt-2 text-3xl font-bold text-[var(--color-danger)]">
+              <div className="text-sm text-[hsl(var(--muted-foreground))]">超期率</div>
+              <div className="mt-2 text-3xl font-bold text-[hsl(var(--danger))]">
                 {(data.overdueRate * 100).toFixed(1)}%
               </div>
-              <div className="mt-1 text-xs text-[var(--color-text-secondary)]">
+              <div className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
                 {data.overdueProjects} 个超期项目
               </div>
             </Card>
             <Card>
-              <div className="text-sm text-[var(--color-text-secondary)]">平均审核评分</div>
-              <div className="mt-2 text-3xl font-bold text-[var(--color-text)]">
+              <div className="text-sm text-[hsl(var(--muted-foreground))]">平均审核评分</div>
+              <div className="mt-2 text-3xl font-bold text-[hsl(var(--foreground))]">
                 {data.averageReviewScore !== null
                   ? data.averageReviewScore.toFixed(1)
                   : "N/A"}
               </div>
             </Card>
             <Card>
-              <div className="text-sm text-[var(--color-text-secondary)]">总项目数</div>
-              <div className="mt-2 text-3xl font-bold text-[var(--color-text)]">
+              <div className="text-sm text-[hsl(var(--muted-foreground))]">总项目数</div>
+              <div className="mt-2 text-3xl font-bold text-[hsl(var(--foreground))]">
                 {data.totalProjects}
               </div>
             </Card>
@@ -165,7 +165,7 @@ function IndustryStatisticsTab() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4}>
-                    <div className="py-4 text-center text-sm text-[var(--color-text-secondary)]">
+                    <div className="py-4 text-center text-sm text-[hsl(var(--muted-foreground))]">
                       暂无数据
                     </div>
                   </TableCell>
@@ -187,10 +187,10 @@ function CarbonStatisticsTab() {
   return (
     <div className="space-y-6">
       <Card>
-        <div className="text-sm text-[var(--color-text-secondary)]">碳排放总量</div>
-        <div className="mt-2 text-3xl font-bold text-[var(--color-text)]">
+        <div className="text-sm text-[hsl(var(--muted-foreground))]">碳排放总量</div>
+        <div className="mt-2 text-3xl font-bold text-[hsl(var(--foreground))]">
           {data?.totalEmissions.toFixed(2) ?? "0"}{" "}
-          <span className="text-sm font-normal text-[var(--color-text-secondary)]">
+          <span className="text-sm font-normal text-[hsl(var(--muted-foreground))]">
             tCO₂e
           </span>
         </div>
@@ -244,7 +244,7 @@ function CarbonStatisticsTab() {
             ) : (
               <TableRow>
                 <TableCell colSpan={3}>
-                  <div className="py-4 text-center text-sm text-[var(--color-text-secondary)]">
+                  <div className="py-4 text-center text-sm text-[hsl(var(--muted-foreground))]">
                     暂无数据
                   </div>
                 </TableCell>
@@ -263,22 +263,22 @@ export default function ManagerStatisticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">统计分析</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">统计分析</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           审计工作数据统计、趋势分析和报表导出
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 rounded-lg border border-[var(--color-border)] bg-gray-50 p-1">
+      <div className="flex gap-1 rounded-lg border border-[hsl(var(--border))] bg-gray-50 p-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? "bg-white text-[var(--color-primary)] shadow-sm"
-                : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+                ? "bg-white text-[hsl(var(--primary))] shadow-sm"
+                : "text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
             }`}
           >
             {tab.label}

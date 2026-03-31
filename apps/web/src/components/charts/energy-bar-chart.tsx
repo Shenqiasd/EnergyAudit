@@ -24,8 +24,8 @@ export function EnergyBarChart({ title, data, xAxis, yAxis }: EnergyBarChartProp
   if (data.length === 0) {
     return (
       <ChartContainer title={title}>
-        <div className="flex h-48 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无数据
+        <div className="flex h-48 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无数据
         </div>
       </ChartContainer>
     );
@@ -38,7 +38,7 @@ export function EnergyBarChart({ title, data, xAxis, yAxis }: EnergyBarChartProp
     <ChartContainer title={title}>
       <div className="flex flex-col">
         {yAxis && (
-          <div className="mb-1 text-xs text-[var(--color-text-secondary)]">{yAxis}</div>
+          <div className="mb-1 text-xs text-[hsl(var(--muted-foreground))]">{yAxis}</div>
         )}
         <div className="flex items-end gap-2" style={{ height: 180 }}>
           {data.map((d, i) => {
@@ -46,8 +46,8 @@ export function EnergyBarChart({ title, data, xAxis, yAxis }: EnergyBarChartProp
             const color = d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length];
             return (
               <div key={i} className="flex flex-col items-center gap-1" style={{ width: barWidth }}>
-                <span className="text-xs text-[var(--color-text-secondary)]">
-                  {d.value.toFixed(1)}
+                <span className=                "text-xs text-[hsl(var(--muted-foreground))]">
+                                  {d.value.toFixed(1)}
                 </span>
                 <div
                   className="w-full rounded-t"
@@ -57,7 +57,7 @@ export function EnergyBarChart({ title, data, xAxis, yAxis }: EnergyBarChartProp
                     minHeight: 4,
                   }}
                 />
-                <span className="mt-1 text-xs text-[var(--color-text)] truncate w-full text-center">
+                <span className="mt-1 text-xs text-[hsl(var(--foreground))] truncate w-full text-center">
                   {d.label}
                 </span>
               </div>
@@ -65,7 +65,7 @@ export function EnergyBarChart({ title, data, xAxis, yAxis }: EnergyBarChartProp
           })}
         </div>
         {xAxis && (
-          <div className="mt-2 text-center text-xs text-[var(--color-text-secondary)]">{xAxis}</div>
+          <div className="mt-2 text-center text-xs text-[hsl(var(--muted-foreground))]">{xAxis}</div>
         )}
       </div>
     </ChartContainer>

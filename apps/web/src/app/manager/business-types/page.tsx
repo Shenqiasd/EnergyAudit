@@ -67,10 +67,10 @@ export default function BusinessTypesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
             业务类型管理
           </h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             配置平台支持的业务类型，管理模块可见性
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function BusinessTypesPage() {
                     {bt.businessType}
                   </TableCell>
                   <TableCell className="font-medium">{bt.label}</TableCell>
-                  <TableCell className="text-[var(--color-text-secondary)]">
+                  <TableCell className="text-[hsl(var(--muted-foreground))]">
                     {bt.description || "-"}
                   </TableCell>
                   <TableCell>
@@ -142,7 +142,7 @@ export default function BusinessTypesPage() {
                 <TableRow>
                   <TableCell
                     colSpan={5}
-                    className="text-center text-[var(--color-text-secondary)]"
+                    className="text-center text-[hsl(var(--muted-foreground))]"
                   >
                     暂无业务类型数据
                   </TableCell>
@@ -258,7 +258,7 @@ function EditBusinessTypeModal({
           onChange={(e) => setForm({ ...form, description: e.target.value })}
         />
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-[var(--color-text)]">
+          <label className="text-sm font-medium text-[hsl(var(--foreground))]">
             启用状态
           </label>
           <button

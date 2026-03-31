@@ -39,7 +39,7 @@ export default function AdmissionReviewPage({
   const [showConfirmApprove, setShowConfirmApprove] = useState(false);
 
   if (isLoading) return <PageLoading />;
-  if (!enterprise) return <div className="p-8 text-center text-[var(--color-text-secondary)]">企业不存在</div>;
+  if (!enterprise) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">企业不存在</div>;
 
   const handleApprove = () => {
     approveMutation.mutate(
@@ -76,8 +76,8 @@ export default function AdmissionReviewPage({
           </Button>
         </a>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">准入审核</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">准入审核</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             审核企业 {enterprise.name} 的准入申请
           </p>
         </div>
@@ -130,7 +130,7 @@ export default function AdmissionReviewPage({
         title="确认审核通过"
       >
         <div className="space-y-4">
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             确认通过企业 <strong>{enterprise.name}</strong> 的准入申请？通过后企业将可以参与能源审计。
           </p>
           <div className="flex justify-end gap-3">
@@ -150,7 +150,7 @@ export default function AdmissionReviewPage({
         title="驳回申请"
       >
         <div className="space-y-4">
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             请输入驳回原因，企业将收到通知。
           </p>
           <Input
@@ -176,8 +176,8 @@ export default function AdmissionReviewPage({
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-4">
-      <span className="w-32 shrink-0 text-sm text-[var(--color-text-secondary)]">{label}</span>
-      <span className="text-sm text-[var(--color-text)]">{value}</span>
+      <span className="w-32 shrink-0 text-sm text-[hsl(var(--muted-foreground))]">{label}</span>
+      <span className="text-sm text-[hsl(var(--foreground))]">{value}</span>
     </div>
   );
 }

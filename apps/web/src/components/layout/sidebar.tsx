@@ -160,7 +160,7 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
   return (
     <aside
       className={clsx(
-        "flex h-full flex-col bg-[var(--color-sidebar)] text-white transition-all duration-300",
+        "flex h-full flex-col bg-slate-800 text-white transition-all duration-300",
         collapsed ? "w-16" : "w-60",
       )}
     >
@@ -208,8 +208,8 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                         className={clsx(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                           isActive
-                            ? "bg-[var(--color-sidebar-active)] text-white font-medium"
-                            : "text-white/70 hover:bg-[var(--color-sidebar-hover)] hover:text-white",
+                            ? "bg-slate-900 text-white font-medium"
+                            : "text-white/70 hover:bg-slate-700 hover:text-white",
                           collapsed && "justify-center px-2",
                         )}
                         title={collapsed ? item.label : undefined}

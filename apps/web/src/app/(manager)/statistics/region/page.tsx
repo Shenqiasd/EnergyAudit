@@ -62,7 +62,7 @@ export default function RegionStatisticsPage() {
             <ArrowLeft size={16} />
             返回区域总览
           </Button>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
             {selectedRegion} - 省市明细
           </h1>
         </div>
@@ -94,7 +94,7 @@ export default function RegionStatisticsPage() {
                 </TableBody>
               </Table>
             ) : (
-              <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+              <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
                 暂无省市数据
               </p>
             )}
@@ -107,14 +107,14 @@ export default function RegionStatisticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">区域统计</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">区域统计</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           按区域查看企业分布、能耗排名和合规率
         </p>
       </div>
 
       <div className="flex items-center gap-3">
-        <MapPin size={16} className="text-[var(--color-text-secondary)]" />
+        <MapPin size={16} className="text-[hsl(var(--muted-foreground))]" />
         <Select
           options={batchOptions}
           value={selectedBatchId ?? ""}
@@ -157,7 +157,7 @@ export default function RegionStatisticsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <BarChart3 size={18} className="text-[var(--color-primary)]" />
+            <BarChart3 size={18} className="text-[hsl(var(--primary))]" />
             <CardTitle>区域分布明细</CardTitle>
           </div>
         </CardHeader>
@@ -189,7 +189,7 @@ export default function RegionStatisticsPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无区域数据，请确保企业已配置区域信息
           </p>
         )}
@@ -228,7 +228,7 @@ export default function RegionStatisticsPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无合规率数据
           </p>
         )}

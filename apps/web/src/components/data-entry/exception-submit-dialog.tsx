@@ -70,17 +70,17 @@ export function ExceptionSubmitDialog({
           {warnings.map((warning) => (
             <div
               key={warning.id}
-              className="rounded-lg border border-[var(--color-border)] p-3"
+              className="rounded-lg border border-[hsl(var(--border))] p-3"
             >
               <div className="mb-2 flex items-center gap-2">
                 <Badge variant="warning" className="text-xs">
                   警告
                 </Badge>
-                <span className="font-mono text-xs text-[var(--color-text-secondary)]">
+                <span className="font-mono text-xs text-[hsl(var(--muted-foreground))]">
                   {warning.ruleCode}
                 </span>
               </div>
-              <p className="mb-2 text-sm text-[var(--color-text)]">
+              <p className="mb-2 text-sm text-[hsl(var(--foreground))]">
                 {warning.message}
               </p>
               <textarea
@@ -89,7 +89,7 @@ export function ExceptionSubmitDialog({
                   handleExplanationChange(warning.id, e.target.value)
                 }
                 rows={2}
-                className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
                 placeholder="请输入例外说明..."
               />
             </div>
