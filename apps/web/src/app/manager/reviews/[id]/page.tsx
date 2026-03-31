@@ -67,10 +67,10 @@ export default function ManagerReviewDetailPage() {
           返回
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">审核详情</h1>
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审核详情</h1>
           <div className="flex items-center gap-2 mt-1">
             <Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>
-            <span className="text-sm text-[var(--color-text-secondary)]">
+            <span className="text-sm text-[hsl(var(--muted-foreground))]">
               项目: {task.auditProjectId}
             </span>
           </div>
@@ -83,29 +83,29 @@ export default function ManagerReviewDetailPage() {
         </CardHeader>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-[var(--color-text-secondary)]">审核员 ID: </span>
-            <span className="text-[var(--color-text)]">{task.reviewerId}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">审核员 ID: </span>
+            <span className="text-[hsl(var(--foreground))]">{task.reviewerId}</span>
           </div>
           <div>
-            <span className="text-[var(--color-text-secondary)]">总分: </span>
-            <span className="text-[var(--color-text)]">{task.totalScore ?? "未评分"}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">总分: </span>
+            <span className="text-[hsl(var(--foreground))]">{task.totalScore ?? "未评分"}</span>
           </div>
           <div>
-            <span className="text-[var(--color-text-secondary)]">分配时间: </span>
-            <span className="text-[var(--color-text)]">
+            <span className="text-[hsl(var(--muted-foreground))]">分配时间: </span>
+            <span className="text-[hsl(var(--foreground))]">
               {task.assignedAt ? new Date(task.assignedAt).toLocaleString("zh-CN") : "-"}
             </span>
           </div>
           <div>
-            <span className="text-[var(--color-text-secondary)]">完成时间: </span>
-            <span className="text-[var(--color-text)]">
+            <span className="text-[hsl(var(--muted-foreground))]">完成时间: </span>
+            <span className="text-[hsl(var(--foreground))]">
               {task.completedAt ? new Date(task.completedAt).toLocaleString("zh-CN") : "-"}
             </span>
           </div>
         </div>
 
         {task.status === "pending_assignment" && (
-          <div className="flex items-center gap-2 pt-3 border-t border-[var(--color-border)]">
+          <div className="flex items-center gap-2 pt-3 border-t border-[hsl(var(--border))]">
             <Input
               value={reviewerId}
               onChange={(e) => setReviewerId(e.target.value)}
@@ -123,7 +123,7 @@ export default function ManagerReviewDetailPage() {
         )}
 
         {task.status === "pending_confirmation" && (
-          <div className="flex items-center gap-2 pt-3 border-t border-[var(--color-border)]">
+          <div className="flex items-center gap-2 pt-3 border-t border-[hsl(var(--border))]">
             <Button
               onClick={() => confirmReview.mutate()}
               disabled={confirmReview.isPending}
@@ -148,7 +148,7 @@ export default function ManagerReviewDetailPage() {
           <CardHeader className="p-0">
             <CardTitle>审核结论</CardTitle>
           </CardHeader>
-          <p className="text-sm text-[var(--color-text)]">{task.conclusion}</p>
+          <p className="text-sm text-[hsl(var(--foreground))]">{task.conclusion}</p>
         </Card>
       )}
 
@@ -159,14 +159,14 @@ export default function ManagerReviewDetailPage() {
           </CardHeader>
           <div className="space-y-2">
             {scoresData.scores.map((score) => (
-              <div key={score.id} className="flex items-center justify-between p-2 rounded bg-[var(--color-bg-secondary)]">
-                <span className="text-sm text-[var(--color-text)]">{score.category}</span>
+              <div key={score.id} className="flex items-center justify-between p-2 rounded bg-[hsl(var(--muted))]">
+                <span className="text-sm text-[hsl(var(--foreground))]">{score.category}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[var(--color-text)]">
+                  <span className="text-sm font-medium text-[hsl(var(--foreground))]">
                     {score.score} / {score.maxScore}
                   </span>
                   {score.comment && (
-                    <span className="text-xs text-[var(--color-text-secondary)]">
+                    <span className="text-xs text-[hsl(var(--muted-foreground))]">
                       {score.comment}
                     </span>
                   )}
@@ -174,8 +174,8 @@ export default function ManagerReviewDetailPage() {
               </div>
             ))}
           </div>
-          <div className="pt-2 border-t border-[var(--color-border)]">
-            <span className="text-sm font-medium text-[var(--color-text)]">
+          <div className="pt-2 border-t border-[hsl(var(--border))]">
+            <span className="text-sm font-medium text-[hsl(var(--foreground))]">
               总分: {scoresData.totalScore} / {scoresData.totalMaxScore}，
               平均分: {scoresData.averageScore.toFixed(1)}
             </span>
@@ -189,15 +189,15 @@ export default function ManagerReviewDetailPage() {
             <CardTitle>审核问题 ({issuesData.length})</CardTitle>
           </CardHeader>
           {issuesData.map((issue) => (
-            <div key={issue.id} className="p-3 rounded border border-[var(--color-border)]">
+            <div key={issue.id} className="p-3 rounded border border-[hsl(var(--border))]">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[var(--color-text)]">{issue.description}</span>
+                <span className="text-sm text-[hsl(var(--foreground))]">{issue.description}</span>
                 <Badge variant={SEVERITY_VARIANTS[issue.severity] ?? "default"}>
                   {SEVERITY_LABELS[issue.severity] ?? issue.severity}
                 </Badge>
               </div>
               {issue.suggestion && (
-                <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+                <p className="text-xs text-[hsl(var(--muted-foreground))] mt-1">
                   建议: {issue.suggestion}
                 </p>
               )}

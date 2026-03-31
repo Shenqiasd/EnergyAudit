@@ -93,8 +93,8 @@ export default function ManagerBatchesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">批次管理</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">批次管理</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             创建和管理审计批次，分配企业到批次
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function ManagerBatchesPage() {
               })}
               {(!data?.items || data.items.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-[var(--color-text-secondary)]">
+                  <TableCell colSpan={8} className="text-center text-[hsl(var(--muted-foreground))]">
                     暂无批次数据
                   </TableCell>
                 </TableRow>

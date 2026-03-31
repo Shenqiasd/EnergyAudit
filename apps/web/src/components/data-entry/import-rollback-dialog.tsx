@@ -52,13 +52,13 @@ export function ImportRollbackDialog({
           </div>
         </div>
 
-        <div className="rounded-lg border border-[var(--color-border)] p-3">
+        <div className="rounded-lg border border-[hsl(var(--border))] p-3">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-[var(--color-text-secondary)]">导入任务:</span>
+            <span className="text-[hsl(var(--muted-foreground))]">导入任务:</span>
             <span className="font-mono text-xs">{importJobId}</span>
           </div>
           <div className="mt-1 flex items-center gap-2 text-sm">
-            <span className="text-[var(--color-text-secondary)]">模块:</span>
+            <span className="text-[hsl(var(--muted-foreground))]">模块:</span>
             <Badge variant="default" className="text-xs">
               {moduleCode}
             </Badge>
@@ -72,7 +72,7 @@ export function ImportRollbackDialog({
             onChange={(e) => setConfirmed(e.target.checked)}
             className="rounded border-gray-300"
           />
-          <span className="text-[var(--color-text)]">
+          <span className="text-[hsl(var(--foreground))]">
             我已了解回滚将删除本次导入的所有数据，并恢复导入前状态
           </span>
         </label>

@@ -49,7 +49,7 @@ export default function EnterpriseRectificationDetailPage() {
           返回
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">{task.title}</h1>
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{task.title}</h1>
           <div className="flex items-center gap-2 mt-1">
             <Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>
             {task.isOverdue && <Badge variant="danger">已延期</Badge>}
@@ -63,18 +63,18 @@ export default function EnterpriseRectificationDetailPage() {
         </CardHeader>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-[var(--color-text-secondary)]">项目 ID: </span>
-            <span className="text-[var(--color-text)]">{task.auditProjectId}</span>
+            <span className="text-[hsl(var(--muted-foreground))]">项目 ID: </span>
+            <span className="text-[hsl(var(--foreground))]">{task.auditProjectId}</span>
           </div>
           <div>
-            <span className="text-[var(--color-text-secondary)]">截止日期: </span>
-            <span className="text-[var(--color-text)]">
+            <span className="text-[hsl(var(--muted-foreground))]">截止日期: </span>
+            <span className="text-[hsl(var(--foreground))]">
               {task.deadline ? new Date(task.deadline).toLocaleDateString("zh-CN") : "未设置"}
             </span>
           </div>
         </div>
         {task.description && (
-          <p className="text-sm text-[var(--color-text)]">{task.description}</p>
+          <p className="text-sm text-[hsl(var(--foreground))]">{task.description}</p>
         )}
 
         {task.status === "pending_claim" && (
@@ -94,7 +94,7 @@ export default function EnterpriseRectificationDetailPage() {
           </CardHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium text-[var(--color-text)]">
+              <label className="text-sm font-medium text-[hsl(var(--foreground))]">
                 完成百分比: {progressPercent}%
               </label>
               <input
@@ -110,7 +110,7 @@ export default function EnterpriseRectificationDetailPage() {
               value={progressNote}
               onChange={(e) => setProgressNote(e.target.value)}
               placeholder="整改说明..."
-              className="w-full min-h-[100px] p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] resize-y"
+              className="w-full min-h-[100px] p-3 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] text-[hsl(var(--foreground))] resize-y"
             />
             <div className="flex gap-2">
               <Button
@@ -147,15 +147,15 @@ export default function EnterpriseRectificationDetailPage() {
           </CardHeader>
           <div className="space-y-3">
             {task.progress.map((entry) => (
-              <div key={entry.id} className="flex gap-3 p-3 rounded border border-[var(--color-border)]">
+              <div key={entry.id} className="flex gap-3 p-3 rounded border border-[hsl(var(--border))]">
                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                   <span className="text-sm font-bold text-blue-600">
                     {entry.progressPercent}%
                   </span>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-[var(--color-text)]">{entry.note}</p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">
+                  <p className="text-sm text-[hsl(var(--foreground))]">{entry.note}</p>
+                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
                     {new Date(entry.createdAt).toLocaleString("zh-CN")}
                   </p>
                 </div>

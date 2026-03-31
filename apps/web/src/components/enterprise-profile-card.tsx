@@ -22,7 +22,7 @@ export function EnterpriseProfileCard({ projectId }: EnterpriseProfileCardProps)
             </span>
           </CardTitle>
         </CardHeader>
-        <p className="text-sm text-[var(--color-text-secondary)]">加载中...</p>
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">加载中...</p>
       </Card>
     );
   }
@@ -55,8 +55,8 @@ export function EnterpriseProfileCard({ projectId }: EnterpriseProfileCardProps)
           (f) =>
             f.value && (
               <div key={f.label}>
-                <span className="text-[var(--color-text-secondary)]">{f.label}：</span>
-                <span className="text-[var(--color-text)]">{f.value}</span>
+                <span className="text-[hsl(var(--muted-foreground))]">{f.label}：</span>
+                <span className="text-[hsl(var(--foreground))]">{f.value}</span>
               </div>
             ),
         )}

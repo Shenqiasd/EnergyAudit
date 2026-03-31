@@ -10,9 +10,9 @@ interface LoadingProps {
 export function Loading({ size = 24, className, text }: LoadingProps) {
   return (
     <div className={clsx("flex items-center justify-center gap-2", className)}>
-      <Loader2 size={size} className="animate-spin text-[var(--color-primary)]" />
+      <Loader2 size={size} className="animate-spin text-[hsl(var(--primary))]" />
       {text && (
-        <span className="text-sm text-[var(--color-text-secondary)]">{text}</span>
+        <span className="text-sm text-[hsl(var(--muted-foreground))]">{text}</span>
       )}
     </div>
   );

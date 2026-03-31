@@ -59,8 +59,8 @@ export default function ManagerReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">报告管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">报告管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理所有项目的审计报告，跟踪报告状态
         </p>
       </div>
@@ -90,7 +90,7 @@ export default function ManagerReportsPage() {
         {isLoading ? (
           <Loading text="加载中..." />
         ) : !data?.items?.length ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             暂无报告数据。
           </p>
         ) : (
@@ -124,12 +124,12 @@ export default function ManagerReportsPage() {
                       {STATUS_LABELS[report.status] ?? report.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                     {report.generatedAt
                       ? new Date(report.generatedAt).toLocaleString("zh-CN")
                       : "-"}
                   </TableCell>
-                  <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                     {new Date(report.updatedAt).toLocaleString("zh-CN")}
                   </TableCell>
                 </TableRow>

@@ -28,8 +28,8 @@ export function RegionDistributionChart({
   if (data.length === 0) {
     return (
       <ChartContainer title={title}>
-        <div className="flex h-48 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无区域数据
+        <div className="flex h-48 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无区域数据
         </div>
       </ChartContainer>
     );
@@ -50,7 +50,7 @@ export function RegionDistributionChart({
               className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1 transition-colors"
               onClick={() => onClick?.(d.regionCode)}
             >
-              <span className="w-20 truncate text-sm text-[var(--color-text)]">
+              <span className="w-20 truncate text-sm text-[hsl(var(--foreground))]">
                 {d.regionName}
               </span>
               <div className="flex-1 h-6 rounded bg-gray-100 relative">
@@ -62,7 +62,7 @@ export function RegionDistributionChart({
                   }}
                 />
               </div>
-              <span className="w-16 text-right text-sm font-mono text-[var(--color-text)]">
+              <span className="w-16 text-right text-sm font-mono text-[hsl(var(--foreground))]">
                 {d.enterpriseCount} 家
               </span>
             </div>

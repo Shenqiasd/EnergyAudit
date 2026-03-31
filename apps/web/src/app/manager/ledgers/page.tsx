@@ -16,13 +16,13 @@ export default function LedgersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">台账管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">台账管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           企业台账、审核台账、整改台账查询与导出
         </p>
       </div>
 
-      <div className="flex gap-1 rounded-lg border border-[var(--color-border)] bg-gray-50 p-1">
+      <div className="flex gap-1 rounded-lg border border-[hsl(var(--border))] bg-gray-50 p-1">
         {ledgerTabs.map((tab) => {
           const isActive = pathname === tab.href;
           return (
@@ -32,8 +32,8 @@ export default function LedgersPage() {
               className={clsx(
                 "rounded-md px-4 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-white text-[var(--color-primary)] shadow-sm"
-                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]",
+                  ? "bg-white text-[hsl(var(--primary))] shadow-sm"
+                  : "text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]",
               )}
             >
               {tab.label}
@@ -42,7 +42,7 @@ export default function LedgersPage() {
         })}
       </div>
 
-      <div className="flex h-48 items-center justify-center rounded-xl border border-[var(--color-border)] bg-white text-sm text-[var(--color-text-secondary)]">
+      <div className="flex h-48 items-center justify-center rounded-xl border border-[hsl(var(--border))] bg-white text-sm text-[hsl(var(--muted-foreground))]">
         请选择上方台账类型查看详情
       </div>
     </div>

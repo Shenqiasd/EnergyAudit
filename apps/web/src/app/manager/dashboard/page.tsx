@@ -64,8 +64,8 @@ export default function ManagerDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">工作台</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">工作台</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理端工作台 — 审计工作总览、项目进度、审核状态统计
         </p>
       </div>

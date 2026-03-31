@@ -64,23 +64,23 @@ export default function EnterpriseConfigPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">配置中心</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">配置中心</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理企业能源审计所需的基础数据配置
         </p>
       </div>
 
       {completeness && !completeness.isComplete && (
-        <div className="flex items-start gap-3 rounded-xl border border-[var(--color-warning)] bg-[var(--color-warning-light)] p-4">
-          <AlertTriangle size={20} className="mt-0.5 shrink-0 text-[var(--color-warning)]" />
+        <div className="flex items-start gap-3 rounded-xl border border-[hsl(var(--warning))] bg-[hsl(var(--warning))/10] p-4">
+          <AlertTriangle size={20} className="mt-0.5 shrink-0 text-[hsl(var(--warning))]" />
           <div>
-            <p className="font-medium text-[var(--color-text)]">配置未完成</p>
-            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            <p className="font-medium text-[hsl(var(--foreground))]">配置未完成</p>
+            <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
               请完成以下配置后方可进行申报：
             </p>
             <ul className="mt-2 space-y-1">
               {completeness.missingItems.map((item, i) => (
-                <li key={i} className="text-sm text-[var(--color-text-secondary)]">
+                <li key={i} className="text-sm text-[hsl(var(--muted-foreground))]">
                   • {item}
                 </li>
               ))}
@@ -98,14 +98,14 @@ export default function EnterpriseConfigPage() {
         </CardHeader>
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-[var(--color-text-secondary)]">
+            <span className="text-[hsl(var(--muted-foreground))]">
               已配置 {totalItems} 项，{completedSections}/3 个必要分类已完成
             </span>
-            <span className="font-medium text-[var(--color-text)]">{progressPercent}%</span>
+            <span className="font-medium text-[hsl(var(--foreground))]">{progressPercent}%</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
             <div
-              className="h-full rounded-full bg-[var(--color-primary)] transition-all duration-500"
+              className="h-full rounded-full bg-[hsl(var(--primary))] transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -117,21 +117,21 @@ export default function EnterpriseConfigPage() {
           <Card key={section.title} className="flex flex-col">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <section.icon size={20} className="text-[var(--color-primary)]" />
+                <section.icon size={20} className="text-[hsl(var(--primary))]" />
                 <CardTitle>{section.title}</CardTitle>
               </div>
               {section.complete ? (
-                <CheckCircle size={18} className="text-[var(--color-success)]" />
+                <CheckCircle size={18} className="text-[hsl(var(--success))]" />
               ) : (
-                <AlertTriangle size={18} className="text-[var(--color-warning)]" />
+                <AlertTriangle size={18} className="text-[hsl(var(--warning))]" />
               )}
             </CardHeader>
-            <p className="mb-4 flex-1 text-sm text-[var(--color-text-secondary)]">
+            <p className="mb-4 flex-1 text-sm text-[hsl(var(--muted-foreground))]">
               {section.description}
             </p>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[var(--color-text-secondary)]">
-                已配置 <span className="font-medium text-[var(--color-text)]">{section.count}</span> 项
+              <span className="text-sm text-[hsl(var(--muted-foreground))]">
+                已配置 <span className="font-medium text-[hsl(var(--foreground))]">{section.count}</span> 项
                 （至少需要 {section.required} 项）
               </span>
               <Link href={section.href}>

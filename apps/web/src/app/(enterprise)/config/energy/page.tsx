@@ -113,8 +113,8 @@ export default function EnergyConfigPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">能源品种配置</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">能源品种配置</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             配置企业使用的能源品种及折标系数
           </p>
         </div>
@@ -173,7 +173,7 @@ export default function EnergyConfigPage() {
                         size="sm"
                         onClick={() => setDeleteConfirmId(item.id)}
                       >
-                        <Trash2 size={14} className="text-[var(--color-danger)]" />
+                        <Trash2 size={14} className="text-[hsl(var(--danger))]" />
                       </Button>
                     </div>
                   </TableCell>
@@ -182,7 +182,7 @@ export default function EnergyConfigPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无能源品种配置，请点击"新增能源品种"开始配置
           </p>
         )}
@@ -254,7 +254,7 @@ export default function EnergyConfigPage() {
         onClose={() => setDeleteConfirmId(null)}
         title="确认删除"
       >
-        <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
           确定要删除该能源品种定义吗？此操作不可恢复。
         </p>
         <div className="flex justify-end gap-3">

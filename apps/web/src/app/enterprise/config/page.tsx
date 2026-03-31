@@ -5,8 +5,8 @@ export default function EnterpriseConfigPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">企业配置</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">企业配置</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理企业基本信息、联系人、用能设备等配置
         </p>
       </div>
@@ -20,7 +20,7 @@ export default function EnterpriseConfigPage() {
             </span>
           </CardTitle>
         </CardHeader>
-        <p className="text-sm text-[var(--color-text-secondary)]">
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">
           企业配置页面将包括：企业基本信息管理、用能设备清单、联系人信息维护、企业准入状态查看等功能模块。
         </p>
       </Card>

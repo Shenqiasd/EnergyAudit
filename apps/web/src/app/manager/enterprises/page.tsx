@@ -97,8 +97,8 @@ export default function ManagerEnterprisesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">企业管理</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">企业管理</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             管理参与审计的企业信息、准入状态和企业账号
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function ManagerEnterprisesPage() {
                 ))}
                 {data?.items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-[var(--color-text-secondary)]">
+                    <TableCell colSpan={8} className="text-center text-[hsl(var(--muted-foreground))]">
                       暂无企业数据
                     </TableCell>
                   </TableRow>
@@ -207,7 +207,7 @@ export default function ManagerEnterprisesPage() {
 
             {totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)]">
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">
                   共 {data?.total} 条记录
                 </span>
                 <div className="flex gap-2">

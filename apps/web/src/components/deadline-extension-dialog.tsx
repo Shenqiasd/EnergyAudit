@@ -54,7 +54,7 @@ export function DeadlineExtensionDialog({
   return (
     <Modal open={open} onClose={handleClose} title={`${entityLabels[entityType]}延期`}>
       <div className="space-y-4">
-        <div className="flex items-center gap-2 rounded-lg bg-[var(--color-bg-secondary)] p-3 text-sm text-[var(--color-text-secondary)]">
+        <div className="flex items-center gap-2 rounded-lg bg-[hsl(var(--muted))] p-3 text-sm text-[hsl(var(--muted-foreground))]">
           <Calendar size={16} />
           <span>当前截止日期: {formatDate(currentDeadline)}</span>
         </div>
@@ -67,11 +67,11 @@ export function DeadlineExtensionDialog({
         />
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+          <label className="mb-1.5 block text-sm font-medium text-[hsl(var(--foreground))]">
             延期原因
           </label>
           <textarea
-            className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))] focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
             rows={3}
             value={reason}
             onChange={(e) => setReason(e.target.value)}

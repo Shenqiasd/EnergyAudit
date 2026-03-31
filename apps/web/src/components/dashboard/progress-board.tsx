@@ -20,8 +20,8 @@ export function ProgressBoard({ title, items }: ProgressBoardProps) {
         <CardHeader>
           <CardTitle>{title}</CardTitle>
         </CardHeader>
-        <div className="flex h-32 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无数据
+        <div className="flex h-32 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无数据
         </div>
       </Card>
     );
@@ -38,14 +38,14 @@ export function ProgressBoard({ title, items }: ProgressBoardProps) {
           return (
             <div key={item.label}>
               <div className="mb-1 flex items-center justify-between text-sm">
-                <span className="text-[var(--color-text)]">{item.label}</span>
-                <span className="text-[var(--color-text-secondary)]">
-                  {item.value}/{item.total} ({percentage.toFixed(0)}%)
+                <span className="text-[hsl(var(--foreground))]">{item.label}</span>
+                <span className=                "text-[hsl(var(--muted-foreground))]">
+                                  {item.value}/{item.total} ({percentage.toFixed(0)}%)
                 </span>
               </div>
               <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
                 <div
-                  className="h-full rounded-full bg-[var(--color-primary)] transition-all"
+                  className="h-full rounded-full bg-[hsl(var(--primary))] transition-all"
                   style={{ width: `${Math.min(percentage, 100)}%` }}
                 />
               </div>

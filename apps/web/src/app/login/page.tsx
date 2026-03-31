@@ -31,17 +31,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg)] px-4">
-      <div className="w-full max-w-md rounded-xl border border-[var(--color-border)] bg-white p-8 shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--background))] px-4">
+      <div className="w-full max-w-md rounded-xl border border-[hsl(var(--border))] bg-white p-8 shadow-sm">
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mb-4 flex items-center justify-center gap-2">
-            <FileBarChart size={32} className="text-[var(--color-primary)]" />
-            <h1 className="text-2xl font-bold text-[var(--color-text)]">
+            <FileBarChart size={32} className="text-[hsl(var(--primary))]" />
+            <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
               能源审计平台
             </h1>
           </div>
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             请使用您的账号登录
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="email"
-              className="mb-1 block text-sm font-medium text-[var(--color-text)]"
+              className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
             >
               邮箱
             </label>
@@ -68,14 +68,14 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="请输入邮箱地址"
               required
-              className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[hsl(var(--border))] px-3 py-2 text-sm outline-none focus:border-[hsl(var(--primary))] focus:ring-1 focus:ring-[hsl(var(--primary))]"
             />
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="mb-1 block text-sm font-medium text-[var(--color-text)]"
+              className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]"
             >
               密码
             </label>
@@ -86,14 +86,14 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
               required
-              className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]"
+              className="w-full rounded-lg border border-[hsl(var(--border))] px-3 py-2 text-sm outline-none focus:border-[hsl(var(--primary))] focus:ring-1 focus:ring-[hsl(var(--primary))]"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90 disabled:opacity-50"
           >
             {isLoading ? "登录中..." : "登录"}
           </button>
@@ -103,7 +103,7 @@ export default function LoginPage() {
         <div className="mt-6 text-center">
           <a
             href="/"
-            className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]"
+            className="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--primary))]"
           >
             开发模式入口 →
           </a>

@@ -68,16 +68,16 @@ export function Header({ onMenuToggle }: HeaderProps) {
   const roles: UserRole[] = ["enterprise_user", "manager", "reviewer"];
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-[var(--color-border)] bg-white px-4 lg:px-6">
+    <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 lg:px-6">
       {/* Left: menu toggle + breadcrumb */}
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuToggle}
-          className="rounded-lg p-2 text-[var(--color-text-secondary)] hover:bg-gray-100"
+          className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
         >
           <Menu size={20} />
         </button>
-        <nav className="hidden items-center gap-1 text-sm text-[var(--color-text-secondary)] sm:flex">
+        <nav className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] sm:flex">
           <span>首页</span>
           {breadcrumbs.map((crumb, i) => (
             <span key={i} className="flex items-center gap-1">
@@ -85,7 +85,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
               <span
                 className={
                   i === breadcrumbs.length - 1
-                    ? "text-[var(--color-text)] font-medium"
+                    ? "text-[hsl(var(--foreground))] font-medium"
                     : ""
                 }
               >
@@ -114,8 +114,8 @@ export function Header({ onMenuToggle }: HeaderProps) {
             )}
           </button>
           {showRoleSwitcher && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-[var(--color-border)] bg-white py-1 shadow-lg">
-              <div className="px-3 py-2 text-xs font-medium text-[var(--color-text-secondary)]">
+            <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] py-1 shadow-lg">
+              <div className="px-3 py-2 text-xs font-medium text-[hsl(var(--muted-foreground))]">
                 切换角色 (开发用)
               </div>
               {roles.map((role) => (
@@ -135,14 +135,14 @@ export function Header({ onMenuToggle }: HeaderProps) {
                   </Badge>
                 </button>
               ))}
-              <div className="border-t border-[var(--color-border)] mt-1 pt-1">
+              <div className="border-t border-[hsl(var(--border))] mt-1 pt-1">
                 <button
                   onClick={() => {
                     logout();
                     router.push("/");
                     setShowRoleSwitcher(false);
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[var(--color-danger)] hover:bg-gray-50"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[hsl(var(--danger))] hover:bg-[hsl(var(--muted))]"
                 >
                   <LogOut size={16} />
                   退出登录

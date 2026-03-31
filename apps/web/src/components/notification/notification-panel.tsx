@@ -144,30 +144,30 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
         : "/manager";
 
   return (
-    <div className="absolute right-0 top-full z-50 mt-1 w-96 rounded-lg border border-[var(--color-border)] bg-white shadow-lg">
+    <div className="absolute right-0 top-full z-50 mt-1 w-96 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[var(--color-border)] px-4 py-3">
-        <h3 className="text-sm font-semibold text-[var(--color-text)]">
-          通知消息
+      <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-4 py-3">
+        <h3 className=        "text-sm font-semibold text-[hsl(var(--foreground))]">
+                  通知消息
         </h3>
         <button
           onClick={handleMarkAllRead}
-          className="text-xs text-[var(--color-primary)] hover:underline"
-          disabled={markAllAsRead.isPending}
-        >
-          全部已读
+          className=        "text-xs text-[hsl(var(--primary))] hover:underline"
+                  disabled={markAllAsRead.isPending}
+                >
+                  全部已读
         </button>
       </div>
 
       {/* Notification list */}
       <div className="max-h-96 overflow-y-auto">
         {isLoading ? (
-          <div className="px-4 py-8 text-center text-sm text-[var(--color-text-secondary)]">
-            加载中...
+          <div className=          "px-4 py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
+                      加载中...
           </div>
         ) : notifications.length === 0 ? (
-          <div className="px-4 py-8 text-center text-sm text-[var(--color-text-secondary)]">
-            暂无通知
+          <div className=          "px-4 py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
+                      暂无通知
           </div>
         ) : (
           notifications.map((notification) => {
@@ -186,18 +186,18 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium text-[var(--color-text)]">
-                      {notification.title}
+                    <span className=                    "truncate text-sm font-medium text-[hsl(var(--foreground))]">
+                                          {notification.title}
                     </span>
                     {!notification.isRead && (
-                      <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-primary)]" />
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[hsl(var(--primary))]" />
                     )}
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-[var(--color-text-secondary)]">
-                    {notification.content}
+                  <p className=                  "mt-0.5 truncate text-xs text-[hsl(var(--muted-foreground))]">
+                                      {notification.content}
                   </p>
-                  <span className="mt-1 text-[10px] text-[var(--color-text-secondary)]">
-                    {timeAgo(notification.createdAt)}
+                  <span className=                  "mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
+                                      {timeAgo(notification.createdAt)}
                   </span>
                 </div>
               </button>
@@ -207,13 +207,13 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-[var(--color-border)] px-4 py-2">
+      <div className="border-t border-[hsl(var(--border))] px-4 py-2">
         <button
           onClick={() => {
             router.push(`${rolePrefix}/notifications`);
             onClose();
           }}
-          className="w-full text-center text-xs text-[var(--color-primary)] hover:underline"
+          className="w-full text-center text-xs text-[hsl(var(--primary))] hover:underline"
         >
           查看全部通知
         </button>

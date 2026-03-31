@@ -85,17 +85,17 @@ export default function EnterpriseFilingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
           数据填报
         </h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           填写审计所需的能源消耗数据、生产数据等，共 {modules?.length ?? 0} 个填报模块
         </p>
       </div>
 
       {categories.map((category) => (
         <div key={category}>
-          <h2 className="mb-3 text-lg font-semibold text-[var(--color-text)]">
+          <h2 className="mb-3 text-lg font-semibold text-[hsl(var(--foreground))]">
             {category}
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -111,17 +111,17 @@ export default function EnterpriseFilingPage() {
                   <Card
                     className={clsx(
                       "cursor-pointer transition-shadow hover:shadow-md",
-                      mod.recordStatus === "submitted" && "border-[var(--color-success)]",
+                      mod.recordStatus === "submitted" && "border-[hsl(var(--success))]",
                     )}
                   >
                     <CardHeader className="mb-2">
                       <div className="flex items-center gap-2">
-                        <Icon size={18} className="text-[var(--color-primary)]" />
+                        <Icon size={18} className="text-[hsl(var(--primary))]" />
                         <CardTitle className="text-sm">{mod.name}</CardTitle>
                       </div>
                       <Badge variant={status.variant}>{status.label}</Badge>
                     </CardHeader>
-                    <p className="text-xs text-[var(--color-text-secondary)]">
+                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
                       {mod.description ?? `${mod.name}数据填报`}
                     </p>
                   </Card>
@@ -142,7 +142,7 @@ export default function EnterpriseFilingPage() {
               </span>
             </CardTitle>
           </CardHeader>
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             请联系管理员配置填报模块。
           </p>
         </Card>

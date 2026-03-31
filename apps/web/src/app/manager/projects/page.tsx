@@ -103,8 +103,8 @@ export default function ManagerProjectsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">项目管理</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">项目管理</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             管理审计项目的全生命周期，跟踪项目进度
           </p>
         </div>
@@ -140,7 +140,7 @@ export default function ManagerProjectsPage() {
                   <Badge variant={STATUS_VARIANTS[status] ?? "default"}>
                     {STATUS_LABELS[status] ?? status}
                   </Badge>
-                  <span className="text-xs text-[var(--color-text-secondary)]">
+                  <span className="text-xs text-[hsl(var(--muted-foreground))]">
                     ({items.length})
                   </span>
                 </div>
@@ -148,19 +148,19 @@ export default function ManagerProjectsPage() {
                   {items.map((proj) => (
                     <Card
                       key={proj.id}
-                      className={`cursor-pointer transition-shadow hover:shadow-md ${proj.isOverdue ? "border-[var(--color-danger)] border-2" : ""}`}
+                      className={`cursor-pointer transition-shadow hover:shadow-md ${proj.isOverdue ? "border-[hsl(var(--danger))] border-2" : ""}`}
                       onClick={() => router.push(`/manager/projects/${proj.id}`)}
                     >
                       <div className="space-y-2">
-                        <p className="font-medium text-sm text-[var(--color-text)]">
+                        <p className="font-medium text-sm text-[hsl(var(--foreground))]">
                           {proj.enterpriseName ?? "未知企业"}
                         </p>
-                        <div className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+                        <div className="flex items-center gap-1 text-xs text-[hsl(var(--muted-foreground))]">
                           <Clock size={12} />
                           {formatDate(proj.deadline)}
                         </div>
                         {proj.isOverdue && (
-                          <div className="flex items-center gap-1 text-xs text-[var(--color-danger)]">
+                          <div className="flex items-center gap-1 text-xs text-[hsl(var(--danger))]">
                             <AlertTriangle size={12} />
                             已逾期
                           </div>
@@ -169,7 +169,7 @@ export default function ManagerProjectsPage() {
                     </Card>
                   ))}
                   {items.length === 0 && (
-                    <p className="text-xs text-center text-[var(--color-text-secondary)] py-4">
+                    <p className="text-xs text-center text-[hsl(var(--muted-foreground))] py-4">
                       暂无项目
                     </p>
                   )}

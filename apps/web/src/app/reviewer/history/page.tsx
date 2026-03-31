@@ -22,8 +22,8 @@ export default function ReviewerHistoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">审核历史</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审核历史</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看已完成的审核记录和历史评分
         </p>
       </div>
@@ -58,20 +58,20 @@ export default function ReviewerHistoryPage() {
                 <div className="flex items-center justify-between p-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-[var(--color-text)]">
+                      <span className="font-medium text-[hsl(var(--foreground))]">
                         审核任务
                       </span>
                       <Badge variant="success">已完成</Badge>
                     </div>
-                    <div className="text-sm text-[var(--color-text-secondary)]">
+                    <div className="text-sm text-[hsl(var(--muted-foreground))]">
                       项目 ID: {task.auditProjectId}
                     </div>
                     {task.totalScore && (
-                      <div className="text-sm text-[var(--color-text-secondary)]">
+                      <div className="text-sm text-[hsl(var(--muted-foreground))]">
                         总分: {task.totalScore}
                       </div>
                     )}
-                    <div className="text-xs text-[var(--color-text-secondary)]">
+                    <div className="text-xs text-[hsl(var(--muted-foreground))]">
                       完成时间: {task.completedAt ? new Date(task.completedAt).toLocaleDateString("zh-CN") : "-"}
                     </div>
                   </div>

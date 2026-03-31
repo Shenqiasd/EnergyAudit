@@ -18,17 +18,17 @@ export function KpiCard({ icon: Icon, label, value, trend, className }: KpiCardP
   return (
     <div
       className={clsx(
-        "rounded-xl border border-[var(--color-border)] bg-white p-6 shadow-sm",
+        "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-sm",
         className,
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-primary-light)]">
-          <Icon size={20} className="text-[var(--color-primary)]" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[hsl(var(--primary))]/10">
+          <Icon size={20} className="text-[hsl(var(--primary))]" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-[var(--color-text-secondary)]">{label}</p>
-          <p className="text-2xl font-bold text-[var(--color-text)]">{value}</p>
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">{label}</p>
+          <p className="text-2xl font-bold text-[hsl(var(--foreground))]">{value}</p>
         </div>
       </div>
       {trend && (
@@ -36,9 +36,9 @@ export function KpiCard({ icon: Icon, label, value, trend, className }: KpiCardP
           <span
             className={clsx(
               "font-medium",
-              trend.direction === "up" && "text-[var(--color-success)]",
-              trend.direction === "down" && "text-[var(--color-danger)]",
-              trend.direction === "neutral" && "text-[var(--color-text-secondary)]",
+              trend.direction === "up" && "text-[hsl(var(--success))]",
+              trend.direction === "down" && "text-[hsl(var(--danger))]",
+              trend.direction === "neutral" && "text-[hsl(var(--muted-foreground))]",
             )}
           >
             {trend.direction === "up" ? "↑" : trend.direction === "down" ? "↓" : "→"}{" "}

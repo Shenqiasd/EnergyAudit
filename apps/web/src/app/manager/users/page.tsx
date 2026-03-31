@@ -109,8 +109,8 @@ export default function ManagerUsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">用户管理</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">用户管理</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             管理平台用户账号、角色分配和企业关联
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function ManagerUsersPage() {
                 ))}
                 {data?.items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-[var(--color-text-secondary)]">
+                    <TableCell colSpan={6} className="text-center text-[hsl(var(--muted-foreground))]">
                       暂无用户数据
                     </TableCell>
                   </TableRow>
@@ -212,7 +212,7 @@ export default function ManagerUsersPage() {
 
             {totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)]">
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">
                   共 {data?.total} 条记录
                 </span>
                 <div className="flex gap-2">
