@@ -6,7 +6,14 @@ if (apiUrl && !apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
 }
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["*.replit.dev", "*.repl.co", "*.worf.replit.dev"],
+  allowedDevOrigins: [
+    "*.replit.dev",
+    "*.repl.co",
+    "*.worf.replit.dev",
+    "*.worf.repl.co",
+    "*.repl.co:5000",
+    "*.replit.dev:5000",
+  ],
   async rewrites() {
     return [
       {
