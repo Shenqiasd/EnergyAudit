@@ -108,7 +108,7 @@ function SheetTitle({
   ...props
 }: HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h2
+    <DialogPrimitive.Title
       className={cn(
         "text-lg font-semibold text-[hsl(var(--foreground))]",
         className,
@@ -124,7 +124,7 @@ function SheetDescription({
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p
+    <DialogPrimitive.Description
       className={cn("text-sm text-[hsl(var(--muted-foreground))]", className)}
       {...props}
     />
