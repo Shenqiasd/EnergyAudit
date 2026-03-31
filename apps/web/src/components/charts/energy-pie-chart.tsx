@@ -24,8 +24,8 @@ export function EnergyPieChart({ title, data }: EnergyPieChartProps) {
   if (total === 0 || data.length === 0) {
     return (
       <ChartContainer title={title}>
-        <div className="flex h-48 items-center justify-center text-sm text-[var(--color-text-secondary)]">
-          暂无数据
+        <div className="flex h-48 items-center justify-center text-sm         text-[hsl(var(--muted-foreground))]">
+                  暂无数据
         </div>
       </ChartContainer>
     );
@@ -70,9 +70,9 @@ export function EnergyPieChart({ title, data }: EnergyPieChartProps) {
                 className="inline-block h-3 w-3 rounded-sm"
                 style={{ backgroundColor: s.color }}
               />
-              <span className="text-[var(--color-text)]">{s.label}</span>
-              <span className="text-[var(--color-text-secondary)]">
-                {(s.percentage * 100).toFixed(1)}%
+              <span className="text-[hsl(var(--foreground))]">{s.label}</span>
+              <span className=              "text-[hsl(var(--muted-foreground))]">
+                              {(s.percentage * 100).toFixed(1)}%
               </span>
             </div>
           ))}

@@ -96,8 +96,8 @@ export default function FilingPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">数据填报</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">数据填报</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             选择模块进行数据填报，支持离线自动保存
           </p>
         </div>
@@ -142,14 +142,14 @@ export default function FilingPage() {
             >
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <FileText size={18} className="text-[var(--color-primary)]" />
+                  <FileText size={18} className="text-[hsl(var(--primary))]" />
                   <CardTitle>{mod.name}</CardTitle>
                 </div>
               </CardHeader>
-              <p className="text-sm text-[var(--color-text-secondary)]">
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">
                 {mod.description ?? "暂无描述"}
               </p>
-              <div className="mt-3 text-xs text-[var(--color-text-secondary)]">
+              <div className="mt-3 text-xs text-[hsl(var(--muted-foreground))]">
                 状态: {mod.recordStatus === "not_started" ? "未开始" : mod.recordStatus}
               </div>
             </Card>
@@ -182,20 +182,20 @@ export default function FilingPage() {
             <div className="space-y-3">
               {recordDetail.items.map((item) => (
                 <div key={item.id} className="flex items-center gap-4">
-                  <label className="w-40 text-sm font-medium text-[var(--color-text)]">
+                  <label className="w-40 text-sm font-medium text-[hsl(var(--foreground))]">
                     {item.fieldCode}
                   </label>
                   <input
                     type="text"
                     value={formData[item.fieldCode] ?? item.rawValue ?? ""}
                     onChange={(e) => handleFieldChange(item.fieldCode, e.target.value)}
-                    className="flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    className="flex-1 rounded-lg border border-[hsl(var(--border))] px-3 py-2 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
                   />
                 </div>
               ))}
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+            <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
               暂无数据字段，请先创建数据记录
             </p>
           )}

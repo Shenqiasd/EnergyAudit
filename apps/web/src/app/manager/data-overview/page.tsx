@@ -44,10 +44,10 @@ export default function ManagerDataOverviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
           填报概览
         </h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           查看所有企业的数据填报进度
         </p>
       </div>
@@ -55,28 +55,28 @@ export default function ManagerDataOverviewPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <Card>
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             总模块数
           </p>
-          <p className="mt-1 text-2xl font-bold text-[var(--color-text)]">
+          <p className="mt-1 text-2xl font-bold text-[hsl(var(--foreground))]">
             {totalModules}
           </p>
         </Card>
         <Card>
-          <p className="text-sm text-[var(--color-text-secondary)]">已提交</p>
-          <p className="mt-1 text-2xl font-bold text-[var(--color-success)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">已提交</p>
+          <p className="mt-1 text-2xl font-bold text-[hsl(var(--success))]">
             {submittedCount}
           </p>
         </Card>
         <Card>
-          <p className="text-sm text-[var(--color-text-secondary)]">填报中</p>
-          <p className="mt-1 text-2xl font-bold text-[var(--color-primary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">填报中</p>
+          <p className="mt-1 text-2xl font-bold text-[hsl(var(--primary))]">
             {inProgressCount}
           </p>
         </Card>
         <Card>
-          <p className="text-sm text-[var(--color-text-secondary)]">未开始</p>
-          <p className="mt-1 text-2xl font-bold text-[var(--color-text)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">未开始</p>
+          <p className="mt-1 text-2xl font-bold text-[hsl(var(--foreground))]">
             {notStartedCount}
           </p>
         </Card>
@@ -109,7 +109,7 @@ export default function ManagerDataOverviewPage() {
                 return (
                   <tr key={mod.code}>
                     <td className="font-medium">{mod.name}</td>
-                    <td className="text-[var(--color-text-secondary)]">
+                    <td className="text-[hsl(var(--muted-foreground))]">
                       {mod.category}
                     </td>
                     <td>
@@ -121,7 +121,7 @@ export default function ManagerDataOverviewPage() {
             </tbody>
           </Table>
         ) : (
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             暂无模块数据
           </p>
         )}

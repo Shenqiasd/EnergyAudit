@@ -9,7 +9,7 @@ export function Card({ className, children, ...props }: CardProps) {
   return (
     <div
       className={clsx(
-        "rounded-xl border border-[var(--color-border)] bg-white p-6 shadow-sm",
+        "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-sm",
         className,
       )}
       {...props}
@@ -41,7 +41,7 @@ interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 export function CardTitle({ className, children, ...props }: CardTitleProps) {
   return (
     <h3
-      className={clsx("text-lg font-semibold text-[var(--color-text)]", className)}
+      className={clsx("text-lg font-semibold text-[hsl(var(--card-foreground))]", className)}
       {...props}
     >
       {children}

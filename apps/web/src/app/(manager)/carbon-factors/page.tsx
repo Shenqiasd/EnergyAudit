@@ -111,8 +111,8 @@ export default function CarbonFactorsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">碳排放因子管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">碳排放因子管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理平台级碳排放因子，企业可在此基础上进行覆盖配置
         </p>
       </div>
@@ -122,7 +122,7 @@ export default function CarbonFactorsPage() {
           <CardTitle>碳排放因子列表</CardTitle>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Filter size={16} className="text-[var(--color-text-secondary)]" />
+              <Filter size={16} className="text-[hsl(var(--muted-foreground))]" />
               <Select
                 options={[{ value: "", label: "全部年份" }, ...yearOptions]}
                 value={selectedYear ? String(selectedYear) : ""}
@@ -158,7 +158,7 @@ export default function CarbonFactorsPage() {
                   <TableCell>
                     <div>
                       <p className="font-medium">{item.name}</p>
-                      <p className="text-xs text-[var(--color-text-secondary)]">{item.energyCode}</p>
+                      <p className="text-xs text-[hsl(var(--muted-foreground))]">{item.energyCode}</p>
                     </div>
                   </TableCell>
                   <TableCell className="font-mono">{item.emissionFactor}</TableCell>
@@ -181,7 +181,7 @@ export default function CarbonFactorsPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无碳排放因子数据
           </p>
         )}
@@ -250,7 +250,7 @@ export default function CarbonFactorsPage() {
               type="checkbox"
               checked={form.isDefault}
               onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
-              className="rounded border-[var(--color-border)]"
+              className="rounded border-[hsl(var(--border))]"
             />
             设为默认因子
           </label>

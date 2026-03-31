@@ -57,7 +57,7 @@ export default function BatchDetailPage() {
   const extendDeadline = useExtendBatchDeadline(batchId);
 
   if (batchLoading) return <PageLoading />;
-  if (!batch) return <div className="p-8 text-center text-[var(--color-text-secondary)]">批次不存在</div>;
+  if (!batch) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">批次不存在</div>;
 
   const assignedEnterpriseIds = new Set(projects?.items.map((p) => p.enterpriseId) ?? []);
   const availableEnterprises = enterprises?.items.filter((e) => !assignedEnterpriseIds.has(e.id)) ?? [];
@@ -88,8 +88,8 @@ export default function BatchDetailPage() {
           返回
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">{batch.name}</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{batch.name}</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             {batch.year}年度 · 共 {batch.totalProjects} 个项目
           </p>
         </div>
@@ -104,8 +104,8 @@ export default function BatchDetailPage() {
             <div className="flex items-center gap-3">
               <Icon size={24} className={color} />
               <div>
-                <p className="text-sm text-[var(--color-text-secondary)]">{label}</p>
-                <p className="text-2xl font-bold text-[var(--color-text)]">
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">{label}</p>
+                <p className="text-2xl font-bold text-[hsl(var(--foreground))]">
                   {batch.stats[key] ?? 0}
                 </p>
               </div>
@@ -157,7 +157,7 @@ export default function BatchDetailPage() {
             ))}
             {availableEnterprises.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-[var(--color-text-secondary)]">
+                <TableCell colSpan={4} className="text-center text-[hsl(var(--muted-foreground))]">
                   暂无可分配企业
                 </TableCell>
               </TableRow>
@@ -199,7 +199,7 @@ export default function BatchDetailPage() {
                   {proj.isOverdue ? (
                     <Badge variant="danger">已逾期</Badge>
                   ) : (
-                    <span className="text-[var(--color-text-secondary)]">-</span>
+                    <span className="text-[hsl(var(--muted-foreground))]">-</span>
                   )}
                 </TableCell>
                 <TableCell>
@@ -215,7 +215,7 @@ export default function BatchDetailPage() {
             ))}
             {(!projects?.items || projects.items.length === 0) && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-[var(--color-text-secondary)]">
+                <TableCell colSpan={5} className="text-center text-[hsl(var(--muted-foreground))]">
                   暂无项目
                 </TableCell>
               </TableRow>

@@ -31,8 +31,8 @@ export default function ManagerCalculationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">计算管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">计算管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理各项目的能耗计算、碳排放核算和标杆对比
         </p>
       </div>
@@ -43,12 +43,12 @@ export default function ManagerCalculationsPage() {
           <CardHeader>
             <CardTitle>
               <span className="flex items-center gap-2 text-base">
-                <Cpu size={18} className="text-[var(--color-primary)]" />
+                <Cpu size={18} className="text-[hsl(var(--primary))]" />
                 项目总数
               </span>
             </CardTitle>
           </CardHeader>
-          <p className="text-3xl font-bold text-[var(--color-text)]">
+          <p className="text-3xl font-bold text-[hsl(var(--foreground))]">
             {projects.length}
           </p>
         </Card>
@@ -56,12 +56,12 @@ export default function ManagerCalculationsPage() {
           <CardHeader>
             <CardTitle>
               <span className="flex items-center gap-2 text-base">
-                <BarChart3 size={18} className="text-[var(--color-success)]" />
+                <BarChart3 size={18} className="text-[hsl(var(--success))]" />
                 已计算
               </span>
             </CardTitle>
           </CardHeader>
-          <p className="text-3xl font-bold text-[var(--color-success)]">
+          <p className="text-3xl font-bold text-[hsl(var(--success))]">
             {projects.filter((p) => p.hasSnapshot).length}
           </p>
         </Card>
@@ -69,12 +69,12 @@ export default function ManagerCalculationsPage() {
           <CardHeader>
             <CardTitle>
               <span className="flex items-center gap-2 text-base">
-                <Play size={18} className="text-[var(--color-warning)]" />
+                <Play size={18} className="text-[hsl(var(--warning))]" />
                 待计算
               </span>
             </CardTitle>
           </CardHeader>
-          <p className="text-3xl font-bold text-[var(--color-warning)]">
+          <p className="text-3xl font-bold text-[hsl(var(--warning))]">
             {projects.filter((p) => !p.hasSnapshot).length}
           </p>
         </Card>
@@ -92,7 +92,7 @@ export default function ManagerCalculationsPage() {
         </CardHeader>
 
         {projects.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
             暂无项目数据。请先在项目管理中创建审计项目。
           </p>
         ) : (
@@ -128,7 +128,7 @@ export default function ManagerCalculationsPage() {
                   <TableCell>
                     {project.totalCarbon?.toFixed(2) ?? "-"}
                   </TableCell>
-                  <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                     {project.lastCalculatedAt
                       ? new Date(project.lastCalculatedAt).toLocaleString("zh-CN")
                       : "-"}

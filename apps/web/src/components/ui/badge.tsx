@@ -10,11 +10,11 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-gray-100 text-gray-700",
-  primary: "bg-[var(--color-primary-light)] text-[var(--color-primary)]",
+  primary: "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]",
   secondary: "bg-gray-100 text-gray-500",
-  success: "bg-[var(--color-success-light)] text-[var(--color-success)]",
-  warning: "bg-[var(--color-warning-light)] text-[var(--color-warning)]",
-  danger: "bg-[var(--color-danger-light)] text-[var(--color-danger)]",
+  success: "bg-[hsl(var(--success))]/10 text-[hsl(var(--success))]",
+  warning: "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
+  danger: "bg-[hsl(var(--danger))]/10 text-[hsl(var(--danger))]",
 };
 
 export function Badge({

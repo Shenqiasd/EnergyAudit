@@ -55,14 +55,14 @@ export default function BenchmarkAnalysisPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">能效对标分析</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">能效对标分析</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           行业能效对标总览，企业能效排名
         </p>
       </div>
 
       <div className="flex items-center gap-3">
-        <Filter size={16} className="text-[var(--color-text-secondary)]" />
+        <Filter size={16} className="text-[hsl(var(--muted-foreground))]" />
         <Input
           placeholder="行业代码筛选"
           value={industryCode}
@@ -85,7 +85,7 @@ export default function BenchmarkAnalysisPage() {
         <Card key={code}>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <TrendingUp size={18} className="text-[var(--color-primary)]" />
+              <TrendingUp size={18} className="text-[hsl(var(--primary))]" />
               <CardTitle>行业 {code} 对标值</CardTitle>
             </div>
           </CardHeader>
@@ -128,7 +128,7 @@ export default function BenchmarkAnalysisPage() {
 
       {industryGroups.size === 0 && (
         <Card>
-          <div className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <div className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无对标数据
           </div>
         </Card>
@@ -138,7 +138,7 @@ export default function BenchmarkAnalysisPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Award size={18} className="text-[var(--color-primary)]" />
+            <Award size={18} className="text-[hsl(var(--primary))]" />
             <CardTitle>企业能效排名</CardTitle>
           </div>
         </CardHeader>
@@ -170,7 +170,7 @@ export default function BenchmarkAnalysisPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无排名数据
           </p>
         )}

@@ -122,8 +122,8 @@ export default function UnitConfigPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">单元定义配置</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">单元定义配置</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             配置企业的用能单元及能源消耗边界
           </p>
         </div>
@@ -170,7 +170,7 @@ export default function UnitConfigPage() {
                         <Pencil size={14} />
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => setDeleteConfirmId(item.id)}>
-                        <Trash2 size={14} className="text-[var(--color-danger)]" />
+                        <Trash2 size={14} className="text-[hsl(var(--danger))]" />
                       </Button>
                     </div>
                   </TableCell>
@@ -179,7 +179,7 @@ export default function UnitConfigPage() {
             </TableBody>
           </Table>
         ) : (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
             暂无单元定义，请点击"新增单元"开始配置
           </p>
         )}
@@ -237,7 +237,7 @@ export default function UnitConfigPage() {
         onClose={() => setDeleteConfirmId(null)}
         title="确认删除"
       >
-        <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+        <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
           确定要删除该单元定义吗？此操作不可恢复。
         </p>
         <div className="flex justify-end gap-3">

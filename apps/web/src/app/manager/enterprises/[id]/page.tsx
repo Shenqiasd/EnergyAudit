@@ -53,7 +53,7 @@ export default function EnterpriseDetailPage({
   const restoreMutation = useUpdateAdmission(id, "restore");
 
   if (isLoading) return <PageLoading />;
-  if (!enterprise) return <div className="p-8 text-center text-[var(--color-text-secondary)]">企业不存在</div>;
+  if (!enterprise) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">企业不存在</div>;
 
   const handleAction = (action: string) => {
     const operatedBy = "system";
@@ -76,8 +76,8 @@ export default function EnterpriseDetailPage({
           </Button>
         </a>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">{enterprise.name}</h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{enterprise.name}</h1>
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             {enterprise.unifiedSocialCreditCode}
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function EnterpriseDetailPage({
             </CardHeader>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="text-sm text-[var(--color-text-secondary)]">当前状态：</span>
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">当前状态：</span>
                 <StatusBadge status={enterprise.admissionStatus} />
               </div>
               <div className="flex flex-wrap gap-2">
@@ -166,10 +166,10 @@ export default function EnterpriseDetailPage({
             {enterprise.bindings.length > 0 ? (
               <div className="space-y-3">
                 {enterprise.bindings.map((binding) => (
-                  <div key={binding.id} className="flex items-center justify-between rounded-lg border border-[var(--color-border)] p-3">
+                  <div key={binding.id} className="flex items-center justify-between rounded-lg border border-[hsl(var(--border))] p-3">
                     <div>
                       <p className="text-sm font-medium">{binding.externalSystem}</p>
-                      <p className="text-xs text-[var(--color-text-secondary)]">
+                      <p className="text-xs text-[hsl(var(--muted-foreground))]">
                         外部ID: {binding.externalId}
                       </p>
                     </div>
@@ -178,7 +178,7 @@ export default function EnterpriseDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[var(--color-text-secondary)]">暂未绑定外部系统</p>
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">暂未绑定外部系统</p>
             )}
           </Card>
 
@@ -191,8 +191,8 @@ export default function EnterpriseDetailPage({
                 </span>
               </CardTitle>
             </CardHeader>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              <a href={`/manager/users?enterpriseId=${enterprise.id}`} className="text-[var(--color-primary)] hover:underline">
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">
+              <a href={`/manager/users?enterpriseId=${enterprise.id}`} className="text-[hsl(var(--primary))] hover:underline">
                 查看关联用户 →
               </a>
             </p>
@@ -206,8 +206,8 @@ export default function EnterpriseDetailPage({
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-4">
-      <span className="w-32 shrink-0 text-sm text-[var(--color-text-secondary)]">{label}</span>
-      <span className="text-sm text-[var(--color-text)]">{value}</span>
+      <span className="w-32 shrink-0 text-sm text-[hsl(var(--muted-foreground))]">{label}</span>
+      <span className="text-sm text-[hsl(var(--foreground))]">{value}</span>
     </div>
   );
 }

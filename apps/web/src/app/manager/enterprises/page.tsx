@@ -196,7 +196,7 @@ export default function ManagerEnterprisesPage() {
                 ))}
                 {data?.items.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-[var(--color-text-secondary)]">
+                    <TableCell colSpan={8} className="text-center text-[hsl(var(--muted-foreground))]">
                       暂无企业数据
                     </TableCell>
                   </TableRow>
@@ -206,7 +206,7 @@ export default function ManagerEnterprisesPage() {
 
             {totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)]">
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">
                   共 {data?.total} 条记录
                 </span>
                 <div className="flex gap-2">

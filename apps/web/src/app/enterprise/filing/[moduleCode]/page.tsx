@@ -187,15 +187,15 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
         <div className="flex items-center gap-3">
           <Link
             href="/enterprise/filing"
-            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
+            className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
           >
             <ArrowLeft size={20} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--color-text)]">
+            <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
               {moduleInfo?.name ?? moduleCode}
             </h1>
-            <p className="mt-0.5 text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-0.5 text-sm text-[hsl(var(--muted-foreground))]">
               {moduleInfo?.category ?? ""}
             </p>
           </div>
@@ -242,9 +242,9 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <Card className="border-[var(--color-danger)]">
+        <Card className="border-[hsl(var(--danger))]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-[var(--color-danger)]">
+            <div className="flex items-center gap-2 text-[hsl(var(--danger))]">
               <AlertCircle size={16} />
               <span className="text-sm font-medium">
                 校验错误 ({validationErrors.length})
@@ -253,7 +253,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
             {validationErrors.map((err) => (
               <p
                 key={err.ruleCode}
-                className="text-sm text-[var(--color-danger)]"
+                className="text-sm text-[hsl(var(--danger))]"
               >
                 {err.message}
               </p>
@@ -263,9 +263,9 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
       )}
 
       {validationWarnings.length > 0 && (
-        <Card className="border-[var(--color-warning)]">
+        <Card className="border-[hsl(var(--warning))]">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-[var(--color-warning)]">
+            <div className="flex items-center gap-2 text-[hsl(var(--warning))]">
               <AlertTriangle size={16} />
               <span className="text-sm font-medium">
                 警告 ({validationWarnings.length})
@@ -274,7 +274,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
             {validationWarnings.map((err) => (
               <p
                 key={err.ruleCode}
-                className="text-sm text-[var(--color-warning)]"
+                className="text-sm text-[hsl(var(--warning))]"
               >
                 {err.message}
               </p>
@@ -307,7 +307,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
           <CardHeader>
             <CardTitle>开始填报</CardTitle>
           </CardHeader>
-          <p className="mb-4 text-sm text-[var(--color-text-secondary)]">
+          <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
             点击下方按钮创建数据记录，开始填写{" "}
             {moduleInfo?.name ?? moduleCode} 模块。
           </p>
@@ -319,7 +319,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
             <CardTitle>数据填写</CardTitle>
           </CardHeader>
           {fields.length === 0 ? (
-            <p className="text-sm text-[var(--color-text-secondary)]">
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">
               该模块暂无字段配置，请联系管理员配置字段。
             </p>
           ) : (
@@ -336,10 +336,10 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
 
                 return (
                   <div key={field.code}>
-                    <label className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+                    <label className="mb-1 block text-sm font-medium text-[hsl(var(--foreground))]">
                       {field.name}
                       {isRequired && (
-                        <span className="ml-1 text-[var(--color-danger)]">
+                        <span className="ml-1 text-[hsl(var(--danger))]">
                           *
                         </span>
                       )}
@@ -374,12 +374,12 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
                           )?.placeholder as string | undefined
                         }
                         className={clsx(
-                          fieldError && "border-[var(--color-danger)]",
+                          fieldError && "border-[hsl(var(--danger))]",
                         )}
                       />
                     )}
                     {fieldError && (
-                      <p className="mt-1 text-xs text-[var(--color-danger)]">
+                      <p className="mt-1 text-xs text-[hsl(var(--danger))]">
                         {fieldError.message}
                       </p>
                     )}
@@ -390,7 +390,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
           )}
 
           {/* Action Buttons */}
-          <div className="mt-6 flex items-center gap-3 border-t border-[var(--color-border)] pt-4">
+          <div className="mt-6 flex items-center gap-3 border-t border-[hsl(var(--border))] pt-4">
             <Button onClick={() => handleSave()} disabled={isSaving}>
               <Save size={16} className="mr-1" />
               {isSaving ? "保存中..." : "保存"}
@@ -405,7 +405,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="bg-[var(--color-success)] hover:opacity-90"
+              className="bg-[hsl(var(--success))] hover:opacity-90"
             >
               <Send size={16} className="mr-1" />
               {isSubmitting ? "提交中..." : "提交"}

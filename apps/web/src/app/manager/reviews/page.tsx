@@ -45,8 +45,8 @@ export default function ManagerReviewsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)]">审核管理</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审核管理</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
           管理审核任务分配、审核进度监控和整改督办
         </p>
       </div>
@@ -54,15 +54,15 @@ export default function ManagerReviewsPage() {
       <div className="grid grid-cols-3 gap-4">
         <Card className="p-4 text-center">
           <div className="text-2xl font-bold text-orange-500">{pendingCount}</div>
-          <div className="text-sm text-[var(--color-text-secondary)]">待分配</div>
+          <div className="text-sm text-[hsl(var(--muted-foreground))]">待分配</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-2xl font-bold text-blue-500">{inProgressCount}</div>
-          <div className="text-sm text-[var(--color-text-secondary)]">进行中</div>
+          <div className="text-sm text-[hsl(var(--muted-foreground))]">进行中</div>
         </Card>
         <Card className="p-4 text-center">
           <div className="text-2xl font-bold text-green-500">{completedCount}</div>
-          <div className="text-sm text-[var(--color-text-secondary)]">已完成</div>
+          <div className="text-sm text-[hsl(var(--muted-foreground))]">已完成</div>
         </Card>
       </div>
 
@@ -104,17 +104,17 @@ export default function ManagerReviewsPage() {
                 <div className="flex items-center justify-between p-4">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-[var(--color-text)]">
+                      <span className="font-medium text-[hsl(var(--foreground))]">
                         审核任务
                       </span>
                       <Badge variant={STATUS_VARIANTS[task.status] ?? "default"}>
                         {STATUS_LABELS[task.status] ?? task.status}
                       </Badge>
                     </div>
-                    <div className="text-sm text-[var(--color-text-secondary)]">
+                    <div className="text-sm text-[hsl(var(--muted-foreground))]">
                       项目 ID: {task.auditProjectId}
                     </div>
-                    <div className="text-xs text-[var(--color-text-secondary)]">
+                    <div className="text-xs text-[hsl(var(--muted-foreground))]">
                       审核员 ID: {task.reviewerId}
                     </div>
                   </div>

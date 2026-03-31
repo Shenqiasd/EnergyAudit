@@ -97,10 +97,10 @@ export default function ManagerAuditLogsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
             操作日志
           </h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             查看平台操作记录，支持按条件筛选和导出
           </p>
         </div>
@@ -202,12 +202,12 @@ export default function ManagerAuditLogsPage() {
                     <TableCell>
                       <ActionBadge action={log.action} />
                     </TableCell>
-                    <TableCell className="text-sm text-[var(--color-text-secondary)]">
+                    <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
                       {log.targetType
                         ? `${log.targetType}${log.targetId ? `/${log.targetId}` : ""}`
                         : "-"}
                     </TableCell>
-                    <TableCell className="max-w-xs truncate text-sm text-[var(--color-text-secondary)]">
+                    <TableCell className="max-w-xs truncate text-sm text-[hsl(var(--muted-foreground))]">
                       {log.detail ?? "-"}
                     </TableCell>
                   </TableRow>
@@ -216,7 +216,7 @@ export default function ManagerAuditLogsPage() {
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="text-center text-[var(--color-text-secondary)]"
+                      className="text-center text-[hsl(var(--muted-foreground))]"
                     >
                       暂无日志数据
                     </TableCell>
@@ -227,7 +227,7 @@ export default function ManagerAuditLogsPage() {
 
             {totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)]">
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">
                   共 {data?.total} 条记录
                 </span>
                 <div className="flex gap-2">

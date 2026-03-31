@@ -71,10 +71,10 @@ export default function ManagerJobsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">
+          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
             任务监控
           </h1>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
             查看异步任务执行状态，支持重试失败任务
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function ManagerJobsPage() {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="text-center text-[var(--color-text-secondary)]"
+                      className="text-center text-[hsl(var(--muted-foreground))]"
                     >
                       暂无任务数据
                     </TableCell>
@@ -148,7 +148,7 @@ export default function ManagerJobsPage() {
 
             {totalPages > 1 && (
               <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)]">
+                <span className="text-sm text-[hsl(var(--muted-foreground))]">
                   共 {data?.total} 条记录
                 </span>
                 <div className="flex gap-2">
@@ -195,12 +195,12 @@ function JobRow({ job }: { job: Job }) {
       <TableCell className="text-sm">
         {new Date(job.createdAt).toLocaleString("zh-CN")}
       </TableCell>
-      <TableCell className="text-sm text-[var(--color-text-secondary)]">
+      <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
         {job.completedAt
           ? new Date(job.completedAt).toLocaleString("zh-CN")
           : "-"}
       </TableCell>
-      <TableCell className="max-w-xs truncate text-sm text-[var(--color-text-secondary)]">
+      <TableCell className="max-w-xs truncate text-sm text-[hsl(var(--muted-foreground))]">
         {job.error ?? (job.result ? "成功" : "-")}
       </TableCell>
       <TableCell>
