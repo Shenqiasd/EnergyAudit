@@ -3,7 +3,7 @@
 import { useAuth } from "@/lib/auth/use-auth";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Header } from "./header";
 import { MobileBottomNav } from "./mobile-bottom-nav";
@@ -32,7 +32,10 @@ export function AppShell({ children }: AppShellProps) {
       {/* Mobile sidebar overlay */}
       <AnimatePresence>
         {mobileOpen && (
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-40 bg-black/50 lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
@@ -81,9 +84,11 @@ export function AppShell({ children }: AppShellProps) {
           }}
         />
         <main className="flex-1 overflow-y-auto bg-[hsl(var(--background))] p-4 pb-20 lg:p-6 lg:pb-6">
-          <PageTransition key={pathname}>
-            {children}
-          </PageTransition>
+          <AnimatePresence mode="wait">
+            <PageTransition key={pathname}>
+              {children}
+            </PageTransition>
+          </AnimatePresence>
         </main>
         {/* Mobile bottom tab navigation */}
         <MobileBottomNav role={user.role} />
