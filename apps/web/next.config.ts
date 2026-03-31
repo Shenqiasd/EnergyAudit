@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
     "*.repl.co:5000",
     "*.replit.dev:5000",
   ],
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Accel-Buffering", value: "no" },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
