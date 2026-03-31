@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "HOSTNAME=0.0.0.0 next dev --port 5000 -H 0.0.0.0",
     "build": "next build",
-    "start": "node .next/standalone/apps/web/server.js",
+    "start": "next start --port 5000 -H 0.0.0.0",
     "type-check": "tsc --noEmit",
     "lint": "next lint"
   },
