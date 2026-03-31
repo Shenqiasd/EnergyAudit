@@ -1,94 +1,149 @@
-import { clsx } from "clsx";
-import type { HTMLAttributes, ReactNode, TdHTMLAttributes, ThHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { forwardRef, type HTMLAttributes, type ReactNode, type TdHTMLAttributes, type ThHTMLAttributes } from "react";
 
-interface TableProps extends HTMLAttributes<HTMLTableElement> {
-  children: ReactNode;
-}
-
-export function Table({ className, children, ...props }: TableProps) {
-  return (
-    <div className="w-full overflow-auto">
+const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
+  ({ className, ...props }, ref) => (
+    <div className="relative w-full overflow-auto">
       <table
-        className={clsx("w-full caption-bottom text-sm", className)}
+        ref={ref}
+        className={cn("w-full caption-bottom text-sm", className)}
         {...props}
-      >
-        {children}
-      </table>
+      />
     </div>
-  );
-}
+  )
+);
+Table.displayName = "Table";
 
-export function TableHeader({
-  className,
-  children,
-  ...props
-}: HTMLAttributes<HTMLTableSectionElement> & { children: ReactNode }) {
-  return (
-    <thead className={clsx("border-b border-[hsl(var(--border))]", className)} {...props}>
-      {children}
-    </thead>
-  );
-}
+const TableHeader = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
+  ({ className, ...props }, ref) => (
+    <thead ref={ref} className={cn("border-b border-[hsl(var(--border))] [&_tr]:border-b", className)} {...props} />
+  )
+);
+TableHeader.displayName = "TableHeader";
 
-export function TableBody({
-  className,
-  children,
-  ...props
-}: HTMLAttributes<HTMLTableSectionElement> & { children: ReactNode }) {
-  return (
-    <tbody className={clsx("[&_tr:last-child]:border-0", className)} {...props}>
-      {children}
-    </tbody>
-  );
-}
+const TableBody = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
+  ({ className, ...props }, ref) => (
+    <tbody
+      ref={ref}
+      className={cn("[&_tr:last-child]:border-0 [&_tr:nth-child(even)]:bg-[hsl(var(--muted))]/50", className)}
+      {...props}
+    />
+  )
+);
+TableBody.displayName = "TableBody";
 
-export function TableRow({
-  className,
-  children,
-  ...props
-}: HTMLAttributes<HTMLTableRowElement> & { children: ReactNode }) {
-  return (
+const TableFooter = forwardRef<HTMLTableSectionElement, HTMLAttributes<HTMLTableSectionElement>>(
+  ({ className, ...props }, ref) => (
+    <tfoot
+      ref={ref}
+      className={cn("border-t border-[hsl(var(--border))] bg-[hsl(var(--muted))]/50 font-medium", className)}
+      {...props}
+    />
+  )
+);
+TableFooter.displayName = "TableFooter";
+
+const TableRow = forwardRef<HTMLTableRowElement, HTMLAttributes<HTMLTableRowElement>>(
+  ({ className, ...props }, ref) => (
     <tr
-      className={clsx(
-        "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))]/50",
+      ref={ref}
+      className={cn(
+        "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))]/50 data-[state=selected]:bg-[hsl(var(--muted))]",
         className,
       )}
       {...props}
-    >
-      {children}
-    </tr>
-  );
+    />
+  )
+);
+TableRow.displayName = "TableRow";
+
+type SortDirection = "asc" | "desc" | false;
+
+interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
+  sortable?: boolean;
+  sortDirection?: SortDirection;
+  onSort?: () => void;
 }
 
-export function TableHead({
-  className,
-  children,
-  ...props
-}: ThHTMLAttributes<HTMLTableCellElement> & { children: ReactNode }) {
-  return (
+const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
+  ({ className, children, sortable, sortDirection, onSort, ...props }, ref) => (
     <th
-      className={clsx(
+      ref={ref}
+      className={cn(
         "h-12 px-4 text-left align-middle font-medium text-[hsl(var(--muted-foreground))]",
+        sortable && "cursor-pointer select-none",
         className,
       )}
+      onClick={sortable ? onSort : undefined}
       {...props}
     >
-      {children}
+      <div className="flex items-center gap-1">
+        {children}
+        {sortable && (
+          <span className="ml-1 inline-flex">
+            {sortDirection === "asc" && <ArrowUp className="h-4 w-4" />}
+            {sortDirection === "desc" && <ArrowDown className="h-4 w-4" />}
+            {!sortDirection && <ArrowUpDown className="h-4 w-4 opacity-40" />}
+          </span>
+        )}
+      </div>
     </th>
+  )
+);
+TableHead.displayName = "TableHead";
+
+const TableCell = forwardRef<HTMLTableCellElement, TdHTMLAttributes<HTMLTableCellElement>>(
+  ({ className, ...props }, ref) => (
+    <td
+      ref={ref}
+      className={cn("p-4 align-middle", className)}
+      {...props}
+    />
+  )
+);
+TableCell.displayName = "TableCell";
+
+const TableCaption = forwardRef<HTMLTableCaptionElement, HTMLAttributes<HTMLTableCaptionElement>>(
+  ({ className, ...props }, ref) => (
+    <caption
+      ref={ref}
+      className={cn("mt-4 text-sm text-[hsl(var(--muted-foreground))]", className)}
+      {...props}
+    />
+  )
+);
+TableCaption.displayName = "TableCaption";
+
+/* ────────── Empty state ────────── */
+
+interface TableEmptyProps {
+  colSpan: number;
+  icon?: ReactNode;
+  message?: string;
+}
+
+function TableEmpty({ colSpan, icon, message = "暂无数据" }: TableEmptyProps) {
+  return (
+    <TableRow>
+      <TableCell colSpan={colSpan} className="h-24 text-center">
+        <div className="flex flex-col items-center justify-center gap-2 text-[hsl(var(--muted-foreground))]">
+          {icon}
+          <span>{message}</span>
+        </div>
+      </TableCell>
+    </TableRow>
   );
 }
 
-export function TableCell({
-  className,
-  children,
-  ...props
-}: TdHTMLAttributes<HTMLTableCellElement> & { children: ReactNode }) {
-  return (
-    <td
-      className={clsx("p-4 align-middle", className)}
-      {...props}
-    >
-      {children}
-    </td>
-  );
-}
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+  TableEmpty,
+};

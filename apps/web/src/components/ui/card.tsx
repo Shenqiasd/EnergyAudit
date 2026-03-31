@@ -1,50 +1,53 @@
-import { clsx } from "clsx";
-import type { HTMLAttributes, ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { forwardRef, type HTMLAttributes } from "react";
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
-}
-
-export function Card({ className, children, ...props }: CardProps) {
-  return (
+const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
     <div
-      className={clsx(
-        "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-sm",
-        className,
+      ref={ref}
+      className={cn(
+        "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))] shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5",
+        className
       )}
       {...props}
-    >
-      {children}
-    </div>
-  );
-}
+    />
+  )
+);
+Card.displayName = "Card";
 
-interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
-}
+const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
+  )
+);
+CardHeader.displayName = "CardHeader";
 
-export function CardHeader({ className, children, ...props }: CardHeaderProps) {
-  return (
-    <div
-      className={clsx("mb-4 flex items-center justify-between", className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-}
+const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3 ref={ref} className={cn("text-lg font-semibold leading-none tracking-tight", className)} {...props} />
+  )
+);
+CardTitle.displayName = "CardTitle";
 
-interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
-  children: ReactNode;
-}
+const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p ref={ref} className={cn("text-sm text-[hsl(var(--muted-foreground))]", className)} {...props} />
+  )
+);
+CardDescription.displayName = "CardDescription";
 
-export function CardTitle({ className, children, ...props }: CardTitleProps) {
-  return (
-    <h3
-      className={clsx("text-lg font-semibold text-[hsl(var(--card-foreground))]", className)}
-      {...props}
-    >
-      {children}
-    </h3>
-  );
-}
+const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  )
+);
+CardContent.displayName = "CardContent";
+
+const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
+  )
+);
+CardFooter.displayName = "CardFooter";
+
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
