@@ -6,6 +6,7 @@ import { ListChecks, Play, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/layout/page-header";
 import { Select } from "@/components/ui/select";
 import { Loading } from "@/components/ui/loading";
 import { useReviewTasks } from "@/lib/api/hooks/use-reviews";
@@ -38,12 +39,10 @@ export default function ReviewerTasksPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">我的审核</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          查看分配给我的审核任务，进行审核评分
-        </p>
-      </div>
+      <PageHeader
+        title="我的审核"
+        description="查看分配给我的审核任务，进行审核评分"
+      />
 
       <div className="flex items-center gap-4">
         <Select

@@ -6,6 +6,7 @@ import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ProgressBoard } from "@/components/dashboard/progress-board";
 import { AlertList } from "@/components/dashboard/alert-list";
 import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
+import { PageHeader } from "@/components/layout/page-header";
 import {
   useDashboardSummary,
   useAlerts,
@@ -63,12 +64,10 @@ export default function ManagerDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">工作台</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          管理端工作台 — 审计工作总览、项目进度、审核状态统计
-        </p>
-      </div>
+      <PageHeader
+        title="工作台"
+        description="管理端工作台 — 审计工作总览、项目进度、审核状态统计"
+      />
 
       {/* KPI Cards Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

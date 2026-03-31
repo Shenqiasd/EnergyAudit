@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Building2, Plus, RefreshCw, Search, Eye, CheckCircle, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
@@ -95,18 +96,16 @@ export default function ManagerEnterprisesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">企业管理</h1>
-          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            管理参与审计的企业信息、准入状态和企业账号
-          </p>
-        </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus size={16} />
-          新增企业
-        </Button>
-      </div>
+      <PageHeader
+        title="企业管理"
+        description="管理参与审计的企业信息、准入状态和企业账号"
+        actions={
+          <Button onClick={() => setShowCreateModal(true)}>
+            <Plus size={16} />
+            新增企业
+          </Button>
+        }
+      />
 
       <Card>
         <CardHeader>

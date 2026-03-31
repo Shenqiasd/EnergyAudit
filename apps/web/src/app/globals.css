@@ -23,6 +23,7 @@
   --sidebar-border: 214 32% 91%;
   --sidebar-accent: 217 91% 97%;
   --sidebar-accent-foreground: 217 91% 50%;
+  --sidebar-muted: 215 16% 47%;
 
   /* Muted */
   --muted: 210 40% 96%;
@@ -81,6 +82,7 @@
   --sidebar-border: 217 33% 17%;
   --sidebar-accent: 217 33% 14%;
   --sidebar-accent-foreground: 217 91% 70%;
+  --sidebar-muted: 215 16% 47%;
   --muted: 217 33% 14%;
   --muted-foreground: 215 20% 55%;
   --ring: 217 91% 60%;

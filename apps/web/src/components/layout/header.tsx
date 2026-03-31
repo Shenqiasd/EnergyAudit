@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { NotificationBell } from "@/components/notification/notification-bell";
 import type { UserRole } from "@/lib/auth/auth-provider";
@@ -8,10 +9,12 @@ import {
   ChevronRight,
   LogOut,
   Menu,
-  User,
+  Search,
+  Shield,
 } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 interface HeaderProps {
   onMenuToggle: () => void;
@@ -46,13 +49,26 @@ const breadcrumbMap: Record<string, string> = {
   tasks: "我的审核",
   history: "审核历史",
   notifications: "消息通知",
+  "business-types": "业务类型",
+  calculations: "计算管理",
+  "data-overview": "填报概览",
+  rectifications: "整改监管",
+  benchmarks: "能效对标",
+  region: "区域统计",
+  ledgers: "台账管理",
+  sync: "同步管理",
+  "audit-logs": "操作日志",
+  jobs: "任务监控",
 };
+
+function buildBreadcrumbHref(segments: string[], index: number): string {
+  return "/" + segments.slice(0, index + 1).join("/");
+}
 
 export function Header({ onMenuToggle }: HeaderProps) {
   const { user, logout, switchRole } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
 
   const roleDashboards: Record<UserRole, string> = {
     enterprise_user: "/enterprise/dashboard",
@@ -61,96 +77,148 @@ export function Header({ onMenuToggle }: HeaderProps) {
   };
 
   const segments = pathname.split("/").filter(Boolean);
-  const breadcrumbs = segments.map(
-    (seg) => breadcrumbMap[seg] || seg,
-  );
+  const breadcrumbs = segments.map((seg, i) => ({
+    label: breadcrumbMap[seg] || seg,
+    href: buildBreadcrumbHref(segments, i),
+    isLast: i === segments.length - 1,
+  }));
 
   const roles: UserRole[] = ["enterprise_user", "manager", "reviewer"];
 
+  const userInitial = user?.name ? user.name.charAt(0) : "U";
+
   return (
-    <header className="flex h-16 items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 lg:px-6">
+    <header className="flex h-16 items-center justify-between bg-[hsl(var(--card))] px-4 shadow-sm lg:px-6">
       {/* Left: menu toggle + breadcrumb */}
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuToggle}
-          className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
+          className="rounded-lg p-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))]"
         >
           <Menu size={20} />
         </button>
         <nav className="hidden items-center gap-1 text-sm text-[hsl(var(--muted-foreground))] sm:flex">
-          <span>首页</span>
-          {breadcrumbs.map((crumb, i) => (
-            <span key={i} className="flex items-center gap-1">
-              <ChevronRight size={14} />
-              <span
-                className={
-                  i === breadcrumbs.length - 1
-                    ? "text-[hsl(var(--foreground))] font-medium"
-                    : ""
-                }
-              >
-                {crumb}
-              </span>
+          <Link
+            href="/"
+            className="transition-colors hover:text-[hsl(var(--foreground))]"
+          >
+            首页
+          </Link>
+          {breadcrumbs.map((crumb) => (
+            <span key={crumb.href} className="flex items-center gap-1">
+              <ChevronRight size={14} className="text-[hsl(var(--muted-foreground))]" />
+              {crumb.isLast ? (
+                <span className="font-medium text-[hsl(var(--foreground))]">
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link
+                  href={crumb.href}
+                  className="transition-colors hover:text-[hsl(var(--foreground))]"
+                >
+                  {crumb.label}
+                </Link>
+              )}
             </span>
           ))}
         </nav>
       </div>
 
-      {/* Right: notification bell + user info + role switcher */}
-      <div className="flex items-center gap-3">
+      {/* Right: search trigger + notification bell + user dropdown */}
+      <div className="flex items-center gap-2">
+        {/* Global search trigger (Wave 14 - Command palette placeholder) */}
+        <button
+          className="hidden items-center gap-2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--muted))] px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--accent))] md:flex"
+          onClick={() => {
+            /* Command palette - Wave 14 */
+          }}
+        >
+          <Search size={14} />
+          <span>搜索...</span>
+          <kbd className="ml-2 rounded border border-[hsl(var(--border))] bg-white px-1.5 py-0.5 text-[10px] font-medium text-[hsl(var(--muted-foreground))]">
+            ⌘K
+          </kbd>
+        </button>
+
         <NotificationBell />
-        {/* Role switcher (dev only) */}
-        <div className="relative">
-          <button
-            onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
-            className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm hover:bg-gray-100"
-          >
-            <User size={16} />
-            <span className="hidden sm:inline">{user?.name || "未登录"}</span>
-            {user?.role && (
-              <Badge variant={roleBadgeVariants[user.role]}>
-                {roleLabels[user.role]}
-              </Badge>
-            )}
-          </button>
-          {showRoleSwitcher && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] py-1 shadow-lg">
-              <div className="px-3 py-2 text-xs font-medium text-[hsl(var(--muted-foreground))]">
-                切换角色 (开发用)
+
+        {/* User dropdown with Radix DropdownMenu */}
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[hsl(var(--accent))]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[hsl(var(--primary))] text-xs font-medium text-white">
+                {userInitial}
               </div>
+              <span className="hidden max-w-[120px] truncate sm:inline">
+                {user?.name || "未登录"}
+              </span>
+              {user?.role && (
+                <Badge variant={roleBadgeVariants[user.role]}>
+                  {roleLabels[user.role]}
+                </Badge>
+              )}
+            </button>
+          </DropdownMenu.Trigger>
+
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              align="end"
+              sideOffset={8}
+              className="z-50 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-1 shadow-lg"
+            >
+              {/* User info header */}
+              <div className="px-3 py-2">
+                <div className="text-sm font-medium text-[hsl(var(--foreground))]">
+                  {user?.name || "未登录"}
+                </div>
+                {user?.email && (
+                  <div className="text-xs text-[hsl(var(--muted-foreground))]">
+                    {user.email}
+                  </div>
+                )}
+              </div>
+
+              <DropdownMenu.Separator className="my-1 h-px bg-[hsl(var(--border))]" />
+
+              {/* Role switcher */}
+              <DropdownMenu.Label className="px-3 py-1.5 text-xs font-medium text-[hsl(var(--muted-foreground))]">
+                切换角色
+              </DropdownMenu.Label>
               {roles.map((role) => (
-                <button
+                <DropdownMenu.Item
                   key={role}
-                  onClick={() => {
+                  onSelect={() => {
                     switchRole(role);
                     router.push(roleDashboards[role]);
-                    setShowRoleSwitcher(false);
                   }}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 ${
-                    user?.role === role ? "bg-gray-50 font-medium" : ""
-                  }`}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-[hsl(var(--accent))]",
+                    user?.role === role && "bg-[hsl(var(--accent))] font-medium",
+                  )}
                 >
+                  <Shield size={14} />
                   <Badge variant={roleBadgeVariants[role]}>
                     {roleLabels[role]}
                   </Badge>
-                </button>
+                </DropdownMenu.Item>
               ))}
-              <div className="border-t border-[hsl(var(--border))] mt-1 pt-1">
-                <button
-                  onClick={() => {
-                    logout();
-                    router.push("/");
-                    setShowRoleSwitcher(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[hsl(var(--danger))] hover:bg-[hsl(var(--muted))]"
-                >
-                  <LogOut size={16} />
-                  退出登录
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+
+              <DropdownMenu.Separator className="my-1 h-px bg-[hsl(var(--border))]" />
+
+              {/* Logout */}
+              <DropdownMenu.Item
+                onSelect={() => {
+                  logout();
+                  router.push("/");
+                }}
+                className="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-[hsl(var(--destructive))] outline-none transition-colors hover:bg-red-50"
+              >
+                <LogOut size={14} />
+                退出登录
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
       </div>
     </header>
   );
