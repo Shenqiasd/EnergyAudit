@@ -11,3 +11,4 @@ coverage/
 
 .turbo/
 .gstack/
+apps/web/.next/
