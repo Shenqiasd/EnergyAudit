@@ -212,7 +212,7 @@ export default function ManagerBatchesPage() {
       />
 
       {isLoading ? (
-        <ListPageSkeleton rows={5} />
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
       ) : filteredItems.length === 0 ? (
         <EmptyState
           icon={<Layers className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}

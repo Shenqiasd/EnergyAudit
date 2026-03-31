@@ -110,7 +110,7 @@ export default function EnterpriseLedgerPage() {
       </Card>
 
       {isLoading ? (
-        <ListPageSkeleton rows={8} />
+        <ListPageSkeleton rows={8} showFilterSkeleton={false} />
       ) : (
         <Card>
           <Table>

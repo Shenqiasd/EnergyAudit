@@ -1,14 +1,22 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function ListPageSkeleton({ rows = 5 }: { rows?: number }) {
+export function ListPageSkeleton({
+  rows = 5,
+  showFilterSkeleton = true,
+}: {
+  rows?: number;
+  showFilterSkeleton?: boolean;
+}) {
   return (
     <div className="space-y-4">
       {/* FilterBar skeleton */}
-      <div className="flex gap-3">
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-10 w-32" />
-        <Skeleton className="h-10 w-32" />
-      </div>
+      {showFilterSkeleton && (
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-32" />
+          <Skeleton className="h-10 w-32" />
+        </div>
+      )}
       {/* Table skeleton */}
       <div className="rounded-xl border border-[hsl(var(--border))]">
         <div className="flex gap-4 p-4 border-b border-[hsl(var(--border))]">

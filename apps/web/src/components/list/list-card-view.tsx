@@ -21,6 +21,7 @@ const cardVariants = {
 interface ListCardViewProps<TData> {
   data: TData[];
   renderCard: (item: TData, index: number) => ReactNode;
+  keyExtractor?: (item: TData, index: number) => string;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyAction?: ReactNode;
@@ -30,6 +31,7 @@ interface ListCardViewProps<TData> {
 export function ListCardView<TData>({
   data,
   renderCard,
+  keyExtractor,
   emptyTitle = "暂无数据",
   emptyDescription,
   emptyAction,
@@ -56,7 +58,7 @@ export function ListCardView<TData>({
       )}
     >
       {data.map((item, index) => (
-        <motion.div key={index} variants={cardVariants}>
+        <motion.div key={keyExtractor ? keyExtractor(item, index) : index} variants={cardVariants}>
           {renderCard(item, index)}
         </motion.div>
       ))}

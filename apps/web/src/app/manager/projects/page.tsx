@@ -165,7 +165,7 @@ export default function ManagerProjectsPage() {
       />
 
       {isLoading ? (
-        <ListPageSkeleton rows={5} />
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
       ) : items.length === 0 ? (
         <EmptyState
           icon={<ClipboardCheck className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}

@@ -203,7 +203,7 @@ export default function ManagerEnterprisesPage() {
       />
 
       {isLoading ? (
-        <ListPageSkeleton rows={5} />
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
       ) : items.length === 0 ? (
         <EmptyState
           icon={<Building2 className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}

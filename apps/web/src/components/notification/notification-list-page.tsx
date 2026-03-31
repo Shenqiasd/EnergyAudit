@@ -209,8 +209,18 @@ export function NotificationListPage() {
       {/* Notification list */}
       <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))]">
         {isLoading ? (
-          <div className="p-4">
-            <ListPageSkeleton rows={4} />
+          <div className="px-4 py-12">
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex gap-3 animate-pulse">
+                  <div className="h-5 w-5 rounded-full bg-[hsl(var(--muted))] shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-3/4 rounded bg-[hsl(var(--muted))]" />
+                    <div className="h-3 w-1/2 rounded bg-[hsl(var(--muted))]" />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : notifications.length === 0 ? (
           <EmptyState
