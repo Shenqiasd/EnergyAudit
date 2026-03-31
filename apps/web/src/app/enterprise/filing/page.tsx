@@ -2,8 +2,9 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading } from "@/components/ui/loading";
 import { Progress } from "@/components/ui/progress";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import { useDataModules } from "@/lib/api/hooks/use-data-entry";
 import { clsx } from "clsx";
 import {
@@ -79,7 +80,7 @@ export default function EnterpriseFilingPage() {
     return groups;
   }, [modules]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <ListPageSkeleton rows={6} />;
 
   const categories = Object.keys(grouped);
 
@@ -148,19 +149,11 @@ export default function EnterpriseFilingPage() {
       ))}
 
       {categories.length === 0 && !isLoading && (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <span className="flex items-center gap-2">
-                <Database size={20} />
-                暂无填报模块
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">
-            请联系管理员配置填报模块。
-          </p>
-        </Card>
+        <EmptyState
+          icon={<Database className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无填报模块"
+          description="等待项目配置填报模块"
+        />
       )}
     </div>
   );

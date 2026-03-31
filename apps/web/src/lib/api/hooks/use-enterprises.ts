@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface Enterprise {
   id: string;
@@ -109,6 +110,10 @@ export function useCreateEnterprise() {
       apiClient.post<Enterprise>("/enterprises", data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["enterprises"] });
+      toast({ title: "创建成功", description: "企业已成功创建", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "创建失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -121,6 +126,10 @@ export function useUpdateEnterprise(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["enterprises"] });
       void queryClient.invalidateQueries({ queryKey: ["enterprise", id] });
+      toast({ title: "更新成功", description: "企业信息已更新", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "更新失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -133,6 +142,10 @@ export function useUpdateAdmission(id: string, action: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["enterprises"] });
       void queryClient.invalidateQueries({ queryKey: ["enterprise", id] });
+      toast({ title: "操作成功", description: "准入状态已更新", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -143,6 +156,10 @@ export function useSyncEnterprise(id: string) {
     mutationFn: () => apiClient.post(`/enterprises/${id}/sync`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["enterprise", id] });
+      toast({ title: "同步成功", description: "企业数据已同步", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "同步失败", description: error.message, variant: "destructive" });
     },
   });
 }

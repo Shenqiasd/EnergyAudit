@@ -5,11 +5,12 @@ import Link from "next/link";
 import { Hand } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
 import { FilterBar } from "@/components/list/filter-bar";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { Wrench } from "lucide-react";
 import {
   useRectificationTasks,
   useClaimRectification,
@@ -151,9 +152,13 @@ export default function EnterpriseRectificationPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
       ) : filteredItems.length === 0 ? (
-        <EmptyState title="暂无整改任务" description="整改任务将在审核发现问题后显示" />
+        <EmptyState
+          icon={<Wrench className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无整改任务"
+          description="审核通过无需整改"
+        />
       ) : (
         <DataTable columns={columns} data={filteredItems} />
       )}

@@ -2,11 +2,11 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
-import { AlertTriangle } from "lucide-react";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { AlertTriangle, ClipboardCheck } from "lucide-react";
 import { useAuditProjects, type AuditProject } from "@/lib/api/hooks/use-audit-projects";
 import { useRouter } from "next/navigation";
 
@@ -110,9 +110,13 @@ export default function EnterpriseProjectsPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} />
       ) : items.length === 0 ? (
-        <EmptyState title="暂无项目" description="项目将在管理员分配后显示" />
+        <EmptyState
+          icon={<ClipboardCheck className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无审计项目"
+          description="企业准入后将分配项目"
+        />
       ) : (
         <DataTable columns={columns} data={items} />
       )}

@@ -5,13 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/layout/page-header";
 import { FilterBar } from "@/components/list/filter-bar";
-import { AlertTriangle, Plus } from "lucide-react";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { AlertTriangle, Layers, Plus } from "lucide-react";
 import { useAuditBatches, useCreateBatch } from "@/lib/api/hooks/use-audit-batches";
 import type { AuditBatch } from "@/lib/api/hooks/use-audit-batches";
 import { useBusinessTypes } from "@/lib/api/hooks/use-business-types";
@@ -212,11 +212,18 @@ export default function ManagerBatchesPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
       ) : filteredItems.length === 0 ? (
         <EmptyState
-          title="暂无批次数据"
-          description={'点击右上角"新建批次"按钮创建新的审计批次'}
+          icon={<Layers className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无批次"
+          description="创建第一个审计批次开始工作"
+          action={
+            <Button onClick={() => setShowCreate(true)}>
+              <Plus size={16} />
+              新建批次
+            </Button>
+          }
         />
       ) : (
         <DataTable columns={columns} data={filteredItems} />

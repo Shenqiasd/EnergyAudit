@@ -15,7 +15,17 @@ import {
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { EmptyState } from "./empty-state";
+
+const rowVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.25, ease: "easeOut" as const },
+  }),
+};
 
 interface FilterableColumn {
   id: string;
@@ -151,8 +161,12 @@ export function DataTable<TData, TValue>({
             <tbody>
               {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row, index) => (
-                  <tr
+                  <motion.tr
                     key={row.id}
+                    custom={index}
+                    variants={rowVariants}
+                    initial="hidden"
+                    animate="visible"
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
                       "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))]/50 data-[state=selected]:bg-[hsl(var(--muted))]",
@@ -167,7 +181,7 @@ export function DataTable<TData, TValue>({
                         )}
                       </td>
                     ))}
-                  </tr>
+                  </motion.tr>
                 ))
               ) : (
                 <tr>

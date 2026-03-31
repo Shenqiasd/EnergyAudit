@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth/use-auth";
 import { useState, type ReactNode } from "react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
+import { CommandPalette } from "@/components/command-palette";
 
 interface AppShellProps {
   children: ReactNode;
@@ -64,6 +65,7 @@ export function AppShell({ children }: AppShellProps) {
         </main>
         {/* TODO: Mobile bottom tab navigation (Wave 14+) */}
       </div>
+      <CommandPalette />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface RectificationTask {
   id: string;
@@ -97,6 +98,10 @@ export function useGenerateRectifications() {
     }) => apiClient.post<GenerateResult>("/rectifications/generate", data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+      toast({ title: "生成成功", description: "整改任务已生成", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "生成失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -109,6 +114,10 @@ export function useClaimRectification(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+      toast({ title: "认领成功", description: "整改任务已认领", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "认领失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -124,6 +133,10 @@ export function useUpdateProgress(id: string) {
     }) => apiClient.put<RectificationTaskDetail>(`/rectifications/${id}/progress`, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
+      toast({ title: "更新成功", description: "进度已更新", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "更新失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -136,6 +149,10 @@ export function useSubmitRectification(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+      toast({ title: "提交成功", description: "整改已提交审核", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "提交失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -148,6 +165,10 @@ export function useAcceptRectification(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+      toast({ title: "通过成功", description: "整改已通过验收", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -160,6 +181,10 @@ export function useRejectRectification(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+      toast({ title: "驳回成功", description: "整改已驳回", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -175,6 +200,10 @@ export function useExtendRectificationDeadline(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["rectification-task", id] });
       void queryClient.invalidateQueries({ queryKey: ["rectification-tasks"] });
+      toast({ title: "延期成功", description: "整改截止日期已延长", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "延期失败", description: error.message, variant: "destructive" });
     },
   });
 }

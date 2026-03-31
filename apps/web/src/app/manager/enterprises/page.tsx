@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, RefreshCw, Eye, CheckCircle } from "lucide-react";
+import { Plus, RefreshCw, Eye, CheckCircle, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PageLoading } from "@/components/ui/loading";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DataTable, type ColumnDef } from "@/components/ui/data-table";
 import { FilterBar } from "@/components/list/filter-bar";
 import { ListCardView } from "@/components/list/list-card-view";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import { useEnterprises, useCreateEnterprise, useSyncEnterprise } from "@/lib/api/hooks/use-enterprises";
 import type { Enterprise } from "@/lib/api/hooks/use-enterprises";
 
@@ -203,11 +203,18 @@ export default function ManagerEnterprisesPage() {
       />
 
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
       ) : items.length === 0 ? (
         <EmptyState
-          title="暂无企业数据"
-          description={'点击右上角"新增企业"按钮添加企业'}
+          icon={<Building2 className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无企业"
+          description="还没有注册的审计企业"
+          action={
+            <Button onClick={() => setShowCreateModal(true)}>
+              <Plus size={16} />
+              新增企业
+            </Button>
+          }
         />
       ) : viewMode === "table" ? (
         <DataTable columns={columns} data={items} pageSize={20} hidePagination />
