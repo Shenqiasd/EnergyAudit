@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Wrench, Hand, Send } from "lucide-react";
+import { Hand } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select } from "@/components/ui/select";
-import { Loading } from "@/components/ui/loading";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { PageHeader } from "@/components/layout/page-header";
+import { FilterBar } from "@/components/list/filter-bar";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { Wrench } from "lucide-react";
 import {
   useRectificationTasks,
   useClaimRectification,
 } from "@/lib/api/hooks/use-rectifications";
+import type { RectificationTask } from "@/lib/api/hooks/use-rectifications";
 
 const STATUS_LABELS: Record<string, string> = {
   pending_issue: "待下发",
@@ -33,110 +37,131 @@ const STATUS_VARIANTS: Record<string, "default" | "primary" | "success" | "warni
   closed: "default",
 };
 
+function ClaimButton({ taskId }: { taskId: string }) {
+  const claimTask = useClaimRectification(taskId);
+  return (
+    <Button
+      size="sm"
+      onClick={(e) => {
+        e.preventDefault();
+        claimTask.mutate();
+      }}
+      disabled={claimTask.isPending}
+    >
+      <Hand size={14} className="mr-1" />
+      {claimTask.isPending ? "认领中..." : "认领"}
+    </Button>
+  );
+}
+
 export default function EnterpriseRectificationPage() {
+  const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const { data, isLoading } = useRectificationTasks({
     status: statusFilter || undefined,
   });
 
+  const items = data?.items ?? [];
+  const filteredItems = searchText
+    ? items.filter((t) => t.title.toLowerCase().includes(searchText.toLowerCase()))
+    : items;
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString("zh-CN");
+  };
+
+  const columns: ColumnDef<RectificationTask, unknown>[] = [
+    {
+      accessorKey: "title",
+      header: "任务名称",
+      cell: ({ row }) => (
+        <Link href={`/enterprise/rectification/${row.original.id}`} className="font-medium hover:underline">
+          {row.original.title}
+        </Link>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "状态",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1.5">
+          <Badge variant={STATUS_VARIANTS[row.original.status] ?? "default"}>
+            {STATUS_LABELS[row.original.status] ?? row.original.status}
+          </Badge>
+          {row.original.isOverdue && <Badge variant="danger">延期</Badge>}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "deadline",
+      header: "截止日期",
+      cell: ({ row }) => formatDate(row.original.deadline),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "创建日期",
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: "actions",
+      header: "操作",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Link href={`/enterprise/rectification/${row.original.id}`}>
+            <Button size="sm" variant="ghost">
+              查看详情
+            </Button>
+          </Link>
+          {row.original.status === "pending_claim" && (
+            <ClaimButton taskId={row.original.id} />
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">整改任务</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          查看审核发现的问题，提交整改方案和完成情况
-        </p>
-      </div>
+      <PageHeader
+        title="我的整改任务"
+        description="查看审核发现的问题，提交整改方案和完成情况"
+      />
 
-      <div className="flex items-center gap-4">
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          options={[
-            { value: "", label: "全部状态" },
-            { value: "pending_claim", label: "待认领" },
-            { value: "in_progress", label: "整改中" },
-            { value: "pending_acceptance", label: "待验收" },
-            { value: "completed", label: "已完成" },
-            { value: "delayed", label: "已延期" },
-          ]}
-        />
-      </div>
+      <FilterBar
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        searchPlaceholder="搜索整改任务..."
+        filters={[
+          {
+            key: "status",
+            label: "任务状态",
+            options: [
+              { value: "", label: "全部状态" },
+              { value: "pending_claim", label: "待认领" },
+              { value: "in_progress", label: "整改中" },
+              { value: "pending_acceptance", label: "待验收" },
+              { value: "completed", label: "已完成" },
+              { value: "delayed", label: "已延期" },
+            ],
+            value: statusFilter,
+            onChange: setStatusFilter,
+          },
+        ]}
+      />
 
       {isLoading ? (
-        <Loading />
-      ) : !data?.items.length ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <span className="flex items-center gap-2">
-                <Wrench size={20} />
-                暂无整改任务
-              </span>
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
+      ) : filteredItems.length === 0 ? (
+        <EmptyState
+          icon={<Wrench className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无整改任务"
+          description="审核通过无需整改"
+        />
       ) : (
-        <div className="grid gap-4">
-          {data.items.map((task) => (
-            <RectificationTaskCard key={task.id} task={task} />
-          ))}
-        </div>
+        <DataTable columns={columns} data={filteredItems} />
       )}
     </div>
-  );
-}
-
-function RectificationTaskCard({ task }: {
-  task: {
-    id: string;
-    title: string;
-    description: string | null;
-    status: string;
-    deadline: string | null;
-    isOverdue: boolean;
-    auditProjectId: string;
-  };
-}) {
-  const claimTask = useClaimRectification(task.id);
-
-  return (
-    <Link href={`/enterprise/rectification/${task.id}`}>
-      <Card className="cursor-pointer transition-shadow hover:shadow-md">
-        <div className="flex items-center justify-between p-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-[hsl(var(--foreground))]">{task.title}</span>
-              <Badge variant={STATUS_VARIANTS[task.status] ?? "default"}>
-                {STATUS_LABELS[task.status] ?? task.status}
-              </Badge>
-              {task.isOverdue && <Badge variant="danger">延期</Badge>}
-            </div>
-            {task.description && (
-              <p className="text-sm text-[hsl(var(--muted-foreground))] line-clamp-1">
-                {task.description}
-              </p>
-            )}
-            <div className="text-xs text-[hsl(var(--muted-foreground))]">
-              {task.deadline && (
-                <span>截止: {new Date(task.deadline).toLocaleDateString("zh-CN")}</span>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2" onClick={(e) => e.preventDefault()}>
-            {task.status === "pending_claim" && (
-              <Button
-                size="sm"
-                onClick={() => claimTask.mutate()}
-                disabled={claimTask.isPending}
-              >
-                <Hand size={14} className="mr-1" />
-                认领
-              </Button>
-            )}
-          </div>
-        </div>
-      </Card>
-    </Link>
   );
 }

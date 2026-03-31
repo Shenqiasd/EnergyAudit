@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface Report {
   id: string;
@@ -111,6 +112,10 @@ export function useGenerateReport(projectId: string) {
       apiClient.post<GenerateResult>(`/reports/generate/${projectId}`),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["reports"] });
+      toast({ title: "生成成功", description: "报告已开始生成", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "生成失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -123,6 +128,10 @@ export function useTransitionReportStatus(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["report", id] });
       void queryClient.invalidateQueries({ queryKey: ["reports"] });
+      toast({ title: "操作成功", description: "报告状态已更新", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -135,6 +144,10 @@ export function useUploadReport(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["report", id] });
       void queryClient.invalidateQueries({ queryKey: ["report-versions", id] });
+      toast({ title: "上传成功", description: "报告已上传", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "上传失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -176,6 +189,10 @@ export function useActivateVersion(reportId: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["report-versions", reportId] });
       void queryClient.invalidateQueries({ queryKey: ["report", reportId] });
+      toast({ title: "激活成功", description: "版本已激活", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "激活失败", description: error.message, variant: "destructive" });
     },
   });
 }

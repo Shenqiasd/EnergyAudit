@@ -1,13 +1,17 @@
 "use client";
 
 import { use, useState } from "react";
-import { ArrowLeft, CheckCircle, XCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PageLoading } from "@/components/ui/loading";
+import { DetailHeader } from "@/components/detail/detail-header";
+import { InfoGrid } from "@/components/detail/info-grid";
+import { Timeline } from "@/components/detail/timeline";
+import type { TimelineItem } from "@/components/detail/timeline";
 import { useEnterprise, useUpdateAdmission } from "@/lib/api/hooks/use-enterprises";
 
 const STATUS_MAP: Record<string, { label: string; variant: "warning" | "success" | "danger" | "default" }> = {
@@ -18,11 +22,6 @@ const STATUS_MAP: Record<string, { label: string; variant: "warning" | "success"
   locked: { label: "已锁定", variant: "default" },
   expired: { label: "已过期", variant: "default" },
 };
-
-function StatusBadge({ status }: { status: string }) {
-  const config = STATUS_MAP[status] ?? { label: status, variant: "default" as const };
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-}
 
 export default function AdmissionReviewPage({
   params,
@@ -66,44 +65,47 @@ export default function AdmissionReviewPage({
     );
   };
 
+  const statusConfig = STATUS_MAP[enterprise.admissionStatus] ?? { label: enterprise.admissionStatus, variant: "default" as const };
+
+  const historyItems: TimelineItem[] = [
+    {
+      id: "created",
+      title: "提交准入申请",
+      description: enterprise.name,
+      timestamp: new Date(enterprise.createdAt).toLocaleString("zh-CN"),
+      type: "default",
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <a href={`/manager/enterprises/${id}`}>
-          <Button variant="ghost" size="sm">
-            <ArrowLeft size={16} />
-            返回详情
-          </Button>
-        </a>
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">准入审核</h1>
-          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            审核企业 {enterprise.name} 的准入申请
-          </p>
-        </div>
-      </div>
+      <DetailHeader
+        icon={<Building2 size={20} />}
+        title="准入审核"
+        subtitle={`审核企业 ${enterprise.name} 的准入申请`}
+        badges={<Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>}
+        backHref={`/manager/enterprises/${id}`}
+        backLabel="返回详情"
+      />
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <Clock size={18} />
-              申请详情
-            </span>
-          </CardTitle>
-          <StatusBadge status={enterprise.admissionStatus} />
+          <CardTitle>申请详情</CardTitle>
         </CardHeader>
-        <div className="space-y-3">
-          <InfoRow label="企业名称" value={enterprise.name} />
-          <InfoRow label="统一社会信用代码" value={enterprise.unifiedSocialCreditCode} />
-          <InfoRow label="行业分类" value={enterprise.industryCode ?? "-"} />
-          <InfoRow label="联系人" value={enterprise.contactPerson ?? "-"} />
-          <InfoRow label="联系电话" value={enterprise.contactPhone ?? "-"} />
-          <InfoRow label="联系邮箱" value={enterprise.contactEmail ?? "-"} />
-          <InfoRow label="地址" value={enterprise.address ?? "-"} />
-          <InfoRow label="备注" value={enterprise.notes ?? "-"} />
-          <InfoRow label="申请时间" value={new Date(enterprise.createdAt).toLocaleString("zh-CN")} />
-        </div>
+        <InfoGrid
+          columns={2}
+          items={[
+            { label: "企业名称", value: enterprise.name },
+            { label: "统一社会信用代码", value: enterprise.unifiedSocialCreditCode },
+            { label: "行业分类", value: enterprise.industryCode ?? "-" },
+            { label: "联系人", value: enterprise.contactPerson ?? "-" },
+            { label: "联系电话", value: enterprise.contactPhone ?? "-" },
+            { label: "联系邮箱", value: enterprise.contactEmail ?? "-" },
+            { label: "地址", value: enterprise.address ?? "-", span: 2 },
+            { label: "备注", value: enterprise.notes ?? "-", span: 2 },
+            { label: "申请时间", value: new Date(enterprise.createdAt).toLocaleString("zh-CN") },
+          ]}
+        />
       </Card>
 
       {enterprise.admissionStatus === "pending_review" && (
@@ -123,6 +125,13 @@ export default function AdmissionReviewPage({
           </div>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>审核历史</CardTitle>
+        </CardHeader>
+        <Timeline items={historyItems} />
+      </Card>
 
       <Modal
         open={showConfirmApprove}
@@ -169,15 +178,6 @@ export default function AdmissionReviewPage({
           </div>
         </div>
       </Modal>
-    </div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start gap-4">
-      <span className="w-32 shrink-0 text-sm text-[hsl(var(--muted-foreground))]">{label}</span>
-      <span className="text-sm text-[hsl(var(--foreground))]">{value}</span>
     </div>
   );
 }

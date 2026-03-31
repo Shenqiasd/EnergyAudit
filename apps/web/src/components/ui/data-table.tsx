@@ -15,7 +15,17 @@ import {
 import { cn } from "@/lib/utils";
 import { ArrowUpDown, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { EmptyState } from "./empty-state";
+
+const rowVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.25, ease: "easeOut" as const },
+  }),
+};
 
 interface FilterableColumn {
   id: string;
@@ -30,6 +40,7 @@ interface DataTableProps<TData, TValue> {
   searchPlaceholder?: string;
   filterableColumns?: FilterableColumn[];
   pageSize?: number;
+  hidePagination?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -39,6 +50,7 @@ export function DataTable<TData, TValue>({
   searchPlaceholder = "搜索...",
   filterableColumns,
   pageSize = 10,
+  hidePagination,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -149,8 +161,12 @@ export function DataTable<TData, TValue>({
             <tbody>
               {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row, index) => (
-                  <tr
+                  <motion.tr
                     key={row.id}
+                    custom={index}
+                    variants={rowVariants}
+                    initial="hidden"
+                    animate="visible"
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
                       "border-b border-[hsl(var(--border))] transition-colors hover:bg-[hsl(var(--muted))]/50 data-[state=selected]:bg-[hsl(var(--muted))]",
@@ -165,7 +181,7 @@ export function DataTable<TData, TValue>({
                         )}
                       </td>
                     ))}
-                  </tr>
+                  </motion.tr>
                 ))
               ) : (
                 <tr>
@@ -183,7 +199,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-2">
+      {!hidePagination && <div className="flex items-center justify-between px-2">
         <div className="text-sm text-[hsl(var(--muted-foreground))]">
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span>
@@ -214,7 +230,7 @@ export function DataTable<TData, TValue>({
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

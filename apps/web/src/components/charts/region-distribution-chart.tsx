@@ -47,13 +47,13 @@ export function RegionDistributionChart({
           return (
             <div
               key={i}
-              className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 rounded p-1 transition-colors"
+              className="flex items-center gap-3 cursor-pointer hover:bg-[hsl(var(--muted))] rounded p-1 transition-colors"
               onClick={() => onClick?.(d.regionCode)}
             >
               <span className="w-20 truncate text-sm text-[hsl(var(--foreground))]">
                 {d.regionName}
               </span>
-              <div className="flex-1 h-6 rounded bg-gray-100 relative">
+              <div className="flex-1 h-6 rounded bg-[hsl(var(--muted))] relative">
                 <div
                   className="h-full rounded transition-all duration-300"
                   style={{

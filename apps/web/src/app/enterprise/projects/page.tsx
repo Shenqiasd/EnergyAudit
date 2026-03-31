@@ -2,18 +2,12 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageLoading } from "@/components/ui/loading";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { FileText } from "lucide-react";
-import { useAuditProjects } from "@/lib/api/hooks/use-audit-projects";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { PageHeader } from "@/components/layout/page-header";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
+import { AlertTriangle, ClipboardCheck } from "lucide-react";
+import { useAuditProjects, type AuditProject } from "@/lib/api/hooks/use-audit-projects";
 import { useRouter } from "next/navigation";
 
 const STATUS_LABELS: Record<string, string> = {
@@ -55,77 +49,77 @@ export default function EnterpriseProjectsPage() {
     return new Date(dateStr).toLocaleDateString("zh-CN");
   };
 
+  const items = data?.items ?? [];
+
+  const columns: ColumnDef<AuditProject, unknown>[] = [
+    {
+      accessorKey: "batchName",
+      header: "批次",
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.batchName ?? "-"}</span>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "状态",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1.5">
+          <Badge variant={STATUS_VARIANTS[row.original.status] ?? "default"}>
+            {STATUS_LABELS[row.original.status] ?? row.original.status}
+          </Badge>
+          {row.original.isOverdue && (
+            <Badge variant="danger">
+              <AlertTriangle size={12} className="mr-0.5" />
+              已逾期
+            </Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "deadline",
+      header: "截止日期",
+      cell: ({ row }) => formatDate(row.original.deadline),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "创建日期",
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: "actions",
+      header: "操作",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => router.push(`/enterprise/projects/${row.original.id}`)}
+        >
+          查看详情
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">我的项目</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          查看分配给本企业的审计项目
-        </p>
-      </div>
+      <PageHeader
+        title="我的审计项目"
+        description="查看分配给本企业的审计项目"
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <FileText size={20} />
-              项目列表
-            </span>
-          </CardTitle>
-        </CardHeader>
-
-        {isLoading ? (
-          <PageLoading />
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>批次</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>截止日期</TableHead>
-                <TableHead>逾期</TableHead>
-                <TableHead>操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.items.map((proj) => (
-                <TableRow key={proj.id}>
-                  <TableCell className="font-medium">{proj.batchName ?? "-"}</TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_VARIANTS[proj.status] ?? "default"}>
-                      {STATUS_LABELS[proj.status] ?? proj.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(proj.deadline)}</TableCell>
-                  <TableCell>
-                    {proj.isOverdue ? (
-                      <Badge variant="danger">已逾期</Badge>
-                    ) : (
-                      <span className="text-[hsl(var(--muted-foreground))]">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => router.push(`/enterprise/projects/${proj.id}`)}
-                    >
-                      查看详情
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {(!data?.items || data.items.length === 0) && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-[hsl(var(--muted-foreground))]">
-                    暂无项目
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+      {isLoading ? (
+        <ListPageSkeleton rows={5} />
+      ) : items.length === 0 ? (
+        <EmptyState
+          icon={<ClipboardCheck className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无审计项目"
+          description="企业准入后将分配项目"
+        />
+      ) : (
+        <DataTable columns={columns} data={items} />
+      )}
     </div>
   );
 }

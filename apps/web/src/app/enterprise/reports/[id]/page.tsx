@@ -4,14 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoading } from "@/components/ui/loading";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { DetailHeader } from "@/components/detail/detail-header";
+import { InfoGrid } from "@/components/detail/info-grid";
 import { EnergyBarChart } from "@/components/charts/energy-bar-chart";
 import { EnergyPieChart } from "@/components/charts/energy-pie-chart";
 import { SankeyDiagram } from "@/components/charts/sankey-diagram";
 import { ReportVersionHistory } from "@/components/report-version-history";
 import { useReport } from "@/lib/api/hooks/use-reports";
 import { useChartData } from "@/lib/api/hooks/use-charts";
-import { ChevronLeft, Download, FileText, Upload } from "lucide-react";
-import Link from "next/link";
+import { Download, FileText, Upload } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
@@ -97,95 +99,120 @@ export default function EnterpriseReportDetailPage() {
 
   const canUpload = report.status === "enterprise_revision" || report.status === "pending_final";
 
+  const actionButtons = (
+    <div className="flex gap-2">
+      <Button variant="secondary" size="sm">
+        <Download size={16} />
+        下载
+      </Button>
+      {canUpload && (
+        <Button size="sm">
+          <Upload size={16} />
+          上传修订版
+        </Button>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/enterprise/reports">
-          <Button variant="ghost" size="sm">
-            <ChevronLeft size={16} />
-            返回
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
-            审计报告
-          </h1>
-          <div className="mt-1 flex items-center gap-3">
-            <Badge variant={STATUS_VARIANTS[report.status] ?? "default"}>
-              {STATUS_LABELS[report.status] ?? report.status}
-            </Badge>
-            <span className="text-sm text-[hsl(var(--muted-foreground))]">
-              版本 v{report.version}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="secondary" size="sm">
-            <Download size={16} />
-            下载
-          </Button>
-          {canUpload && (
-            <Button size="sm">
-              <Upload size={16} />
-              上传修订版
-            </Button>
-          )}
-        </div>
-      </div>
+      <DetailHeader
+        icon={<FileText size={20} />}
+        title="审计报告"
+        subtitle={`版本 v${report.version}`}
+        badges={
+          <Badge variant={STATUS_VARIANTS[report.status] ?? "default"}>
+            {STATUS_LABELS[report.status] ?? report.status}
+          </Badge>
+        }
+        metadata={[
+          { label: "状态", value: STATUS_LABELS[report.status] ?? report.status },
+          { label: "版本", value: `v${report.version}` },
+        ]}
+        actions={actionButtons}
+        backHref="/enterprise/reports"
+        backLabel="返回列表"
+      />
 
-      <div className="flex gap-6">
-        {/* Section navigation sidebar */}
-        <div className="w-48 shrink-0 space-y-1">
-          {report.sections.map((section) => (
-            <button
-              key={section.sectionCode}
-              onClick={() => setActiveSection(section.sectionCode)}
-              className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                (activeSection ?? report.sections[0]?.sectionCode) === section.sectionCode
-                  ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] font-medium"
-                  : "text-[hsl(var(--muted-foreground))] hover:bg-gray-50"
-              }`}
-            >
-              {section.sectionName}
-            </button>
-          ))}
-        </div>
+      <Tabs defaultValue="content">
+        <TabsList>
+          <TabsTrigger value="content">报告概要</TabsTrigger>
+          <TabsTrigger value="versions">版本历史</TabsTrigger>
+          <TabsTrigger value="benchmark">能效对标</TabsTrigger>
+        </TabsList>
 
-        {/* Section content */}
-        <div className="flex-1 space-y-4">
-          {currentSection && (
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <span className="flex items-center gap-2">
-                    <FileText size={18} />
-                    {currentSection.sectionName}
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <div className="whitespace-pre-wrap text-sm text-[hsl(var(--foreground))]">
-                {currentSection.content ?? "暂无内容"}
-              </div>
+        <TabsContent value="content">
+          <div className="flex flex-col gap-6 md:flex-row">
+            {/* Section navigation sidebar */}
+            <div className="flex gap-1 overflow-x-auto md:w-48 md:shrink-0 md:flex-col md:gap-0 md:space-y-1 md:overflow-x-visible">
+              {report.sections.map((section) => (
+                <button
+                  key={section.sectionCode}
+                  onClick={() => setActiveSection(section.sectionCode)}
+                  className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                    (activeSection ?? report.sections[0]?.sectionCode) === section.sectionCode
+                      ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] font-medium"
+                      : "text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))]"
+                  }`}
+                >
+                  {section.sectionName}
+                </button>
+              ))}
+            </div>
 
-              {/* Embedded charts */}
-              {currentSection.charts && currentSection.charts.length > 0 && (
-                <div className="mt-6 space-y-4">
-                  {currentSection.charts.map((chart) => (
-                    <SectionChartRenderer
-                      key={chart.chartCode}
-                      chart={chart}
-                      projectId={report.auditProjectId}
-                    />
-                  ))}
-                </div>
+            {/* Section content */}
+            <div className="flex-1 space-y-4">
+              {currentSection && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      <span className="flex items-center gap-2">
+                        <FileText size={18} />
+                        {currentSection.sectionName}
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <div className="whitespace-pre-wrap text-sm text-[hsl(var(--foreground))]">
+                    {currentSection.content ?? "暂无内容"}
+                  </div>
+
+                  {/* Embedded charts */}
+                  {currentSection.charts && currentSection.charts.length > 0 && (
+                    <div className="mt-6 space-y-4">
+                      {currentSection.charts.map((chart) => (
+                        <SectionChartRenderer
+                          key={chart.chartCode}
+                          chart={chart}
+                          projectId={report.auditProjectId}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </Card>
               )}
-            </Card>
-          )}
+            </div>
+          </div>
+        </TabsContent>
 
-          {/* Version history with comparison and activation */}
+        <TabsContent value="versions">
           <ReportVersionHistory reportId={reportId} />
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="benchmark">
+          <Card>
+            <CardHeader>
+              <CardTitle>能效对标</CardTitle>
+            </CardHeader>
+            <InfoGrid
+              columns={2}
+              items={[
+                { label: "报告状态", value: STATUS_LABELS[report.status] ?? report.status },
+                { label: "当前版本", value: `v${report.version}` },
+              ]}
+            />
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

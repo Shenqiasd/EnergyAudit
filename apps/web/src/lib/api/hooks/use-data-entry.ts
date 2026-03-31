@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface DataModule {
   id: string;
@@ -174,6 +175,10 @@ export function useCreateRecord() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["data-records"] });
       void queryClient.invalidateQueries({ queryKey: ["data-modules"] });
+      toast({ title: "创建成功", description: "填报记录已创建", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "创建失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -186,6 +191,10 @@ export function useSaveRecord(id: string) {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
       void queryClient.invalidateQueries({ queryKey: ["data-records"] });
+      toast({ title: "保存成功", description: "数据已保存", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "保存失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -199,6 +208,10 @@ export function useSubmitRecord(id: string) {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
       void queryClient.invalidateQueries({ queryKey: ["data-records"] });
       void queryClient.invalidateQueries({ queryKey: ["data-modules"] });
+      toast({ title: "提交成功", description: "数据已提交审核", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "提交失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -212,6 +225,10 @@ export function useReturnRecord(id: string) {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
       void queryClient.invalidateQueries({ queryKey: ["data-records"] });
       void queryClient.invalidateQueries({ queryKey: ["data-modules"] });
+      toast({ title: "退回成功", description: "记录已退回", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "退回失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -223,6 +240,10 @@ export function useAcquireLock(id: string) {
       apiClient.post<LockInfo>(`/data-entry/records/${id}/lock`, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
+      toast({ title: "已获取编辑权", variant: "default" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "获取编辑权失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -236,6 +257,9 @@ export function useReleaseLock(id: string) {
       ),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["data-record", id] });
+    },
+    onError: (error: Error) => {
+      toast({ title: "释放编辑权失败", description: error.message, variant: "destructive" });
     },
   });
 }

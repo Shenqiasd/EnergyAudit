@@ -1,23 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PageLoading } from "@/components/ui/loading";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Select } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { PageHeader } from "@/components/layout/page-header";
+import { FilterBar } from "@/components/list/filter-bar";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import { AlertTriangle, Layers, Plus } from "lucide-react";
 import { useAuditBatches, useCreateBatch } from "@/lib/api/hooks/use-audit-batches";
+import type { AuditBatch } from "@/lib/api/hooks/use-audit-batches";
 import { useBusinessTypes } from "@/lib/api/hooks/use-business-types";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -42,8 +38,9 @@ const businessTypeLabels: Record<string, string> = {
 
 export default function ManagerBatchesPage() {
   const router = useRouter();
-  const [yearFilter, setYearFilter] = useState<number | undefined>();
-  const [businessTypeFilter, setBusinessTypeFilter] = useState<string | undefined>();
+  const [searchName, setSearchName] = useState("");
+  const [yearFilter, setYearFilter] = useState<string>("");
+  const [businessTypeFilter, setBusinessTypeFilter] = useState<string>("");
   const [showCreate, setShowCreate] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -55,7 +52,10 @@ export default function ManagerBatchesPage() {
     businessType: "energy_audit",
   });
 
-  const { data, isLoading } = useAuditBatches({ year: yearFilter, businessType: businessTypeFilter });
+  const { data, isLoading } = useAuditBatches({
+    year: yearFilter ? Number(yearFilter) : undefined,
+    businessType: businessTypeFilter || undefined,
+  });
   const { data: businessTypes } = useBusinessTypes();
   const createBatch = useCreateBatch();
   const queryClient = useQueryClient();
@@ -80,138 +80,154 @@ export default function ManagerBatchesPage() {
     setFormData({ name: "", year: currentYear, description: "", filingDeadline: "", reviewDeadline: "", businessType: "energy_audit" });
   };
 
-  const handleClose = async (id: string) => {
-    await closeBatch.mutateAsync(id);
-  };
-
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "-";
     return new Date(dateStr).toLocaleDateString("zh-CN");
   };
 
+  const filteredItems = useMemo(() => {
+    const items = data?.items ?? [];
+    if (!searchName) return items;
+    return items.filter((b) => b.name.toLowerCase().includes(searchName.toLowerCase()));
+  }, [data, searchName]);
+
+  const columns: ColumnDef<AuditBatch, unknown>[] = [
+    {
+      accessorKey: "name",
+      header: "批次名称",
+      cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+    },
+    {
+      accessorKey: "businessType",
+      header: "业务类型",
+      cell: ({ row }) => (
+        <Badge variant="primary">
+          {businessTypeLabels[row.original.businessType ?? "energy_audit"] ?? row.original.businessType ?? "能源审计"}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "year",
+      header: "年度",
+    },
+    {
+      accessorKey: "status",
+      header: "状态",
+      cell: ({ row }) => {
+        const info = statusMap[row.original.status] ?? { label: row.original.status, variant: "default" as const };
+        return (
+          <div className="flex items-center gap-1.5">
+            <Badge variant={info.variant}>{info.label}</Badge>
+            {row.original.isOverdue && (
+              <Badge variant="danger">
+                <AlertTriangle size={12} className="mr-0.5" />
+                超期
+              </Badge>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "projectCount",
+      header: "项目数",
+      cell: ({ row }) => row.original.projectCount ?? 0,
+    },
+    {
+      accessorKey: "filingDeadline",
+      header: "填报截止",
+      cell: ({ row }) => formatDate(row.original.filingDeadline),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "创建日期",
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: "actions",
+      header: "操作",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => router.push(`/manager/batches/${row.original.id}`)}
+          >
+            查看详情
+          </Button>
+          {row.original.status !== "closed" && (
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => closeBatch.mutate(row.original.id)}
+            >
+              关闭批次
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">批次管理</h1>
-          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            创建和管理审计批次，分配企业到批次
-          </p>
-        </div>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus size={16} />
-          新建批次
-        </Button>
-      </div>
+      <PageHeader
+        title="批次管理"
+        description="管理审计批次和周期"
+        actions={
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus size={16} />
+            新建批次
+          </Button>
+        }
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <Layers size={20} />
-              批次列表
-            </span>
-          </CardTitle>
-          <div className="flex items-center gap-3">
-            <div className="w-48">
-              <Select
-                options={[{ value: "", label: "全部年度" }, ...yearOptions]}
-                value={yearFilter ? String(yearFilter) : ""}
-                onChange={(e) => setYearFilter(e.target.value ? Number(e.target.value) : undefined)}
-              />
-            </div>
-            <div className="w-48">
-              <Select
-                options={[
-                  { value: "", label: "全部业务类型" },
-                  ...(businessTypes?.map((bt) => ({ value: bt.businessType, label: bt.label })) ?? [
-                    { value: "energy_audit", label: "能源审计" },
-                    { value: "energy_diagnosis", label: "节能诊断" },
-                  ]),
-                ]}
-                value={businessTypeFilter ?? ""}
-                onChange={(e) => setBusinessTypeFilter(e.target.value || undefined)}
-              />
-            </div>
-          </div>
-        </CardHeader>
+      <FilterBar
+        searchValue={searchName}
+        onSearchChange={setSearchName}
+        searchPlaceholder="搜索批次名称..."
+        filters={[
+          {
+            key: "year",
+            label: "年度",
+            options: [{ value: "", label: "全部年度" }, ...yearOptions],
+            value: yearFilter,
+            onChange: setYearFilter,
+          },
+          {
+            key: "businessType",
+            label: "业务类型",
+            options: [
+              { value: "", label: "全部类型" },
+              ...(businessTypes?.map((bt) => ({ value: bt.businessType, label: bt.label })) ?? [
+                { value: "energy_audit", label: "能源审计" },
+                { value: "energy_diagnosis", label: "节能诊断" },
+              ]),
+            ],
+            value: businessTypeFilter,
+            onChange: setBusinessTypeFilter,
+          },
+        ]}
+      />
 
-        {isLoading ? (
-          <PageLoading />
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>批次名称</TableHead>
-                <TableHead>业务类型</TableHead>
-                <TableHead>年度</TableHead>
-                <TableHead>填报截止日期</TableHead>
-                <TableHead>审核截止日期</TableHead>
-                <TableHead>项目数</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.items.map((batch) => {
-                const statusInfo = statusMap[batch.status] ?? { label: batch.status, variant: "default" as const };
-                return (
-                  <TableRow key={batch.id}>
-                    <TableCell className="font-medium">{batch.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="primary">
-                        {businessTypeLabels[batch.businessType ?? "energy_audit"] ?? batch.businessType ?? "能源审计"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{batch.year}</TableCell>
-                    <TableCell>{formatDate(batch.filingDeadline)}</TableCell>
-                    <TableCell>{formatDate(batch.reviewDeadline)}</TableCell>
-                    <TableCell>{batch.projectCount ?? 0}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5">
-                        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
-                        {batch.isOverdue && (
-                          <Badge variant="danger">
-                            <AlertTriangle size={12} className="mr-0.5" />
-                            超期
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => router.push(`/manager/batches/${batch.id}`)}
-                        >
-                          查看详情
-                        </Button>
-                        {batch.status !== "closed" && (
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => handleClose(batch.id)}
-                          >
-                            关闭批次
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {(!data?.items || data.items.length === 0) && (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center text-[hsl(var(--muted-foreground))]">
-                    暂无批次数据
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+      {isLoading ? (
+        <ListPageSkeleton rows={5} showFilterSkeleton={false} />
+      ) : filteredItems.length === 0 ? (
+        <EmptyState
+          icon={<Layers className="h-8 w-8 text-[hsl(var(--muted-foreground))]" />}
+          title="暂无批次"
+          description="创建第一个审计批次开始工作"
+          action={
+            <Button onClick={() => setShowCreate(true)}>
+              <Plus size={16} />
+              新建批次
+            </Button>
+          }
+        />
+      ) : (
+        <DataTable columns={columns} data={filteredItems} />
+      )}
 
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="新建批次">
         <div className="space-y-4">

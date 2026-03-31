@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../client";
+import { toast } from "@/lib/hooks/use-toast";
 
 interface Notification {
   id: string;
@@ -68,6 +69,9 @@ export function useMarkAsRead() {
         queryKey: ["notifications-unread-count"],
       });
     },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
+    },
   });
 }
 
@@ -81,6 +85,10 @@ export function useMarkAllAsRead() {
       void queryClient.invalidateQueries({
         queryKey: ["notifications-unread-count"],
       });
+      toast({ title: "已全部标记为已读", variant: "default" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "操作失败", description: error.message, variant: "destructive" });
     },
   });
 }
@@ -95,6 +103,10 @@ export function useDeleteNotification() {
       void queryClient.invalidateQueries({
         queryKey: ["notifications-unread-count"],
       });
+      toast({ title: "删除成功", description: "通知已删除", variant: "success" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "删除失败", description: error.message, variant: "destructive" });
     },
   });
 }
