@@ -12,6 +12,7 @@
     "migrate": "tsx src/db/migrate.ts"
   },
   "dependencies": {
+    "@energy-audit/config-engine": "workspace:*",
     "@energy-audit/integrations": "workspace:*",
     "@energy-audit/reporting": "workspace:^",
     "@nestjs/common": "^11.1.17",

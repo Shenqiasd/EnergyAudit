@@ -2,7 +2,7 @@
   "name": "energy-audit-platform",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.17.1",
+  "packageManager": "pnpm@10.26.1",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -10,6 +10,9 @@
     "test": "vitest run",
     "type-check": "turbo run type-check",
     "seed:sample": "pnpm --filter @energy-audit/api exec tsx ../../scripts/seed-sample-data.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@nestjs/core", "bcrypt", "esbuild", "sharp"]
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
