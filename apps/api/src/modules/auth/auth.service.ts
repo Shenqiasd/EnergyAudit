@@ -9,12 +9,12 @@ import * as schema from '../../db/schema';
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 
-interface TokenPayload {
+export interface TokenPayload {
   accessToken: string;
   refreshToken: string;
 }
 
-interface AuthUser {
+export interface AuthUser {
   id: string;
   email: string;
   name: string;

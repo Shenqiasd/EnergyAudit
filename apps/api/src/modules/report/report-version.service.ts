@@ -14,7 +14,7 @@ interface SectionSnapshot {
   charts: unknown;
 }
 
-interface VersionDiff {
+export interface VersionDiff {
   sectionCode: string;
   sectionName: string;
   v1Content: string | null;

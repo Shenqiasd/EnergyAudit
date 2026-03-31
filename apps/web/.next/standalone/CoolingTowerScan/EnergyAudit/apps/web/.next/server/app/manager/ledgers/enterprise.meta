@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/manager/layout,_N_T_/manager/ledgers/layout,_N_T_/manager/ledgers/enterprise/layout,_N_T_/manager/ledgers/enterprise/page,_N_T_/manager/ledgers/enterprise"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/manager/ledgers/enterprise/__PAGE__",
+    "/manager/ledgers/enterprise",
+    "/manager/ledgers",
+    "/manager",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -102,7 +102,14 @@ export class DataValidationService {
 
     // Execute validation rules by layer
     for (const rule of activeRules) {
-      const error = this.executeRule(rule, values);
+      const error = this.executeRule({
+        ruleCode: rule.ruleCode,
+        layer: rule.layer,
+        severity: rule.severity,
+        expression: rule.expression,
+        message: rule.message,
+        fieldCodes: Array.isArray(rule.fieldCodes) ? rule.fieldCodes.join(',') : null,
+      }, values);
       if (error) {
         allErrors.push(error);
       }

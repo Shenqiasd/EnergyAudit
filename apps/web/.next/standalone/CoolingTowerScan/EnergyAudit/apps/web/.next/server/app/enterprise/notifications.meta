@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/enterprise/layout,_N_T_/enterprise/notifications/layout,_N_T_/enterprise/notifications/page,_N_T_/enterprise/notifications"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/enterprise/notifications/__PAGE__",
+    "/enterprise/notifications",
+    "/enterprise",
+    "/_index",
+    "/_head"
+  ]
+}

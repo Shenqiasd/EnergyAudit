@@ -18,7 +18,7 @@ export interface ValidationRule {
   severity: ValidationSeverity;
   expression: string;
   message: string;
-  fieldCodes?: string[];
+  fieldCodes?: string[] | null;
   isActive: boolean;
 }
 
@@ -27,7 +27,7 @@ export interface ValidationError {
   layer: ValidationLayer;
   severity: ValidationSeverity;
   message: string;
-  fieldCodes?: string[];
+  fieldCodes?: string[] | null;
 }
 
 export interface ValidationResult {

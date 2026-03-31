@@ -1,0 +1,13 @@
+var R=require("../../../chunks/ssr/[turbopack]_runtime.js")("server/app/(manager)/carbon-factors/page.js")
+R.c("server/chunks/ssr/[root-of-the-server]__12l6b1y._.js")
+R.c("server/chunks/ssr/0z-d_next_dist_esm_build_templates_app-page_0jq4767.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0ceq0jc._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0dvf952._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__0tjj0fa._.js")
+R.c("server/chunks/ssr/0z-d_next_dist_client_components_07vu1r8._.js")
+R.c("server/chunks/ssr/0z-d_next_dist_client_components_builtin_forbidden_0-b-zmk.js")
+R.c("server/chunks/ssr/0z-d_next_dist_client_components_builtin_unauthorized_0iuy5jy.js")
+R.c("server/chunks/ssr/0z-d_next_dist_client_components_builtin_global-error_0r88zuy.js")
+R.c("server/chunks/ssr/0bgd_web__next-internal_server_app_(manager)_carbon-factors_page_actions_11v2imv.js")
+R.m(4839)
+module.exports=R.m(4839).exports

@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/(enterprise)/layout,_N_T_/(enterprise)/config/layout,_N_T_/(enterprise)/config/energy/layout,_N_T_/(enterprise)/config/energy/page,_N_T_/config/energy"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/!KGVudGVycHJpc2Up/config/energy/__PAGE__",
+    "/!KGVudGVycHJpc2Up/config/energy",
+    "/!KGVudGVycHJpc2Up/config",
+    "/!KGVudGVycHJpc2Up",
+    "/_index",
+    "/_head"
+  ]
+}
