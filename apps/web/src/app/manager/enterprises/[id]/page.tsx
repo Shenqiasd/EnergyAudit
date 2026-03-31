@@ -1,11 +1,16 @@
 "use client";
 
 import { use } from "react";
-import { ArrowLeft, Building2, RefreshCw, Users, Clock, Link2 } from "lucide-react";
+import { Building2, RefreshCw, Users, Clock, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoading } from "@/components/ui/loading";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { DetailHeader } from "@/components/detail/detail-header";
+import { InfoGrid } from "@/components/detail/info-grid";
+import { Timeline } from "@/components/detail/timeline";
+import type { TimelineItem } from "@/components/detail/timeline";
 import { useEnterprise, useSyncEnterprise, useUpdateAdmission } from "@/lib/api/hooks/use-enterprises";
 
 const STATUS_MAP: Record<string, { label: string; variant: "warning" | "success" | "danger" | "default" }> = {
@@ -23,11 +28,6 @@ const SYNC_STATUS_MAP: Record<string, { label: string; color: string }> = {
   failed: { label: "同步失败", color: "bg-red-500" },
   degraded: { label: "降级模式", color: "bg-gray-500" },
 };
-
-function StatusBadge({ status }: { status: string }) {
-  const config = STATUS_MAP[status] ?? { label: status, variant: "default" as const };
-  return <Badge variant={config.variant}>{config.label}</Badge>;
-}
 
 function SyncStatusIndicator({ status }: { status: string }) {
   const config = SYNC_STATUS_MAP[status] ?? { label: status, color: "bg-gray-400" };
@@ -66,85 +66,89 @@ export default function EnterpriseDetailPage({
     mutations[action]?.mutate({ operatedBy });
   };
 
+  const statusConfig = STATUS_MAP[enterprise.admissionStatus] ?? { label: enterprise.admissionStatus, variant: "default" as const };
+
+  const actionButtons = (
+    <div className="flex flex-wrap gap-2">
+      {enterprise.admissionStatus === "pending_review" && (
+        <>
+          <Button size="sm" onClick={() => handleAction("approve")} disabled={approveMutation.isPending}>
+            审核通过
+          </Button>
+          <Button size="sm" variant="danger" onClick={() => handleAction("reject")} disabled={rejectMutation.isPending}>
+            驳回
+          </Button>
+        </>
+      )}
+      {enterprise.admissionStatus === "approved" && (
+        <Button size="sm" variant="secondary" onClick={() => handleAction("suspend")} disabled={suspendMutation.isPending}>
+          停用
+        </Button>
+      )}
+      {enterprise.admissionStatus === "suspended" && (
+        <Button size="sm" onClick={() => handleAction("restore")} disabled={restoreMutation.isPending}>
+          恢复
+        </Button>
+      )}
+    </div>
+  );
+
+  const auditLogItems: TimelineItem[] = [
+    {
+      id: "created",
+      title: "企业创建",
+      description: "创建于系统",
+      timestamp: new Date(enterprise.createdAt).toLocaleString("zh-CN"),
+      type: "success",
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <a href="/manager/enterprises">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft size={16} />
-            返回列表
-          </Button>
-        </a>
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">{enterprise.name}</h1>
-          <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-            {enterprise.unifiedSocialCreditCode}
-          </p>
-        </div>
-      </div>
+      <DetailHeader
+        icon={<Building2 size={20} />}
+        title={enterprise.name}
+        subtitle={enterprise.unifiedSocialCreditCode}
+        badges={<Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>}
+        metadata={[
+          { label: "行业", value: enterprise.industryCode ?? "-" },
+          { label: "联系人", value: enterprise.contactPerson ?? "-" },
+        ]}
+        actions={actionButtons}
+        backHref="/manager/enterprises"
+        backLabel="返回列表"
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <span className="flex items-center gap-2">
-                <Building2 size={18} />
-                基本信息
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <div className="space-y-3">
-            <InfoRow label="企业名称" value={enterprise.name} />
-            <InfoRow label="统一社会信用代码" value={enterprise.unifiedSocialCreditCode} />
-            <InfoRow label="行业分类" value={enterprise.industryCode ?? "-"} />
-            <InfoRow label="联系人" value={enterprise.contactPerson ?? "-"} />
-            <InfoRow label="联系电话" value={enterprise.contactPhone ?? "-"} />
-            <InfoRow label="联系邮箱" value={enterprise.contactEmail ?? "-"} />
-            <InfoRow label="地址" value={enterprise.address ?? "-"} />
-            <InfoRow label="备注" value={enterprise.notes ?? "-"} />
-          </div>
-        </Card>
+      <Tabs defaultValue="basic">
+        <TabsList>
+          <TabsTrigger value="basic">基本信息</TabsTrigger>
+          <TabsTrigger value="bindings">外部绑定</TabsTrigger>
+          <TabsTrigger value="users">用户账户</TabsTrigger>
+          <TabsTrigger value="logs">操作日志</TabsTrigger>
+        </TabsList>
 
-        <div className="space-y-6">
+        <TabsContent value="basic">
           <Card>
             <CardHeader>
-              <CardTitle>
-                <span className="flex items-center gap-2">
-                  <Clock size={18} />
-                  准入状态
-                </span>
-              </CardTitle>
+              <CardTitle>基本信息</CardTitle>
             </CardHeader>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-[hsl(var(--muted-foreground))]">当前状态：</span>
-                <StatusBadge status={enterprise.admissionStatus} />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {enterprise.admissionStatus === "pending_review" && (
-                  <>
-                    <Button size="sm" onClick={() => handleAction("approve")} disabled={approveMutation.isPending}>
-                      审核通过
-                    </Button>
-                    <Button size="sm" variant="danger" onClick={() => handleAction("reject")} disabled={rejectMutation.isPending}>
-                      驳回
-                    </Button>
-                  </>
-                )}
-                {enterprise.admissionStatus === "approved" && (
-                  <Button size="sm" variant="secondary" onClick={() => handleAction("suspend")} disabled={suspendMutation.isPending}>
-                    停用
-                  </Button>
-                )}
-                {enterprise.admissionStatus === "suspended" && (
-                  <Button size="sm" onClick={() => handleAction("restore")} disabled={restoreMutation.isPending}>
-                    恢复
-                  </Button>
-                )}
-              </div>
-            </div>
+            <InfoGrid
+              columns={2}
+              items={[
+                { label: "企业名称", value: enterprise.name },
+                { label: "统一社会信用代码", value: enterprise.unifiedSocialCreditCode },
+                { label: "行业分类", value: enterprise.industryCode ?? "-" },
+                { label: "联系人", value: enterprise.contactPerson ?? "-" },
+                { label: "联系电话", value: enterprise.contactPhone ?? "-" },
+                { label: "联系邮箱", value: enterprise.contactEmail ?? "-" },
+                { label: "地址", value: enterprise.address ?? "-", span: 2 },
+                { label: "备注", value: enterprise.notes ?? "-", span: 2 },
+              ]}
+            />
           </Card>
+        </TabsContent>
 
+        <TabsContent value="bindings">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -181,7 +185,9 @@ export default function EnterpriseDetailPage({
               <p className="text-sm text-[hsl(var(--muted-foreground))]">暂未绑定外部系统</p>
             )}
           </Card>
+        </TabsContent>
 
+        <TabsContent value="users">
           <Card>
             <CardHeader>
               <CardTitle>
@@ -197,17 +203,22 @@ export default function EnterpriseDetailPage({
               </a>
             </p>
           </Card>
-        </div>
-      </div>
-    </div>
-  );
-}
+        </TabsContent>
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-start gap-4">
-      <span className="w-32 shrink-0 text-sm text-[hsl(var(--muted-foreground))]">{label}</span>
-      <span className="text-sm text-[hsl(var(--foreground))]">{value}</span>
+        <TabsContent value="logs">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <span className="flex items-center gap-2">
+                  <Clock size={18} />
+                  操作日志
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <Timeline items={auditLogItems} />
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

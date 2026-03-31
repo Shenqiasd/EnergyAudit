@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle, RotateCcw, Send } from "lucide-react";
+import { useParams } from "next/navigation";
+import { CheckCircle, ClipboardCheck, Send } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Loading } from "@/components/ui/loading";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { DetailHeader } from "@/components/detail/detail-header";
 import {
   useReviewTask,
   useStartReview,
@@ -53,14 +55,10 @@ const SEVERITY_VARIANTS: Record<string, "default" | "primary" | "success" | "war
   critical: "danger",
 };
 
-type TabKey = "scores" | "issues" | "conclusion";
-
 export default function ReviewWorkbenchPage() {
   const params = useParams();
-  const router = useRouter();
   const taskId = params.id as string;
 
-  const [activeTab, setActiveTab] = useState<TabKey>("scores");
   const [conclusion, setConclusion] = useState("");
   const [scores, setScores] = useState<ScoreInput[]>(
     SCORE_CATEGORIES.map((c) => ({
@@ -103,205 +101,191 @@ export default function ReviewWorkbenchPage() {
 
   const totalScore = scores.reduce((sum, s) => sum + Number(s.score), 0);
 
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: "scores", label: "评分表" },
-    { key: "issues", label: "问题登记" },
-    { key: "conclusion", label: "审核结论" },
-  ];
+  const actionButtons = (
+    <div className="flex items-center gap-2">
+      {task.status === "assigned" && (
+        <Button onClick={() => startReview.mutate()}>
+          开始审核
+        </Button>
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="secondary" size="sm" onClick={() => router.push("/reviewer/tasks")}>
-          <ArrowLeft size={16} className="mr-1" />
-          返回
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审核工作台</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm text-[hsl(var(--muted-foreground))]">
-              项目: {task.auditProjectId}
-            </span>
-            <Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>
-          </div>
-        </div>
-      </div>
+      <DetailHeader
+        icon={<ClipboardCheck size={20} />}
+        title="审核工作台"
+        subtitle={`项目: ${task.auditProjectId}`}
+        badges={<Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>}
+        metadata={[
+          { label: "审核员", value: task.reviewerId ?? "未分配" },
+          { label: "总分", value: task.totalScore ?? "未评分" },
+        ]}
+        actions={actionButtons}
+        backHref="/reviewer/tasks"
+        backLabel="返回列表"
+      />
 
-      {task.status === "assigned" && (
-        <Card className="p-4">
-          <Button onClick={() => startReview.mutate()}>
-            开始审核
-          </Button>
-        </Card>
-      )}
+      <Tabs defaultValue="scores">
+        <TabsList>
+          <TabsTrigger value="scores">评分表</TabsTrigger>
+          <TabsTrigger value="issues">问题登记</TabsTrigger>
+          <TabsTrigger value="conclusion">审核结论</TabsTrigger>
+        </TabsList>
 
-      <div className="flex gap-2 border-b border-[hsl(var(--border))]">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === "scores" && (
-        <Card className="p-4 space-y-4">
-          <CardHeader className="p-0">
-            <CardTitle>审核评分</CardTitle>
-          </CardHeader>
-          <div className="space-y-4">
-            {scores.map((score, index) => (
-              <div key={score.category} className="grid grid-cols-[1fr_120px_1fr] gap-4 items-start">
-                <div>
-                  <label className="text-sm font-medium text-[hsl(var(--foreground))]">
-                    {score.category}
-                  </label>
-                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                    满分 {score.maxScore} 分
-                  </p>
-                </div>
-                <Input
-                  type="number"
-                  min="0"
-                  max={score.maxScore}
-                  value={score.score}
-                  onChange={(e) => handleScoreChange(index, e.target.value)}
-                  placeholder="分数"
-                />
-                <Input
-                  value={score.comment ?? ""}
-                  onChange={(e) => handleScoreCommentChange(index, e.target.value)}
-                  placeholder="评价说明"
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center justify-between pt-4 border-t border-[hsl(var(--border))]">
-            <span className="text-lg font-bold text-[hsl(var(--foreground))]">
-              总分: {totalScore} / 100
-            </span>
-            <Button
-              onClick={() => submitScores.mutate(scores)}
-              disabled={submitScores.isPending}
-            >
-              提交评分
-            </Button>
-          </div>
-          {scoresData && scoresData.scores.length > 0 && (
-            <div className="mt-4 p-3 bg-[hsl(var(--muted))] rounded">
-              <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                已保存评分 - 总分: {scoresData.totalScore} / {scoresData.totalMaxScore}，
-                平均分: {scoresData.averageScore.toFixed(1)}
-              </p>
-            </div>
-          )}
-        </Card>
-      )}
-
-      {activeTab === "issues" && (
-        <div className="space-y-4">
+        <TabsContent value="scores">
           <Card className="p-4 space-y-4">
             <CardHeader className="p-0">
-              <CardTitle>登记问题</CardTitle>
+              <CardTitle>审核评分</CardTitle>
             </CardHeader>
-            <div className="space-y-3">
-              <Input
-                value={newIssue.description}
-                onChange={(e) => setNewIssue({ ...newIssue, description: e.target.value })}
-                placeholder="问题描述"
-              />
-              <div className="flex gap-3">
-                <Select
-                  value={newIssue.severity}
-                  onChange={(e) => setNewIssue({ ...newIssue, severity: e.target.value })}
-                  options={[
-                    { value: "low", label: "低" },
-                    { value: "medium", label: "中" },
-                    { value: "high", label: "高" },
-                    { value: "critical", label: "严重" },
-                  ]}
-                />
-                <Input
-                  value={newIssue.suggestion}
-                  onChange={(e) => setNewIssue({ ...newIssue, suggestion: e.target.value })}
-                  placeholder="整改建议"
-                  className="flex-1"
-                />
-              </div>
+            <div className="space-y-4">
+              {scores.map((score, index) => (
+                <div key={score.category} className="grid grid-cols-[1fr_120px_1fr] gap-4 items-start">
+                  <div>
+                    <label className="text-sm font-medium text-[hsl(var(--foreground))]">
+                      {score.category}
+                    </label>
+                    <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                      满分 {score.maxScore} 分
+                    </p>
+                  </div>
+                  <Input
+                    type="number"
+                    min="0"
+                    max={score.maxScore}
+                    value={score.score}
+                    onChange={(e) => handleScoreChange(index, e.target.value)}
+                    placeholder="分数"
+                  />
+                  <Input
+                    value={score.comment ?? ""}
+                    onChange={(e) => handleScoreCommentChange(index, e.target.value)}
+                    placeholder="评价说明"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between pt-4 border-t border-[hsl(var(--border))]">
+              <span className="text-lg font-bold text-[hsl(var(--foreground))]">
+                总分: {totalScore} / 100
+              </span>
               <Button
-                onClick={() => {
-                  if (newIssue.description) {
-                    createIssue.mutate({
-                      description: newIssue.description,
-                      severity: newIssue.severity,
-                      suggestion: newIssue.suggestion || undefined,
-                      requiresRectification: true,
-                    });
-                    setNewIssue({ description: "", severity: "medium", suggestion: "" });
-                  }
-                }}
-                disabled={!newIssue.description || createIssue.isPending}
+                onClick={() => submitScores.mutate(scores)}
+                disabled={submitScores.isPending}
               >
-                添加问题
+                提交评分
               </Button>
             </div>
+            {scoresData && scoresData.scores.length > 0 && (
+              <div className="mt-4 p-3 bg-[hsl(var(--muted))] rounded">
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  已保存评分 - 总分: {scoresData.totalScore} / {scoresData.totalMaxScore}，
+                  平均分: {scoresData.averageScore.toFixed(1)}
+                </p>
+              </div>
+            )}
           </Card>
+        </TabsContent>
 
-          {issuesData && issuesData.length > 0 && (
-            <Card className="p-4 space-y-3">
+        <TabsContent value="issues">
+          <div className="space-y-4">
+            <Card className="p-4 space-y-4">
               <CardHeader className="p-0">
-                <CardTitle>已登记问题 ({issuesData.length})</CardTitle>
+                <CardTitle>登记问题</CardTitle>
               </CardHeader>
-              {issuesData.map((issue) => (
-                <IssueItem key={issue.id} issue={issue} />
-              ))}
+              <div className="space-y-3">
+                <Input
+                  value={newIssue.description}
+                  onChange={(e) => setNewIssue({ ...newIssue, description: e.target.value })}
+                  placeholder="问题描述"
+                />
+                <div className="flex gap-3">
+                  <Select
+                    value={newIssue.severity}
+                    onChange={(e) => setNewIssue({ ...newIssue, severity: e.target.value })}
+                    options={[
+                      { value: "low", label: "低" },
+                      { value: "medium", label: "中" },
+                      { value: "high", label: "高" },
+                      { value: "critical", label: "严重" },
+                    ]}
+                  />
+                  <Input
+                    value={newIssue.suggestion}
+                    onChange={(e) => setNewIssue({ ...newIssue, suggestion: e.target.value })}
+                    placeholder="整改建议"
+                    className="flex-1"
+                  />
+                </div>
+                <Button
+                  onClick={() => {
+                    if (newIssue.description) {
+                      createIssue.mutate({
+                        description: newIssue.description,
+                        severity: newIssue.severity,
+                        suggestion: newIssue.suggestion || undefined,
+                        requiresRectification: true,
+                      });
+                      setNewIssue({ description: "", severity: "medium", suggestion: "" });
+                    }
+                  }}
+                  disabled={!newIssue.description || createIssue.isPending}
+                >
+                  添加问题
+                </Button>
+              </div>
             </Card>
-          )}
-        </div>
-      )}
 
-      {activeTab === "conclusion" && (
-        <Card className="p-4 space-y-4">
-          <CardHeader className="p-0">
-            <CardTitle>审核结论</CardTitle>
-          </CardHeader>
-          <textarea
-            value={conclusion}
-            onChange={(e) => setConclusion(e.target.value)}
-            placeholder="请输入审核结论..."
-            className="w-full min-h-[200px] p-3 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] text-[hsl(var(--foreground))] resize-y"
-          />
-          <div className="flex gap-2">
-            <Button
-              onClick={() =>
-                submitReview.mutate({
-                  conclusion,
-                  totalScore: String(totalScore),
-                })
-              }
-              disabled={!conclusion || submitReview.isPending}
-            >
-              <Send size={14} className="mr-1" />
-              提交审核结论
-            </Button>
+            {issuesData && issuesData.length > 0 && (
+              <Card className="p-4 space-y-3">
+                <CardHeader className="p-0">
+                  <CardTitle>已登记问题 ({issuesData.length})</CardTitle>
+                </CardHeader>
+                {issuesData.map((issue) => (
+                  <IssueItem key={issue.id} issue={issue} />
+                ))}
+              </Card>
+            )}
           </div>
-          {task.conclusion && (
-            <div className="mt-4 p-3 bg-[hsl(var(--muted))] rounded">
-              <p className="text-sm font-medium text-[hsl(var(--foreground))]">已提交的结论:</p>
-              <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
-                {task.conclusion}
-              </p>
+        </TabsContent>
+
+        <TabsContent value="conclusion">
+          <Card className="p-4 space-y-4">
+            <CardHeader className="p-0">
+              <CardTitle>审核结论</CardTitle>
+            </CardHeader>
+            <textarea
+              value={conclusion}
+              onChange={(e) => setConclusion(e.target.value)}
+              placeholder="请输入审核结论..."
+              className="w-full min-h-[200px] p-3 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] text-[hsl(var(--foreground))] resize-y"
+            />
+            <div className="flex gap-2">
+              <Button
+                onClick={() =>
+                  submitReview.mutate({
+                    conclusion,
+                    totalScore: String(totalScore),
+                  })
+                }
+                disabled={!conclusion || submitReview.isPending}
+              >
+                <Send size={14} className="mr-1" />
+                提交审核结论
+              </Button>
             </div>
-          )}
-        </Card>
-      )}
+            {task.conclusion && (
+              <div className="mt-4 p-3 bg-[hsl(var(--muted))] rounded">
+                <p className="text-sm font-medium text-[hsl(var(--foreground))]">已提交的结论:</p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
+                  {task.conclusion}
+                </p>
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

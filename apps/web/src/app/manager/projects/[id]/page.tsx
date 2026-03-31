@@ -8,7 +8,9 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PageLoading } from "@/components/ui/loading";
+import { Progress } from "@/components/ui/progress";
 import { Select } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -18,14 +20,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ArrowLeft,
   AlertTriangle,
-  CheckCircle,
-  Clock,
+  FileText,
   UserPlus,
   Users,
   Trash2,
 } from "lucide-react";
+import { DetailHeader } from "@/components/detail/detail-header";
+import { InfoGrid } from "@/components/detail/info-grid";
+import { Timeline } from "@/components/detail/timeline";
+import type { TimelineItem } from "@/components/detail/timeline";
 import { EnterpriseProfileCard } from "@/components/enterprise-profile-card";
 import {
   useAuditProject,
@@ -134,14 +138,71 @@ export default function ProjectDetailPage() {
     return new Date(dateStr).toLocaleDateString("zh-CN");
   };
 
+  const STATUS_PROGRESS: Record<string, number> = {
+    pending_start: 0,
+    configuring: 10,
+    filing: 25,
+    pending_submit: 40,
+    pending_report: 50,
+    report_processing: 60,
+    pending_review: 70,
+    in_review: 80,
+    pending_rectification: 85,
+    in_rectification: 90,
+    completed: 100,
+    closed: 100,
+  };
+  const progressPercent = STATUS_PROGRESS[project.status] ?? 0;
+
+  const timelineItems: TimelineItem[] = (timeline ?? []).map((t) => ({
+    id: t.id,
+    title: `${STATUS_LABELS[t.fromStatus] ?? t.fromStatus} → ${STATUS_LABELS[t.toStatus] ?? t.toStatus}`,
+    description: t.reason ?? undefined,
+    timestamp: formatDateTime(t.transitionedAt),
+    type: t.toStatus === "completed" ? "success" as const : t.toStatus.includes("rectification") ? "danger" as const : "default" as const,
+  }));
+
+  const transitionButtons = project.validNextStates && project.validNextStates.length > 0 && (
+    <div className="flex flex-wrap gap-2">
+      {project.validNextStates.map((next) => (
+        <Button
+          key={next}
+          size="sm"
+          variant="secondary"
+          onClick={() => handleTransition(next)}
+          disabled={transitionProject.isPending}
+        >
+          → {STATUS_LABELS[next] ?? next}
+        </Button>
+      ))}
+      <Button size="sm" variant="secondary" onClick={() => setShowExtendDeadline(true)}>
+        延期
+      </Button>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/manager/projects")}>
-          <ArrowLeft size={16} />
-          返回
-        </Button>
-      </div>
+      <DetailHeader
+        icon={<FileText size={20} />}
+        title={project.enterpriseName ?? "未知企业"}
+        subtitle={`批次: ${project.batchName ?? "-"}`}
+        badges={
+          <>
+            <Badge variant={STATUS_VARIANTS[project.status] ?? "default"}>
+              {STATUS_LABELS[project.status] ?? project.status}
+            </Badge>
+            {project.isOverdue && <Badge variant="danger">已逾期</Badge>}
+          </>
+        }
+        metadata={[
+          { label: "截止日期", value: formatDate(project.deadline) },
+          { label: "创建时间", value: formatDateTime(project.createdAt) },
+        ]}
+        actions={transitionButtons || undefined}
+        backHref="/manager/projects"
+        backLabel="返回列表"
+      />
 
       {project.isOverdue && (
         <div className="flex items-center gap-2 rounded-lg border-2 border-[hsl(var(--danger))] bg-red-50 p-4">
@@ -156,160 +217,112 @@ export default function ProjectDetailPage() {
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>
-            <div className="flex items-center gap-3">
-              <span>{project.enterpriseName ?? "未知企业"}</span>
-              <Badge variant={STATUS_VARIANTS[project.status] ?? "default"}>
-                {STATUS_LABELS[project.status] ?? project.status}
-              </Badge>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">批次：</span>
-            <span className="text-[hsl(var(--foreground))]">{project.batchName ?? "-"}</span>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-[hsl(var(--muted-foreground))]">项目进度</span>
+          <div className="flex-1">
+            <Progress value={progressPercent} />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[hsl(var(--muted-foreground))]">截止日期：</span>
-            <span className="text-[hsl(var(--foreground))]">{formatDate(project.deadline)}</span>
-            <Button size="sm" variant="ghost" onClick={() => setShowExtendDeadline(true)}>
-              延期
-            </Button>
-          </div>
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">创建时间：</span>
-            <span className="text-[hsl(var(--foreground))]">{formatDateTime(project.createdAt)}</span>
-          </div>
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">模板版本：</span>
-            <span className="text-[hsl(var(--foreground))]">{project.templateVersionId ?? "未绑定"}</span>
-          </div>
+          <span className="text-sm font-medium text-[hsl(var(--foreground))]">{progressPercent}%</span>
         </div>
+      </Card>
 
-        {project.validNextStates && project.validNextStates.length > 0 && (
-          <div className="mt-4 flex items-center gap-2">
-            <span className="text-sm text-[hsl(var(--muted-foreground))]">状态流转：</span>
-            {project.validNextStates.map((next) => (
-              <Button
-                key={next}
-                size="sm"
-                variant="secondary"
-                onClick={() => handleTransition(next)}
-                disabled={transitionProject.isPending}
-              >
-                → {STATUS_LABELS[next] ?? next}
+      <Tabs defaultValue="basic">
+        <TabsList>
+          <TabsTrigger value="basic">基本信息</TabsTrigger>
+          <TabsTrigger value="members">项目成员</TabsTrigger>
+          <TabsTrigger value="timeline">审核记录</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="basic">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>项目信息</CardTitle>
+              </CardHeader>
+              <InfoGrid
+                columns={2}
+                items={[
+                  { label: "企业名称", value: project.enterpriseName ?? "-" },
+                  { label: "批次", value: project.batchName ?? "-" },
+                  { label: "当前状态", value: STATUS_LABELS[project.status] ?? project.status },
+                  { label: "截止日期", value: formatDate(project.deadline) },
+                  { label: "创建时间", value: formatDateTime(project.createdAt) },
+                  { label: "模板版本", value: project.templateVersionId ?? "未绑定" },
+                ]}
+              />
+            </Card>
+
+            <EnterpriseProfileCard projectId={projectId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="members">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <span className="flex items-center gap-2">
+                  <Users size={20} />
+                  项目成员
+                </span>
+              </CardTitle>
+              <Button size="sm" onClick={() => setShowAddMember(true)}>
+                <UserPlus size={14} />
+                添加成员
               </Button>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* Enterprise Profile Snapshot */}
-      <EnterpriseProfileCard projectId={projectId} />
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <Clock size={20} />
-              状态流转记录
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <div className="relative pl-6">
-          {timeline && timeline.length > 0 ? (
-            <div className="space-y-4">
-              {timeline.map((t, idx) => (
-                <div key={t.id} className="relative flex items-start gap-3">
-                  <div className="absolute -left-6 top-1 flex h-4 w-4 items-center justify-center">
-                    <div
-                      className={`h-3 w-3 rounded-full ${idx === 0 ? "bg-[hsl(var(--primary))]" : "bg-gray-300"}`}
-                    />
-                  </div>
-                  {idx < timeline.length - 1 && (
-                    <div className="absolute -left-[18px] top-5 h-full w-0.5 bg-gray-200" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={STATUS_VARIANTS[t.fromStatus] ?? "default"}>
-                        {STATUS_LABELS[t.fromStatus] ?? t.fromStatus}
+            </CardHeader>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>用户</TableHead>
+                  <TableHead>邮箱</TableHead>
+                  <TableHead>角色</TableHead>
+                  <TableHead>加入时间</TableHead>
+                  <TableHead>操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {members?.map((m) => (
+                  <TableRow key={m.id}>
+                    <TableCell className="font-medium">{m.userName ?? m.userId}</TableCell>
+                    <TableCell>{m.userEmail ?? "-"}</TableCell>
+                    <TableCell>
+                      <Badge variant={ROLE_VARIANTS[m.role] ?? "default"}>
+                        {ROLE_LABELS[m.role] ?? m.role}
                       </Badge>
-                      <span className="text-[hsl(var(--muted-foreground))]">→</span>
-                      <Badge variant={STATUS_VARIANTS[t.toStatus] ?? "default"}>
-                        {STATUS_LABELS[t.toStatus] ?? t.toStatus}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
-                      {formatDateTime(t.transitionedAt)}
-                      {t.reason && ` · ${t.reason}`}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-[hsl(var(--muted-foreground))]">暂无流转记录</p>
-          )}
-        </div>
-      </Card>
+                    </TableCell>
+                    <TableCell>{formatDateTime(m.joinedAt)}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleRemoveMember(m.id)}
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {(!members || members.length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-[hsl(var(--muted-foreground))]">
+                      暂无成员
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <Users size={20} />
-              项目成员
-            </span>
-          </CardTitle>
-          <Button size="sm" onClick={() => setShowAddMember(true)}>
-            <UserPlus size={14} />
-            添加成员
-          </Button>
-        </CardHeader>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>用户</TableHead>
-              <TableHead>邮箱</TableHead>
-              <TableHead>角色</TableHead>
-              <TableHead>加入时间</TableHead>
-              <TableHead>操作</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {members?.map((m) => (
-              <TableRow key={m.id}>
-                <TableCell className="font-medium">{m.userName ?? m.userId}</TableCell>
-                <TableCell>{m.userEmail ?? "-"}</TableCell>
-                <TableCell>
-                  <Badge variant={ROLE_VARIANTS[m.role] ?? "default"}>
-                    {ROLE_LABELS[m.role] ?? m.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>{formatDateTime(m.joinedAt)}</TableCell>
-                <TableCell>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleRemoveMember(m.id)}
-                  >
-                    <Trash2 size={14} />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {(!members || members.length === 0) && (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-[hsl(var(--muted-foreground))]">
-                  暂无成员
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+        <TabsContent value="timeline">
+          <Card>
+            <CardHeader>
+              <CardTitle>状态流转记录</CardTitle>
+            </CardHeader>
+            <Timeline items={timelineItems} />
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <Modal open={showAddMember} onClose={() => setShowAddMember(false)} title="添加成员">
         <div className="space-y-4">

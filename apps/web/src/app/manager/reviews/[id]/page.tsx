@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, CheckCircle, RotateCcw, UserPlus } from "lucide-react";
+import { CheckCircle, FileText, RotateCcw, UserPlus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loading } from "@/components/ui/loading";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { DetailHeader } from "@/components/detail/detail-header";
+import { InfoGrid } from "@/components/detail/info-grid";
 import {
   useReviewTask,
   useAssignReviewer,
@@ -59,152 +61,159 @@ export default function ManagerReviewDetailPage() {
   if (isLoading) return <Loading />;
   if (!task) return <div>审核任务不存在</div>;
 
+  const actionButtons = (
+    <div className="flex items-center gap-2">
+      {task.status === "pending_assignment" && (
+        <>
+          <Input
+            value={reviewerId}
+            onChange={(e) => setReviewerId(e.target.value)}
+            placeholder="输入审核员 ID"
+            className="max-w-xs"
+          />
+          <Button
+            onClick={() => assignReviewer.mutate(reviewerId)}
+            disabled={!reviewerId || assignReviewer.isPending}
+          >
+            <UserPlus size={14} className="mr-1" />
+            分配
+          </Button>
+        </>
+      )}
+      {task.status === "pending_confirmation" && (
+        <>
+          <Button
+            onClick={() => confirmReview.mutate()}
+            disabled={confirmReview.isPending}
+          >
+            <CheckCircle size={14} className="mr-1" />
+            确认通过
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => returnReview.mutate()}
+            disabled={returnReview.isPending}
+          >
+            <RotateCcw size={14} className="mr-1" />
+            退回修改
+          </Button>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="secondary" size="sm" onClick={() => router.push("/manager/reviews")}>
-          <ArrowLeft size={16} className="mr-1" />
-          返回
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">审核详情</h1>
-          <div className="flex items-center gap-2 mt-1">
-            <Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>
-            <span className="text-sm text-[hsl(var(--muted-foreground))]">
-              项目: {task.auditProjectId}
-            </span>
-          </div>
-        </div>
-      </div>
+      <DetailHeader
+        icon={<FileText size={20} />}
+        title="审核详情"
+        subtitle={`项目: ${task.auditProjectId}`}
+        badges={<Badge>{STATUS_LABELS[task.status] ?? task.status}</Badge>}
+        metadata={[
+          { label: "审核员", value: task.reviewerId ?? "未分配" },
+          { label: "总分", value: task.totalScore ?? "未评分" },
+        ]}
+        actions={actionButtons}
+        backHref="/manager/reviews"
+        backLabel="返回列表"
+      />
 
-      <Card className="p-4 space-y-3">
-        <CardHeader className="p-0">
-          <CardTitle>任务信息</CardTitle>
-        </CardHeader>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">审核员 ID: </span>
-            <span className="text-[hsl(var(--foreground))]">{task.reviewerId}</span>
-          </div>
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">总分: </span>
-            <span className="text-[hsl(var(--foreground))]">{task.totalScore ?? "未评分"}</span>
-          </div>
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">分配时间: </span>
-            <span className="text-[hsl(var(--foreground))]">
-              {task.assignedAt ? new Date(task.assignedAt).toLocaleString("zh-CN") : "-"}
-            </span>
-          </div>
-          <div>
-            <span className="text-[hsl(var(--muted-foreground))]">完成时间: </span>
-            <span className="text-[hsl(var(--foreground))]">
-              {task.completedAt ? new Date(task.completedAt).toLocaleString("zh-CN") : "-"}
-            </span>
-          </div>
-        </div>
+      <Tabs defaultValue="info">
+        <TabsList>
+          <TabsTrigger value="info">任务信息</TabsTrigger>
+          <TabsTrigger value="scores">评分详情</TabsTrigger>
+          <TabsTrigger value="issues">审核问题</TabsTrigger>
+        </TabsList>
 
-        {task.status === "pending_assignment" && (
-          <div className="flex items-center gap-2 pt-3 border-t border-[hsl(var(--border))]">
-            <Input
-              value={reviewerId}
-              onChange={(e) => setReviewerId(e.target.value)}
-              placeholder="输入审核员 ID"
-              className="max-w-xs"
+        <TabsContent value="info">
+          <Card>
+            <CardHeader>
+              <CardTitle>任务信息</CardTitle>
+            </CardHeader>
+            <InfoGrid
+              columns={2}
+              items={[
+                { label: "审核员 ID", value: task.reviewerId ?? "未分配" },
+                { label: "总分", value: task.totalScore ?? "未评分" },
+                { label: "分配时间", value: task.assignedAt ? new Date(task.assignedAt).toLocaleString("zh-CN") : "-" },
+                { label: "完成时间", value: task.completedAt ? new Date(task.completedAt).toLocaleString("zh-CN") : "-" },
+              ]}
             />
-            <Button
-              onClick={() => assignReviewer.mutate(reviewerId)}
-              disabled={!reviewerId || assignReviewer.isPending}
-            >
-              <UserPlus size={14} className="mr-1" />
-              分配
-            </Button>
-          </div>
-        )}
+            {task.conclusion && (
+              <div className="mt-4 rounded-lg bg-[hsl(var(--muted))] p-3">
+                <p className="text-sm font-medium text-[hsl(var(--foreground))]">审核结论</p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">{task.conclusion}</p>
+              </div>
+            )}
+          </Card>
+        </TabsContent>
 
-        {task.status === "pending_confirmation" && (
-          <div className="flex items-center gap-2 pt-3 border-t border-[hsl(var(--border))]">
-            <Button
-              onClick={() => confirmReview.mutate()}
-              disabled={confirmReview.isPending}
-            >
-              <CheckCircle size={14} className="mr-1" />
-              确认通过
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => returnReview.mutate()}
-              disabled={returnReview.isPending}
-            >
-              <RotateCcw size={14} className="mr-1" />
-              退回修改
-            </Button>
-          </div>
-        )}
-      </Card>
-
-      {task.conclusion && (
-        <Card className="p-4 space-y-3">
-          <CardHeader className="p-0">
-            <CardTitle>审核结论</CardTitle>
-          </CardHeader>
-          <p className="text-sm text-[hsl(var(--foreground))]">{task.conclusion}</p>
-        </Card>
-      )}
-
-      {scoresData && scoresData.scores.length > 0 && (
-        <Card className="p-4 space-y-3">
-          <CardHeader className="p-0">
-            <CardTitle>评分详情</CardTitle>
-          </CardHeader>
-          <div className="space-y-2">
-            {scoresData.scores.map((score) => (
-              <div key={score.id} className="flex items-center justify-between p-2 rounded bg-[hsl(var(--muted))]">
-                <span className="text-sm text-[hsl(var(--foreground))]">{score.category}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[hsl(var(--foreground))]">
-                    {score.score} / {score.maxScore}
-                  </span>
-                  {score.comment && (
-                    <span className="text-xs text-[hsl(var(--muted-foreground))]">
-                      {score.comment}
-                    </span>
-                  )}
+        <TabsContent value="scores">
+          <Card>
+            <CardHeader>
+              <CardTitle>评分详情</CardTitle>
+            </CardHeader>
+            {scoresData && scoresData.scores.length > 0 ? (
+              <>
+                <div className="space-y-2">
+                  {scoresData.scores.map((score) => (
+                    <div key={score.id} className="flex items-center justify-between p-2 rounded bg-[hsl(var(--muted))]">
+                      <span className="text-sm text-[hsl(var(--foreground))]">{score.category}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-[hsl(var(--foreground))]">
+                          {score.score} / {score.maxScore}
+                        </span>
+                        {score.comment && (
+                          <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                            {score.comment}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="pt-2 border-t border-[hsl(var(--border))]">
-            <span className="text-sm font-medium text-[hsl(var(--foreground))]">
-              总分: {scoresData.totalScore} / {scoresData.totalMaxScore}，
-              平均分: {scoresData.averageScore.toFixed(1)}
-            </span>
-          </div>
-        </Card>
-      )}
+                <div className="pt-2 border-t border-[hsl(var(--border))]">
+                  <span className="text-sm font-medium text-[hsl(var(--foreground))]">
+                    总分: {scoresData.totalScore} / {scoresData.totalMaxScore}，
+                    平均分: {scoresData.averageScore.toFixed(1)}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">暂无评分数据</p>
+            )}
+          </Card>
+        </TabsContent>
 
-      {issuesData && issuesData.length > 0 && (
-        <Card className="p-4 space-y-3">
-          <CardHeader className="p-0">
-            <CardTitle>审核问题 ({issuesData.length})</CardTitle>
-          </CardHeader>
-          {issuesData.map((issue) => (
-            <div key={issue.id} className="p-3 rounded border border-[hsl(var(--border))]">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-[hsl(var(--foreground))]">{issue.description}</span>
-                <Badge variant={SEVERITY_VARIANTS[issue.severity] ?? "default"}>
-                  {SEVERITY_LABELS[issue.severity] ?? issue.severity}
-                </Badge>
+        <TabsContent value="issues">
+          <Card>
+            <CardHeader>
+              <CardTitle>审核问题 ({issuesData?.length ?? 0})</CardTitle>
+            </CardHeader>
+            {issuesData && issuesData.length > 0 ? (
+              <div className="space-y-3">
+                {issuesData.map((issue) => (
+                  <div key={issue.id} className="p-3 rounded border border-[hsl(var(--border))]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[hsl(var(--foreground))]">{issue.description}</span>
+                      <Badge variant={SEVERITY_VARIANTS[issue.severity] ?? "default"}>
+                        {SEVERITY_LABELS[issue.severity] ?? issue.severity}
+                      </Badge>
+                    </div>
+                    {issue.suggestion && (
+                      <p className="text-xs text-[hsl(var(--muted-foreground))] mt-1">
+                        建议: {issue.suggestion}
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
-              {issue.suggestion && (
-                <p className="text-xs text-[hsl(var(--muted-foreground))] mt-1">
-                  建议: {issue.suggestion}
-                </p>
-              )}
-            </div>
-          ))}
-        </Card>
-      )}
+            ) : (
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">暂无问题记录</p>
+            )}
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
