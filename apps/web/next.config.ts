@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
-const apiUrl = process.env.INTERNAL_API_URL || "http://localhost:3001";
+let apiUrl = process.env.INTERNAL_API_URL || "http://localhost:3001";
+// Ensure URL has protocol
+if (apiUrl && !apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
+  apiUrl = `http://${apiUrl}`;
+}
 
 const nextConfig: NextConfig = {
   output: "standalone",
