@@ -57,13 +57,16 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleRoleSelect = (card: RoleCard) => {
+    console.log("Role selected:", card.role);
     const defaultUsers: Record<UserRole, { id: string; name: string }> = {
       enterprise_user: { id: "dev-enterprise-001", name: "测试企业用户" },
       manager: { id: "dev-manager-001", name: "测试管理员" },
       reviewer: { id: "dev-reviewer-001", name: "测试审核员" },
     };
     const u = defaultUsers[card.role];
+    console.log("Logging in as:", u);
     loginDev({ ...u, role: card.role });
+    console.log("Navigating to:", card.dashboard);
     router.push(card.dashboard);
   };
 
