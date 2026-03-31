@@ -42,8 +42,6 @@ COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
 EXPOSE 3000
 
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+ENV HOSTNAME=0.0.0.0
 
-# Note: Railway injects INTERNAL_API_URL as a build arg via service variables.
-# The rewrite destination is baked into the Next.js build manifest at build time.
 CMD ["node", "apps/web/server.js"]
