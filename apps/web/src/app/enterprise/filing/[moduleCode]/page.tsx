@@ -88,6 +88,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
   const [autoSaveTime, setAutoSaveTime] = useState<string | undefined>();
   const [currentStep, setCurrentStep] = useState(0);
   const autoSaveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const handleAutoSaveRef = useRef<() => Promise<void>>(() => Promise.resolve());
 
   useEffect(() => {
     if (recordDetail?.items) {
@@ -103,7 +104,7 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
     if (!recordId) return;
 
     autoSaveTimerRef.current = setInterval(() => {
-      void handleAutoSave();
+      void handleAutoSaveRef.current();
     }, 60000);
 
     return () => {
@@ -151,6 +152,10 @@ export default function ModuleRunnerPage({ params }: ModuleRunnerPageProps) {
       setAutoSaveStatus("error");
     }
   }, [recordId, formValues, saveRecord]);
+
+  useEffect(() => {
+    handleAutoSaveRef.current = handleAutoSave;
+  }, [handleAutoSave]);
 
   const handleSave = useCallback(async () => {
     if (!recordId) return;
