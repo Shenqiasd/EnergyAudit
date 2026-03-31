@@ -71,7 +71,7 @@ export default function EnterpriseConfigPage() {
       </div>
 
       {completeness && !completeness.isComplete && (
-        <div className="flex items-start gap-3 rounded-xl border border-[hsl(var(--warning))] bg-[hsl(var(--warning))/10] p-4">
+        <div className="flex items-start gap-3 rounded-xl border border-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10 p-4">
           <AlertTriangle size={20} className="mt-0.5 shrink-0 text-[hsl(var(--warning))]" />
           <div>
             <p className="font-medium text-[hsl(var(--foreground))]">配置未完成</p>

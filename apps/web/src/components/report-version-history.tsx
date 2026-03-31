@@ -52,7 +52,7 @@ export function ReportVersionHistory({ reportId }: ReportVersionHistoryProps) {
               key={v.id}
               className={`flex items-center justify-between rounded-lg border p-3 ${
                 v.isActive
-                  ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))/10]"
+                  ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10"
                   : "border-[hsl(var(--border))]"
               }`}
             >

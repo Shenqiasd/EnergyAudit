@@ -142,7 +142,7 @@ export default function EnterpriseReportDetailPage() {
               onClick={() => setActiveSection(section.sectionCode)}
               className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                 (activeSection ?? report.sections[0]?.sectionCode) === section.sectionCode
-                  ? "bg-[hsl(var(--primary))/10] text-[hsl(var(--primary))] font-medium"
+                  ? "bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] font-medium"
                   : "text-[hsl(var(--muted-foreground))] hover:bg-gray-50"
               }`}
             >

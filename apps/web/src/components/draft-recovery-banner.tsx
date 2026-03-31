@@ -74,7 +74,7 @@ export function DraftRecoveryBanner({
   if (!draft || dismissed) return null;
 
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-[hsl(var(--warning))] bg-[hsl(var(--warning))/10] p-4">
+    <div className="flex items-center gap-3 rounded-xl border border-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10 p-4">
       <AlertTriangle
         size={20}
         className="mt-0.5 shrink-0 text-[hsl(var(--warning))]"
