@@ -39,11 +39,8 @@ COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
 # Note: Add this line when apps/web/public/ exists:
 # COPY --from=build /app/apps/web/public ./apps/web/public
 
-EXPOSE 3000
+EXPOSE 8080
 
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+ENV PORT=8080
 
-# Note: Railway injects INTERNAL_API_URL as a build arg via service variables.
-# The rewrite destination is baked into the Next.js build manifest at build time.
-CMD ["node", "apps/web/server.js"]
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node apps/web/server.js"]

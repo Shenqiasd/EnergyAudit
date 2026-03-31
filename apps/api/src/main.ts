@@ -16,6 +16,16 @@ async function bootstrap() {
 
   app.enableCors();
   app.setGlobalPrefix('api/v1');
+
+  // Add root route handler
+  app.getHttpAdapter().get('/', (req, res) => {
+    res.send({
+      message: 'Energy Audit API',
+      version: '0.1.0',
+      health: '/api/v1/health',
+    });
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
