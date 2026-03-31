@@ -210,37 +210,7 @@ export default function ManagerEnterprisesPage() {
           description={'点击右上角"新增企业"按钮添加企业'}
         />
       ) : viewMode === "table" ? (
-        <>
-          <DataTable columns={columns} data={items} pageSize={20} />
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[hsl(var(--muted-foreground))]">
-                共 {data?.total} 条记录
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                >
-                  上一页
-                </Button>
-                <span className="flex items-center px-3 text-sm">
-                  {page} / {totalPages}
-                </span>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  下一页
-                </Button>
-              </div>
-            </div>
-          )}
-        </>
+        <DataTable columns={columns} data={items} pageSize={20} />
       ) : (
         <ListCardView
           data={items}
@@ -262,6 +232,35 @@ export default function ManagerEnterprisesPage() {
           )}
           emptyTitle="暂无企业数据"
         />
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[hsl(var(--muted-foreground))]">
+            共 {data?.total} 条记录
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              上一页
+            </Button>
+            <span className="flex items-center px-3 text-sm">
+              {page} / {totalPages}
+            </span>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              下一页
+            </Button>
+          </div>
+        </div>
       )}
 
       <Modal
