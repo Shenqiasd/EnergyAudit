@@ -39,8 +39,9 @@ COPY --from=build /app/apps/web/.next/static ./apps/web/.next/static
 # Note: Add this line when apps/web/public/ exists:
 # COPY --from=build /app/apps/web/public ./apps/web/public
 
-EXPOSE 8080
+EXPOSE 3000
 
-ENV PORT=8080
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-CMD ["sh", "-c", "HOSTNAME=0.0.0.0 node apps/web/server.js"]
+CMD ["node", "apps/web/server.js"]
