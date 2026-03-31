@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { Providers } from "@/lib/providers";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "能源审计平台",
@@ -19,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className={inter.variable}>
+    <html lang="zh-CN">
       <body>
         <Providers>{children}</Providers>
       </body>

@@ -41,6 +41,12 @@ pnpm 10.26.1 (monorepo with Turborepo)
 4. **Native build scripts**: Added `pnpm.onlyBuiltDependencies` to package.json for `@nestjs/core`, `bcrypt`, `esbuild`, `sharp`
 5. **Shared packages CommonJS**: `packages/config-engine` and `packages/reporting` tsconfig updated to output CommonJS (module: CommonJS, moduleResolution: Node) so NestJS can load them at runtime
 6. **Missing dependency**: Added `@energy-audit/config-engine: workspace:*` to `apps/api/package.json`
+7. **Root layout force-dynamic**: Added `export const dynamic = 'force-dynamic'` to `apps/web/src/app/layout.tsx` — prevents Next.js 16 + React 19 from statically prerendering all 50 pages (useEffect/useContext null dispatcher bug during prerender)
+8. **Radix UI replaced**: Replaced `@radix-ui/react-toast` (Toaster), `@radix-ui/react-dialog` (Modal), `@radix-ui/react-select` (Select) with native HTML equivalents to eliminate prerender failures in those components
+9. **global-error.tsx**: Added `apps/web/src/app/global-error.tsx` as a minimal client component (required by Next.js for `_global-error` page)
+10. **prerenderEarlyExit false**: Added `experimental.prerenderEarlyExit: false` to `next.config.ts` to allow build to continue when `_global-error` prerender fails (Next.js 16.2.1 + Turbopack internal bug with `LayoutRouterContext` during `_global-error` prerender)
+11. **Next.js worker patch**: Applied patch to `next/dist/export/worker.js` via `patches/next@16.2.1.patch` (registered in `pnpm.patchedDependencies`) — converts uncaught `TypeError` to `ExportPageError` and resets `result = undefined` so `_global-error` prerender failure is silently skipped without blocking the build
+12. **Removed Google font**: Removed `next/font/google` (Inter) from root layout to avoid potential module initialization issues during `_global-error` prerender
 
 ## Development Notes
 

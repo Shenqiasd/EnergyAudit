@@ -1,7 +1,7 @@
 modules = ["nodejs-20", "web"]
 
   [agent]
-  expertMode = true
+expertMode = true
 
   [nix]
   channel = "stable-25_05"
@@ -54,12 +54,16 @@ modules = ["nodejs-20", "web"]
   args = "cd apps/web && pnpm run dev"
   waitForPort = 5000
 
-  [[ports]]
-  localPort = 5000
-  externalPort = 80
+[[ports]]
+localPort = 3001
+externalPort = 80
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
 
   [deployment]
   deploymentTarget = "vm"
   run = ["bash", "-c", "(cd apps/api && node dist/main) & sleep 5 && (cd apps/web && pnpm run start)"]
-  build = ["bash", "-c", "pnpm --filter @energy-audit/config-engine build && pnpm --filter @energy-audit/reporting build && pnpm --filter @energy-audit/api run build && pnpm --filter @energy-audit/web run build"]
+  build = ["bash", "-c", "pnpm --filter=@energy-audit/config-engine build && pnpm --filter=@energy-audit/reporting build && pnpm --filter=@energy-audit/api run build && pnpm --filter=@energy-audit/web run build"]
   

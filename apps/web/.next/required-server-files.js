@@ -96,7 +96,6 @@ self.__SERVER_FILES_MANIFEST={
     "compiler": {},
     "expireTime": 31536000,
     "staticPageGenerationTimeout": 60,
-    "output": "standalone",
     "modularizeImports": {
       "@mui/icons-material": {
         "transform": "@mui/icons-material/{{member}}"
@@ -105,7 +104,15 @@ self.__SERVER_FILES_MANIFEST={
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/Users/pete/Project",
+    "outputFileTracingRoot": "/home/runner/workspace",
+    "allowedDevOrigins": [
+      "*.replit.dev",
+      "*.repl.co",
+      "*.worf.replit.dev",
+      "*.worf.repl.co",
+      "*.repl.co:5000",
+      "*.replit.dev:5000"
+    ],
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -151,7 +158,7 @@ self.__SERVER_FILES_MANIFEST={
       "cssChunking": true,
       "multiZoneDraftMode": false,
       "appNavFailHandling": false,
-      "prerenderEarlyExit": true,
+      "prerenderEarlyExit": false,
       "serverMinification": true,
       "linkNoTouchStart": false,
       "caseSensitiveRoutes": false,
@@ -167,7 +174,7 @@ self.__SERVER_FILES_MANIFEST={
       "proxyPrefetch": "flexible",
       "optimisticClientCache": true,
       "manualClientBasePath": false,
-      "cpus": 9,
+      "cpus": 7,
       "memoryBasedWorkersCount": false,
       "imgOptConcurrency": null,
       "imgOptTimeoutInSeconds": 7,
@@ -304,8 +311,20 @@ self.__SERVER_FILES_MANIFEST={
     "htmlLimitedBots": "[\\w-]+-Google|Google-[\\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight",
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
+    "serverExternalPackages": [
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-select",
+      "@radix-ui/react-toast",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-tooltip",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-switch",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-progress"
+    ],
     "turbopack": {
-      "root": "/Users/pete/Project"
+      "root": "/home/runner/workspace"
     },
     "distDirRoot": ".next",
     "_originalRewrites": {
@@ -319,8 +338,8 @@ self.__SERVER_FILES_MANIFEST={
       "fallback": []
     }
   },
-  "appDir": "/Users/pete/Project/CoolingTowerScan/EnergyAudit/apps/web",
-  "relativeAppDir": "CoolingTowerScan/EnergyAudit/apps/web",
+  "appDir": "/home/runner/workspace/apps/web",
+  "relativeAppDir": "apps/web",
   "files": [
     ".next/routes-manifest.json",
     ".next/server/pages-manifest.json",

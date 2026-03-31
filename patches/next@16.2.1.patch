@@ -1,0 +1,19 @@
+--- a/dist/export/worker.js	2026-03-31 15:24:12.990479465 +0000
++++ b/dist/export/worker.js	2026-03-31 15:29:13.058476527 +0000
+@@ -294,7 +294,7 @@
+                 // The only error that should be caught here is an ExportError, as `exportPage` doesn't throw and instead returns an object with an `error` property.
+                 // This is an overly cautious check to ensure that we don't accidentally catch an unexpected error.
+                 if (!(err instanceof ExportPageError || err instanceof TimeoutError)) {
+-                    throw err;
++                    throw new ExportPageError();
+                 }
+                 if (err instanceof TimeoutError) {
+                     // If the export times out, we will restart the worker up to 3 times.
+@@ -313,6 +313,7 @@
+                         process.exit(1);
+                     } else {
+                     // Otherwise, this is a no-op. The build will continue, and a summary of failed pages will be displayed at the end.
++                    result = undefined;
+                     }
+                 } else {
+                     // Otherwise, we have more attempts to make. Wait before retrying

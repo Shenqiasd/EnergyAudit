@@ -12,7 +12,10 @@
     "seed:sample": "pnpm --filter @energy-audit/api exec tsx ../../scripts/seed-sample-data.ts"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@nestjs/core", "bcrypt", "esbuild", "sharp"]
+    "onlyBuiltDependencies": ["@nestjs/core", "bcrypt", "esbuild", "sharp"],
+    "patchedDependencies": {
+      "next@16.2.1": "patches/next@16.2.1.patch"
+    }
   },
   "devDependencies": {
     "@types/node": "^24.5.2",

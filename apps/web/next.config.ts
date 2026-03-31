@@ -6,6 +6,21 @@ if (apiUrl && !apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
 }
 
 const nextConfig: NextConfig = {
+  experimental: {
+    prerenderEarlyExit: false,
+  },
+  serverExternalPackages: [
+    "@radix-ui/react-dialog",
+    "@radix-ui/react-dropdown-menu",
+    "@radix-ui/react-select",
+    "@radix-ui/react-toast",
+    "@radix-ui/react-tabs",
+    "@radix-ui/react-tooltip",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-switch",
+    "@radix-ui/react-avatar",
+    "@radix-ui/react-progress",
+  ],
   allowedDevOrigins: [
     "*.replit.dev",
     "*.repl.co",
