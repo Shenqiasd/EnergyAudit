@@ -45,13 +45,13 @@ waitForPort = 3001
 name = "Start application"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd apps/web && pnpm run dev"
 waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [[ports]]
 localPort = 3001
