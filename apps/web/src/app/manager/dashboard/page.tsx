@@ -4,7 +4,6 @@ import {
   Building2,
   TrendingUp,
   ClipboardCheck,
-  Wrench,
   AlertTriangle,
   Clock,
   Plus,
@@ -161,19 +160,6 @@ function formatRelativeTime(dateStr: string): string {
   }
 }
 
-function formatCountdown(dateStr: string): string {
-  try {
-    const deadline = new Date(dateStr);
-    const now = new Date();
-    const diffMs = deadline.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return `已超期 ${Math.abs(diffDays)} 天`;
-    if (diffDays === 0) return "今日到期";
-    return `剩余 ${diffDays} 天`;
-  } catch {
-    return "";
-  }
-}
 
 export default function ManagerDashboardPage() {
   const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
@@ -225,8 +211,8 @@ export default function ManagerDashboardPage() {
           sparklineData={[15, 12, 18, 14, 10, 8, 6]}
         />
         <StatCard
-          icon={Wrench}
-          label="整改中任务"
+          icon={AlertTriangle}
+          label="超期预警"
           value={summary?.overdueAlerts ?? 0}
           accentColor="purple"
           trend={{ direction: "flat", value: "0%", text: "较上月" }}
@@ -374,8 +360,8 @@ export default function ManagerDashboardPage() {
                         <span className="text-sm font-medium text-[hsl(var(--foreground))]">
                           {alert.title}
                         </span>
-                        <span className="shrink-0 text-xs font-medium text-red-500">
-                          {formatCountdown(alert.createdAt)}
+                        <span className="shrink-0 text-xs text-[hsl(var(--muted-foreground))]">
+                          {formatRelativeTime(alert.createdAt)}
                         </span>
                       </div>
                       <p className="mt-0.5 text-xs text-[hsl(var(--muted-foreground))]">
