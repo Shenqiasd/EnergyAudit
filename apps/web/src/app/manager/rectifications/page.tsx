@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select } from "@/components/ui/select";
-import { Loading } from "@/components/ui/loading";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { PageLoading } from "@/components/ui/loading";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { PageHeader } from "@/components/layout/page-header";
+import { FilterBar } from "@/components/list/filter-bar";
+import { AlertTriangle } from "lucide-react";
 import {
   useRectificationTasks,
   useRectificationStats,
 } from "@/lib/api/hooks/use-rectifications";
+import type { RectificationTask } from "@/lib/api/hooks/use-rectifications";
+import { useRouter } from "next/navigation";
 
 const STATUS_LABELS: Record<string, string> = {
   pending_issue: "待下发",
@@ -31,15 +37,9 @@ const STATUS_VARIANTS: Record<string, "default" | "primary" | "success" | "warni
   closed: "default",
 };
 
-const KANBAN_COLUMNS = [
-  { status: "pending_issue", label: "待下发" },
-  { status: "pending_claim", label: "待认领" },
-  { status: "in_progress", label: "整改中" },
-  { status: "pending_acceptance", label: "待验收" },
-  { status: "completed", label: "已完成" },
-];
-
 export default function ManagerRectificationsPage() {
+  const router = useRouter();
+  const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const { data, isLoading } = useRectificationTasks({
     status: statusFilter || undefined,
@@ -47,15 +47,79 @@ export default function ManagerRectificationsPage() {
   const { data: stats } = useRectificationStats();
 
   const items = data?.items ?? [];
+  const filteredItems = searchText
+    ? items.filter((t) => t.title.toLowerCase().includes(searchText.toLowerCase()))
+    : items;
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString("zh-CN");
+  };
+
+  const columns: ColumnDef<RectificationTask, unknown>[] = [
+    {
+      accessorKey: "title",
+      header: "整改任务",
+      cell: ({ row }) => (
+        <span className="font-medium">{row.original.title}</span>
+      ),
+    },
+    {
+      accessorKey: "auditProjectId",
+      header: "项目ID",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">{row.original.auditProjectId.slice(0, 12)}...</span>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: "状态",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1.5">
+          <Badge variant={STATUS_VARIANTS[row.original.status] ?? "default"}>
+            {STATUS_LABELS[row.original.status] ?? row.original.status}
+          </Badge>
+          {row.original.isOverdue && (
+            <Badge variant="danger">
+              <AlertTriangle size={12} className="mr-0.5" />
+              延期
+            </Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "deadline",
+      header: "截止日期",
+      cell: ({ row }) => formatDate(row.original.deadline),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "创建日期",
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: "actions",
+      header: "操作",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => router.push(`/manager/rectifications/${row.original.id}`)}
+        >
+          查看详情
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">整改监管</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          监控所有整改任务进度，跟踪完成情况
-        </p>
-      </div>
+      <PageHeader
+        title="整改监管"
+        description="监管企业整改进度"
+      />
 
       {stats && (
         <div className="grid grid-cols-4 gap-4">
@@ -80,61 +144,36 @@ export default function ManagerRectificationsPage() {
         </div>
       )}
 
-      <div className="flex items-center gap-4">
-        <Select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          options={[
-            { value: "", label: "全部状态" },
-            ...KANBAN_COLUMNS.map((col) => ({ value: col.status, label: col.label })),
-            { value: "delayed", label: "已延期" },
-            { value: "closed", label: "已关闭" },
-          ]}
-        />
-      </div>
+      <FilterBar
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        searchPlaceholder="搜索整改任务..."
+        filters={[
+          {
+            key: "status",
+            label: "整改状态",
+            options: [
+              { value: "", label: "全部状态" },
+              { value: "pending_issue", label: "待下发" },
+              { value: "pending_claim", label: "待认领" },
+              { value: "in_progress", label: "整改中" },
+              { value: "pending_acceptance", label: "待验收" },
+              { value: "completed", label: "已完成" },
+              { value: "delayed", label: "已延期" },
+              { value: "closed", label: "已关闭" },
+            ],
+            value: statusFilter,
+            onChange: setStatusFilter,
+          },
+        ]}
+      />
 
       {isLoading ? (
-        <Loading />
-      ) : !items.length ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <span className="flex items-center gap-2">
-                <Wrench size={20} />
-                暂无整改任务
-              </span>
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <PageLoading />
+      ) : filteredItems.length === 0 ? (
+        <EmptyState title="暂无整改任务" description="整改任务将在审核发现问题后自动生成" />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((task) => (
-            <Card key={task.id} className="p-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-sm text-[hsl(var(--foreground))] truncate">
-                  {task.title}
-                </span>
-                <Badge variant={STATUS_VARIANTS[task.status] ?? "default"}>
-                  {STATUS_LABELS[task.status] ?? task.status}
-                </Badge>
-              </div>
-              {task.description && (
-                <p className="text-xs text-[hsl(var(--muted-foreground))] line-clamp-2">
-                  {task.description}
-                </p>
-              )}
-              <div className="flex items-center justify-between text-xs text-[hsl(var(--muted-foreground))]">
-                <span>项目: {task.auditProjectId}</span>
-                {task.deadline && (
-                  <span>截止: {new Date(task.deadline).toLocaleDateString("zh-CN")}</span>
-                )}
-              </div>
-              {task.isOverdue && (
-                <Badge variant="danger">已延期</Badge>
-              )}
-            </Card>
-          ))}
-        </div>
+        <DataTable columns={columns} data={filteredItems} />
       )}
     </div>
   );

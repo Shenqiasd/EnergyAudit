@@ -1,23 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Plus, RefreshCw, Search, Eye, CheckCircle, MapPin } from "lucide-react";
+import { Plus, RefreshCw, Eye, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PageLoading } from "@/components/ui/loading";
-import { Select } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { FilterBar } from "@/components/list/filter-bar";
+import { ListCardView } from "@/components/list/list-card-view";
 import { useEnterprises, useCreateEnterprise, useSyncEnterprise } from "@/lib/api/hooks/use-enterprises";
 import type { Enterprise } from "@/lib/api/hooks/use-enterprises";
 
@@ -35,11 +30,82 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge variant={config.variant}>{config.label}</Badge>;
 }
 
+const columns: ColumnDef<Enterprise, unknown>[] = [
+  {
+    accessorKey: "name",
+    header: "企业名称",
+    cell: ({ row }) => (
+      <span className="font-medium">{row.original.name}</span>
+    ),
+  },
+  {
+    accessorKey: "unifiedSocialCreditCode",
+    header: "统一社会信用代码",
+    cell: ({ row }) => (
+      <span className="font-mono text-xs">{row.original.unifiedSocialCreditCode}</span>
+    ),
+  },
+  {
+    accessorKey: "industryCode",
+    header: "行业",
+    cell: ({ row }) => row.original.industryCode ?? "-",
+  },
+  {
+    accessorKey: "admissionStatus",
+    header: "准入状态",
+    cell: ({ row }) => <StatusBadge status={row.original.admissionStatus} />,
+    filterFn: "equals",
+  },
+  {
+    accessorKey: "contactPerson",
+    header: "联系人",
+    cell: ({ row }) => row.original.contactPerson ?? "-",
+  },
+  {
+    id: "actions",
+    header: "操作",
+    enableSorting: false,
+    cell: ({ row }) => <EnterpriseActions enterprise={row.original} />,
+  },
+];
+
+function EnterpriseActions({ enterprise }: { enterprise: Enterprise }) {
+  const syncMutation = useSyncEnterprise(enterprise.id);
+
+  return (
+    <div className="flex gap-2">
+      <a href={`/manager/enterprises/${enterprise.id}`}>
+        <Button variant="ghost" size="sm">
+          <Eye size={14} />
+          查看
+        </Button>
+      </a>
+      {enterprise.admissionStatus === "pending_review" && (
+        <a href={`/manager/enterprises/${enterprise.id}/admission`}>
+          <Button variant="ghost" size="sm">
+            <CheckCircle size={14} />
+            审核
+          </Button>
+        </a>
+      )}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => syncMutation.mutate()}
+        disabled={syncMutation.isPending}
+      >
+        <RefreshCw size={14} className={syncMutation.isPending ? "animate-spin" : ""} />
+        同步
+      </Button>
+    </div>
+  );
+}
+
 export default function ManagerEnterprisesPage() {
   const [page, setPage] = useState(1);
   const [searchName, setSearchName] = useState("");
-  const [searchCode, setSearchCode] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const [formName, setFormName] = useState("");
@@ -49,15 +115,12 @@ export default function ManagerEnterprisesPage() {
   const [formPhone, setFormPhone] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formAddress, setFormAddress] = useState("");
-  const [filterRegion, setFilterRegion] = useState("");
 
-  const { data, isLoading, refetch } = useEnterprises({
+  const { data, isLoading } = useEnterprises({
     page,
     pageSize: 20,
     name: searchName || undefined,
-    creditCode: searchCode || undefined,
     admissionStatus: filterStatus || undefined,
-    regionCode: filterRegion || undefined,
   });
 
   const createMutation = useCreateEnterprise();
@@ -93,12 +156,13 @@ export default function ManagerEnterprisesPage() {
   };
 
   const totalPages = data ? Math.ceil(data.total / data.pageSize) : 0;
+  const items = data?.items ?? [];
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="企业管理"
-        description="管理参与审计的企业信息、准入状态和企业账号"
+        description="管理所有已注册的审计企业"
         actions={
           <Button onClick={() => setShowCreateModal(true)}>
             <Plus size={16} />
@@ -107,134 +171,97 @@ export default function ManagerEnterprisesPage() {
         }
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <Building2 size={20} />
-              企业列表
-            </span>
-          </CardTitle>
-        </CardHeader>
+      <FilterBar
+        searchValue={searchName}
+        onSearchChange={(val) => {
+          setSearchName(val);
+          setPage(1);
+        }}
+        searchPlaceholder="搜索企业名称..."
+        filters={[
+          {
+            key: "status",
+            label: "准入状态",
+            options: [
+              { value: "", label: "全部状态" },
+              { value: "pending_review", label: "待审核" },
+              { value: "approved", label: "已通过" },
+              { value: "rejected", label: "已驳回" },
+              { value: "suspended", label: "已停用" },
+              { value: "locked", label: "已锁定" },
+              { value: "expired", label: "已过期" },
+            ],
+            value: filterStatus,
+            onChange: (val) => {
+              setFilterStatus(val);
+              setPage(1);
+            },
+          },
+        ]}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
-        <div className="mb-4 flex flex-wrap items-end gap-3">
-          <div className="w-48">
-            <Input
-              placeholder="按企业名称搜索"
-              value={searchName}
-              onChange={(e) => {
-                setSearchName(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-          <div className="w-48">
-            <Input
-              placeholder="按信用代码搜索"
-              value={searchCode}
-              onChange={(e) => {
-                setSearchCode(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-          <div className="w-40">
-            <Select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-                setPage(1);
-              }}
-              placeholder="准入状态"
-              options={[
-                { value: "", label: "全部状态" },
-                { value: "pending_review", label: "待审核" },
-                { value: "approved", label: "已通过" },
-                { value: "rejected", label: "已驳回" },
-                { value: "suspended", label: "已停用" },
-                { value: "locked", label: "已锁定" },
-                { value: "expired", label: "已过期" },
-              ]}
-            />
-          </div>
-          <div className="w-40">
-            <Input
-              placeholder="区域筛选"
-              value={filterRegion}
-              onChange={(e) => {
-                setFilterRegion(e.target.value);
-                setPage(1);
-              }}
-            />
-          </div>
-          <Button variant="secondary" size="sm" onClick={() => void refetch()}>
-            <Search size={14} />
-            搜索
-          </Button>
-        </div>
-
-        {isLoading ? (
-          <PageLoading />
-        ) : (
-          <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>企业名称</TableHead>
-                  <TableHead>统一社会信用代码</TableHead>
-                  <TableHead>行业分类</TableHead>
-                  <TableHead>区域</TableHead>
-                  <TableHead>省/市</TableHead>
-                  <TableHead>准入状态</TableHead>
-                  <TableHead>联系人</TableHead>
-                  <TableHead>操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data?.items.map((enterprise: Enterprise) => (
-                  <EnterpriseRow key={enterprise.id} enterprise={enterprise} />
-                ))}
-                {data?.items.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center text-[hsl(var(--muted-foreground))]">
-                      暂无企业数据
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-
-            {totalPages > 1 && (
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-sm text-[hsl(var(--muted-foreground))]">
-                  共 {data?.total} 条记录
-                </span>
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
-                  >
-                    上一页
-                  </Button>
-                  <span className="flex items-center px-3 text-sm">
-                    {page} / {totalPages}
-                  </span>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => p + 1)}
-                  >
-                    下一页
-                  </Button>
+      {isLoading ? (
+        <PageLoading />
+      ) : items.length === 0 ? (
+        <EmptyState
+          title="暂无企业数据"
+          description={'点击右上角"新增企业"按钮添加企业'}
+        />
+      ) : viewMode === "table" ? (
+        <DataTable columns={columns} data={items} pageSize={20} hidePagination />
+      ) : (
+        <ListCardView
+          data={items}
+          renderCard={(enterprise) => (
+            <a key={enterprise.id} href={`/manager/enterprises/${enterprise.id}`}>
+              <Card className="cursor-pointer p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-sm truncate">{enterprise.name}</span>
+                  <StatusBadge status={enterprise.admissionStatus} />
                 </div>
-              </div>
-            )}
-          </>
-        )}
-      </Card>
+                <div className="text-xs text-[hsl(var(--muted-foreground))]">
+                  {enterprise.industryCode ?? "未分类"}
+                </div>
+                <div className="text-xs text-[hsl(var(--muted-foreground))]">
+                  联系人: {enterprise.contactPerson ?? "-"}
+                </div>
+              </Card>
+            </a>
+          )}
+          emptyTitle="暂无企业数据"
+        />
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[hsl(var(--muted-foreground))]">
+            共 {data?.total} 条记录
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              上一页
+            </Button>
+            <span className="flex items-center px-3 text-sm">
+              {page} / {totalPages}
+            </span>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              下一页
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Modal
         open={showCreateModal}
@@ -299,54 +326,5 @@ export default function ManagerEnterprisesPage() {
         </div>
       </Modal>
     </div>
-  );
-}
-
-function EnterpriseRow({ enterprise }: { enterprise: Enterprise }) {
-  const syncMutation = useSyncEnterprise(enterprise.id);
-
-  return (
-    <TableRow>
-      <TableCell className="font-medium">{enterprise.name}</TableCell>
-      <TableCell className="font-mono text-xs">{enterprise.unifiedSocialCreditCode}</TableCell>
-      <TableCell>{enterprise.industryCode ?? "-"}</TableCell>
-      <TableCell>{enterprise.regionName ?? "-"}</TableCell>
-      <TableCell>
-        {enterprise.province || enterprise.city
-          ? `${enterprise.province ?? ""}${enterprise.city ? " / " + enterprise.city : ""}`
-          : "-"}
-      </TableCell>
-      <TableCell>
-        <StatusBadge status={enterprise.admissionStatus} />
-      </TableCell>
-      <TableCell>{enterprise.contactPerson ?? "-"}</TableCell>
-      <TableCell>
-        <div className="flex gap-2">
-          <a href={`/manager/enterprises/${enterprise.id}`}>
-            <Button variant="ghost" size="sm">
-              <Eye size={14} />
-              查看
-            </Button>
-          </a>
-          {enterprise.admissionStatus === "pending_review" && (
-            <a href={`/manager/enterprises/${enterprise.id}/admission`}>
-              <Button variant="ghost" size="sm">
-                <CheckCircle size={14} />
-                审核
-              </Button>
-            </a>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => syncMutation.mutate()}
-            disabled={syncMutation.isPending}
-          >
-            <RefreshCw size={14} className={syncMutation.isPending ? "animate-spin" : ""} />
-            同步
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
   );
 }

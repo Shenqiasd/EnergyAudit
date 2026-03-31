@@ -30,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   searchPlaceholder?: string;
   filterableColumns?: FilterableColumn[];
   pageSize?: number;
+  hidePagination?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -39,6 +40,7 @@ export function DataTable<TData, TValue>({
   searchPlaceholder = "搜索...",
   filterableColumns,
   pageSize = 10,
+  hidePagination,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -183,7 +185,7 @@ export function DataTable<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-2">
+      {!hidePagination && <div className="flex items-center justify-between px-2">
         <div className="text-sm text-[hsl(var(--muted-foreground))]">
           {table.getFilteredSelectedRowModel().rows.length > 0 && (
             <span>
@@ -214,7 +216,7 @@ export function DataTable<TData, TValue>({
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

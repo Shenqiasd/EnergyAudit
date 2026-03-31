@@ -1,20 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading } from "@/components/ui/loading";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { FileText } from "lucide-react";
-import Link from "next/link";
+import { PageLoading } from "@/components/ui/loading";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { PageHeader } from "@/components/layout/page-header";
 import { useReports } from "@/lib/api/hooks/use-reports";
+import type { Report } from "@/lib/api/hooks/use-reports";
 
 const STATUS_LABELS: Record<string, string> = {
   not_generated: "未生成",
@@ -41,74 +35,71 @@ const STATUS_VARIANTS: Record<string, "default" | "primary" | "success" | "warni
 export default function EnterpriseReportsPage() {
   const { data, isLoading } = useReports();
 
+  const items = data?.items ?? [];
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleString("zh-CN");
+  };
+
+  const columns: ColumnDef<Report, unknown>[] = [
+    {
+      accessorKey: "id",
+      header: "报告ID",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">{row.original.id.slice(0, 12)}...</span>
+      ),
+    },
+    {
+      accessorKey: "version",
+      header: "版本",
+      cell: ({ row }) => `v${row.original.version}`,
+    },
+    {
+      accessorKey: "status",
+      header: "状态",
+      cell: ({ row }) => (
+        <Badge variant={STATUS_VARIANTS[row.original.status] ?? "default"}>
+          {STATUS_LABELS[row.original.status] ?? row.original.status}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "generatedAt",
+      header: "生成时间",
+      cell: ({ row }) => formatDate(row.original.generatedAt),
+    },
+    {
+      id: "actions",
+      header: "操作",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Link href={`/enterprise/reports/${row.original.id}`}>
+          <Button size="sm" variant="ghost">
+            查看
+          </Button>
+        </Link>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">报告管理</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          查看和管理审计报告，上传终版报告
-        </p>
-      </div>
+      <PageHeader
+        title="我的审计报告"
+        description="查看和管理审计报告，上传终版报告"
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <FileText size={20} />
-              报告列表
-            </span>
-          </CardTitle>
-        </CardHeader>
-
-        {isLoading ? (
-          <Loading text="加载中..." />
-        ) : !data?.items?.length ? (
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">
-            暂无报告数据。报告将在管理员发起计算和生成后显示。
-          </p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>报告ID</TableHead>
-                <TableHead>版本</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>生成时间</TableHead>
-                <TableHead>操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.items.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell className="font-mono text-xs">
-                    {report.id.slice(0, 12)}...
-                  </TableCell>
-                  <TableCell>v{report.version}</TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_VARIANTS[report.status] ?? "default"}>
-                      {STATUS_LABELS[report.status] ?? report.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
-                    {report.generatedAt
-                      ? new Date(report.generatedAt).toLocaleString("zh-CN")
-                      : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Link href={`/enterprise/reports/${report.id}`}>
-                        <Button size="sm" variant="secondary">
-                          查看
-                        </Button>
-                      </Link>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+      {isLoading ? (
+        <PageLoading />
+      ) : items.length === 0 ? (
+        <EmptyState
+          title="暂无报告数据"
+          description="报告将在管理员发起计算和生成后显示"
+        />
+      ) : (
+        <DataTable columns={columns} data={items} />
+      )}
     </div>
   );
 }

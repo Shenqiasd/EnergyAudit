@@ -1,21 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loading } from "@/components/ui/loading";
-import { Select } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { FileText, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { PageLoading } from "@/components/ui/loading";
+import { EmptyState } from "@/components/ui/empty-state";
+import { DataTable, type ColumnDef } from "@/components/ui/data-table";
+import { PageHeader } from "@/components/layout/page-header";
+import { FilterBar } from "@/components/list/filter-bar";
+import { RefreshCw } from "lucide-react";
 import { useReports } from "@/lib/api/hooks/use-reports";
+import type { Report } from "@/lib/api/hooks/use-reports";
+import { useRouter } from "next/navigation";
 
 const STATUS_LABELS: Record<string, string> = {
   not_generated: "未生成",
@@ -39,105 +35,128 @@ const STATUS_VARIANTS: Record<string, "default" | "primary" | "success" | "warni
   voided: "danger",
 };
 
-const STATUS_OPTIONS = [
-  { value: "", label: "全部状态" },
-  { value: "not_generated", label: "未生成" },
-  { value: "system_draft", label: "系统草稿" },
-  { value: "enterprise_revision", label: "企业修订" },
-  { value: "pending_final", label: "待终版" },
-  { value: "final_uploaded", label: "已上传终版" },
-  { value: "under_review", label: "审核中" },
-  { value: "archived", label: "已归档" },
-];
-
 export default function ManagerReportsPage() {
+  const router = useRouter();
+  const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const { data, isLoading, refetch } = useReports({
     status: statusFilter || undefined,
   });
 
+  const items = data?.items ?? [];
+  const filteredItems = searchText
+    ? items.filter((r) => r.id.includes(searchText) || r.auditProjectId.includes(searchText))
+    : items;
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleString("zh-CN");
+  };
+
+  const columns: ColumnDef<Report, unknown>[] = [
+    {
+      accessorKey: "id",
+      header: "报告ID",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">{row.original.id.slice(0, 12)}...</span>
+      ),
+    },
+    {
+      accessorKey: "auditProjectId",
+      header: "项目ID",
+      cell: ({ row }) => (
+        <span className="font-mono text-xs">{row.original.auditProjectId.slice(0, 12)}...</span>
+      ),
+    },
+    {
+      accessorKey: "version",
+      header: "版本",
+      cell: ({ row }) => `v${row.original.version}`,
+    },
+    {
+      accessorKey: "versionType",
+      header: "类型",
+      cell: ({ row }) =>
+        row.original.versionType === "system_draft"
+          ? "系统草稿"
+          : row.original.versionType === "enterprise_revision"
+            ? "企业修订"
+            : row.original.versionType,
+    },
+    {
+      accessorKey: "status",
+      header: "状态",
+      cell: ({ row }) => (
+        <Badge variant={STATUS_VARIANTS[row.original.status] ?? "default"}>
+          {STATUS_LABELS[row.original.status] ?? row.original.status}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "generatedAt",
+      header: "生成日期",
+      cell: ({ row }) => formatDate(row.original.generatedAt),
+    },
+    {
+      id: "actions",
+      header: "操作",
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => router.push(`/manager/reports/${row.original.id}`)}
+        >
+          查看详情
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">报告管理</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-          管理所有项目的审计报告，跟踪报告状态
-        </p>
-      </div>
+      <PageHeader
+        title="报告管理"
+        description="管理审计报告的全生命周期"
+        actions={
+          <Button variant="secondary" onClick={() => void refetch()}>
+            <RefreshCw size={16} />
+            刷新
+          </Button>
+        }
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <span className="flex items-center gap-2">
-              <FileText size={20} />
-              报告列表
-            </span>
-          </CardTitle>
-          <div className="flex items-center gap-3">
-            <Select
-              options={STATUS_OPTIONS}
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-40"
-            />
-            <Button variant="secondary" size="sm" onClick={() => void refetch()}>
-              <RefreshCw size={14} />
-              刷新
-            </Button>
-          </div>
-        </CardHeader>
+      <FilterBar
+        searchValue={searchText}
+        onSearchChange={setSearchText}
+        searchPlaceholder="搜索报告ID或项目ID..."
+        filters={[
+          {
+            key: "status",
+            label: "报告状态",
+            options: [
+              { value: "", label: "全部状态" },
+              { value: "not_generated", label: "未生成" },
+              { value: "system_draft", label: "系统草稿" },
+              { value: "enterprise_revision", label: "企业修订" },
+              { value: "pending_final", label: "待终版" },
+              { value: "final_uploaded", label: "已上传终版" },
+              { value: "under_review", label: "审核中" },
+              { value: "archived", label: "已归档" },
+            ],
+            value: statusFilter,
+            onChange: setStatusFilter,
+          },
+        ]}
+      />
 
-        {isLoading ? (
-          <Loading text="加载中..." />
-        ) : !data?.items?.length ? (
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">
-            暂无报告数据。
-          </p>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>报告ID</TableHead>
-                <TableHead>版本</TableHead>
-                <TableHead>类型</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>生成时间</TableHead>
-                <TableHead>更新时间</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.items.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell className="font-mono text-xs">
-                    {report.id.slice(0, 12)}...
-                  </TableCell>
-                  <TableCell>v{report.version}</TableCell>
-                  <TableCell className="text-sm">
-                    {report.versionType === "system_draft"
-                      ? "系统草稿"
-                      : report.versionType === "enterprise_revision"
-                        ? "企业修订"
-                        : report.versionType}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={STATUS_VARIANTS[report.status] ?? "default"}>
-                      {STATUS_LABELS[report.status] ?? report.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
-                    {report.generatedAt
-                      ? new Date(report.generatedAt).toLocaleString("zh-CN")
-                      : "-"}
-                  </TableCell>
-                  <TableCell className="text-sm text-[hsl(var(--muted-foreground))]">
-                    {new Date(report.updatedAt).toLocaleString("zh-CN")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+      {isLoading ? (
+        <PageLoading />
+      ) : filteredItems.length === 0 ? (
+        <EmptyState title="暂无报告数据" description="报告将在项目进入报告阶段后自动生成" />
+      ) : (
+        <DataTable columns={columns} data={filteredItems} />
+      )}
     </div>
   );
 }
