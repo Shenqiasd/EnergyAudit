@@ -164,7 +164,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             <DropdownMenu.Content
               align="end"
               sideOffset={8}
-              className="z-50 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-white p-1 shadow-lg animate-in fade-in-0 zoom-in-95"
+              className="z-50 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-white p-1 shadow-lg"
             >
               {/* User info header */}
               <div className="px-3 py-2">
