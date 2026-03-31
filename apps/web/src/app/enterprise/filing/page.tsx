@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loading } from "@/components/ui/loading";
+import { Progress } from "@/components/ui/progress";
 import { useDataModules } from "@/lib/api/hooks/use-data-entry";
 import { clsx } from "clsx";
 import {
@@ -52,16 +53,16 @@ const moduleIcons: Record<string, ElementType> = {
 
 const statusConfig: Record<
   string,
-  { label: string; variant: "default" | "primary" | "success" | "warning" | "danger" }
+  { label: string; variant: "default" | "primary" | "success" | "warning" | "danger"; progress: number }
 > = {
-  not_started: { label: "未开始", variant: "default" },
-  draft: { label: "草稿", variant: "default" },
-  saved: { label: "已保存", variant: "primary" },
-  validation_failed: { label: "校验失败", variant: "danger" },
-  ready_to_submit: { label: "待提交", variant: "warning" },
-  submitted: { label: "已提交", variant: "success" },
-  returned: { label: "已退回", variant: "danger" },
-  archived: { label: "已归档", variant: "default" },
+  not_started: { label: "未开始", variant: "default", progress: 0 },
+  draft: { label: "草稿", variant: "default", progress: 20 },
+  saved: { label: "已保存", variant: "primary", progress: 50 },
+  validation_failed: { label: "校验失败", variant: "danger", progress: 60 },
+  ready_to_submit: { label: "待提交", variant: "warning", progress: 80 },
+  submitted: { label: "已提交", variant: "success", progress: 100 },
+  returned: { label: "已退回", variant: "danger", progress: 40 },
+  archived: { label: "已归档", variant: "default", progress: 100 },
 };
 
 export default function EnterpriseFilingPage() {
@@ -84,6 +85,7 @@ export default function EnterpriseFilingPage() {
 
   return (
     <div className="space-y-6">
+      {/* PageHeader */}
       <div>
         <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
           数据填报
@@ -93,6 +95,7 @@ export default function EnterpriseFilingPage() {
         </p>
       </div>
 
+      {/* Module cards grid */}
       {categories.map((category) => (
         <div key={category}>
           <h2 className="mb-3 text-lg font-semibold text-[hsl(var(--foreground))]">
@@ -116,11 +119,23 @@ export default function EnterpriseFilingPage() {
                   >
                     <CardHeader className="mb-2">
                       <div className="flex items-center gap-2">
-                        <Icon size={18} className="text-[hsl(var(--primary))]" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[hsl(var(--primary))]/10">
+                          <Icon size={18} className="text-[hsl(var(--primary))]" />
+                        </div>
                         <CardTitle className="text-sm">{mod.name}</CardTitle>
                       </div>
                       <Badge variant={status.variant}>{status.label}</Badge>
                     </CardHeader>
+
+                    {/* Progress bar */}
+                    <div className="mb-2 space-y-1">
+                      <div className="flex items-center justify-between text-xs text-[hsl(var(--muted-foreground))]">
+                        <span>填报进度</span>
+                        <span>{status.progress}%</span>
+                      </div>
+                      <Progress value={status.progress} className="h-1.5" />
+                    </div>
+
                     <p className="text-xs text-[hsl(var(--muted-foreground))]">
                       {mod.description ?? `${mod.name}数据填报`}
                     </p>
