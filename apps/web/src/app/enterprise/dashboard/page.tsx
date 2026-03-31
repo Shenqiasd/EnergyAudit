@@ -160,7 +160,7 @@ export default function EnterpriseDashboardPage() {
               mockTodos.map((todo) => {
                 const typeConfig = todoTypeIcons[todo.type] ?? {
                   icon: Bell,
-                  color: "text-gray-500",
+                  color: "text-[hsl(var(--muted-foreground))]",
                 };
                 const IconComponent = typeConfig.icon;
                 const priority = priorityConfig[todo.priority];

@@ -58,9 +58,9 @@ export function ExceptionSubmitDialog({
   return (
     <Modal open={open} onClose={onClose} title="提交例外说明">
       <div className="space-y-4">
-        <div className="flex items-center gap-2 rounded-lg bg-amber-50 p-3">
-          <AlertTriangle size={16} className="shrink-0 text-amber-600" />
-          <p className="text-sm text-amber-800">
+        <div className="flex items-center gap-2 rounded-lg bg-[hsl(var(--warning)/0.1)] p-3">
+          <AlertTriangle size={16} className="shrink-0 text-[hsl(var(--warning))]" />
+          <p className="text-sm text-[hsl(var(--warning))]">
             以下校验项存在警告，请逐条说明原因后提交例外申请。
             管理员审核通过后，数据可正常提交。
           </p>
@@ -89,7 +89,7 @@ export function ExceptionSubmitDialog({
                   handleExplanationChange(warning.id, e.target.value)
                 }
                 rows={2}
-                className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
+                className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--foreground))] focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
                 placeholder="请输入例外说明..."
               />
             </div>

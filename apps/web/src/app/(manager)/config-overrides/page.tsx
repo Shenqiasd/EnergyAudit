@@ -230,7 +230,7 @@ export default function ConfigOverridesPage() {
             <select
               value={form.scopeType}
               onChange={(e) => setForm({ ...form, scopeType: e.target.value })}
-              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--foreground))]"
             >
               {scopeTypes.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -264,7 +264,7 @@ export default function ConfigOverridesPage() {
               onChange={(e) =>
                 setForm({ ...form, targetType: e.target.value })
               }
-              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--foreground))]"
             >
               {targetTypes.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -292,7 +292,7 @@ export default function ConfigOverridesPage() {
                 setJsonError(null);
               }}
               rows={6}
-              className="w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2 font-mono text-sm focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
+              className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2 font-mono text-sm text-[hsl(var(--foreground))] focus:border-[hsl(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
               placeholder='{"isEnabled": false}'
             />
             {jsonError && (
@@ -352,7 +352,7 @@ export default function ConfigOverridesPage() {
           {previewLoading ? (
             <Loading text="加载有效配置..." className="py-4" />
           ) : effectiveConfig ? (
-            <div className="max-h-80 overflow-auto rounded-lg bg-gray-50 p-3">
+            <div className="max-h-80 overflow-auto rounded-lg bg-[hsl(var(--muted))] p-3">
               <pre className="whitespace-pre-wrap font-mono text-xs text-[hsl(var(--foreground))]">
                 {JSON.stringify(effectiveConfig, null, 2)}
               </pre>

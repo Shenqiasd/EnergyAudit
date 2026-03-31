@@ -28,8 +28,8 @@ const roleCards: RoleCard[] = [
     label: "企业端",
     description: "企业用户登录，填报审计数据、管理报告和整改任务",
     icon: Building2,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50 hover:bg-blue-100 border-blue-200",
+    color: "text-blue-600 dark:text-blue-400",
+    bgColor: "bg-blue-50 hover:bg-blue-100 border-blue-200 dark:bg-blue-950/30 dark:hover:bg-blue-900/40 dark:border-blue-800",
     dashboard: "/enterprise/dashboard",
   },
   {
@@ -37,8 +37,8 @@ const roleCards: RoleCard[] = [
     label: "管理端",
     description: "政府管理人员登录，管理企业、项目、审核流程和统计分析",
     icon: Shield,
-    color: "text-green-600",
-    bgColor: "bg-green-50 hover:bg-green-100 border-green-200",
+    color: "text-green-600 dark:text-green-400",
+    bgColor: "bg-green-50 hover:bg-green-100 border-green-200 dark:bg-green-950/30 dark:hover:bg-green-900/40 dark:border-green-800",
     dashboard: "/manager/dashboard",
   },
   {
@@ -46,8 +46,8 @@ const roleCards: RoleCard[] = [
     label: "审核端",
     description: "审核专家登录，查看审核任务、评分和提交审核意见",
     icon: ListChecks,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50 hover:bg-orange-100 border-orange-200",
+    color: "text-orange-600 dark:text-orange-400",
+    bgColor: "bg-orange-50 hover:bg-orange-100 border-orange-200 dark:bg-orange-950/30 dark:hover:bg-orange-900/40 dark:border-orange-800",
     dashboard: "/reviewer/tasks",
   },
 ];
@@ -96,7 +96,7 @@ export default function HomePage() {
               className={`flex flex-col items-center rounded-xl border-2 p-8 text-center transition-all duration-200 ${card.bgColor} cursor-pointer shadow-sm hover:shadow-md`}
             >
               <div
-                className={`mb-4 rounded-full bg-white p-4 shadow-sm ${card.color}`}
+                className={`mb-4 rounded-full bg-[hsl(var(--card))] p-4 shadow-sm ${card.color}`}
               >
                 <Icon size={32} />
               </div>

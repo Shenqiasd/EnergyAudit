@@ -82,7 +82,7 @@ export function BenchmarkBarChart({ title, data }: BenchmarkBarChartProps) {
                   <span className=                  "w-10 text-right text-xs text-[hsl(var(--muted-foreground))]">
                                       实际
                   </span>
-                  <div className="flex-1 h-5 rounded bg-gray-100 relative">
+                  <div className="flex-1 h-5 rounded bg-[hsl(var(--muted))] relative">
                     <div
                       className="h-full rounded"
                       style={{
@@ -101,7 +101,7 @@ export function BenchmarkBarChart({ title, data }: BenchmarkBarChartProps) {
                   <span className=                  "w-10 text-right text-xs text-[hsl(var(--muted-foreground))]">
                                       对标
                   </span>
-                  <div className="flex-1 h-5 rounded bg-gray-100 relative">
+                  <div className="flex-1 h-5 rounded bg-[hsl(var(--muted))] relative">
                     <div
                       className="h-full rounded"
                       style={{

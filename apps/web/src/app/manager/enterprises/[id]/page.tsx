@@ -26,11 +26,11 @@ const SYNC_STATUS_MAP: Record<string, { label: string; color: string }> = {
   synced: { label: "已同步", color: "bg-green-500" },
   pending: { label: "待同步", color: "bg-yellow-500" },
   failed: { label: "同步失败", color: "bg-red-500" },
-  degraded: { label: "降级模式", color: "bg-gray-500" },
+  degraded: { label: "降级模式", color: "bg-[hsl(var(--muted-foreground))]" },
 };
 
 function SyncStatusIndicator({ status }: { status: string }) {
-  const config = SYNC_STATUS_MAP[status] ?? { label: status, color: "bg-gray-400" };
+  const config = SYNC_STATUS_MAP[status] ?? { label: status, color: "bg-[hsl(var(--muted-foreground))]" };
   return (
     <span className="inline-flex items-center gap-1.5 text-sm">
       <span className={`h-2 w-2 rounded-full ${config.color}`} />

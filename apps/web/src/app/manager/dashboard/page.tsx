@@ -395,7 +395,7 @@ export default function ManagerDashboardPage() {
                   <div className="flex flex-col items-center">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback
-                        className={`text-xs ${roleColors[item.userRole] ?? "bg-gray-100 text-gray-700"}`}
+                        className={`text-xs ${roleColors[item.userRole] ?? "bg-[hsl(var(--muted))] text-[hsl(var(--foreground))]"}`}
                       >
                         {(roleLabels[item.userRole] ?? "用")[0]}
                       </AvatarFallback>

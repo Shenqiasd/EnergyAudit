@@ -43,7 +43,7 @@ export function ProgressBoard({ title, items }: ProgressBoardProps) {
                                   {item.value}/{item.total} ({percentage.toFixed(0)}%)
                 </span>
               </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
+              <div className="h-2.5 w-full overflow-hidden rounded-full bg-[hsl(var(--muted))]">
                 <div
                   className="h-full rounded-full bg-[hsl(var(--primary))] transition-all"
                   style={{ width: `${Math.min(percentage, 100)}%` }}
