@@ -2,37 +2,46 @@
 
 import { cn } from "@/lib/utils";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useEffect } from "react";
 import type { ElementType } from "react";
 
 const accentColors = {
   blue: {
-    bg: "from-blue-50/50 to-blue-100/30 dark:from-blue-900/20 dark:to-transparent",
-    border: "border-blue-200/50 dark:border-blue-800/30",
-    icon: "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50",
-    trend: "text-blue-600 dark:text-blue-400",
-    sparkline: "stroke-blue-500",
+    iconBg: "bg-blue-50",
+    iconText: "text-blue-600",
+    sparkline: "stroke-blue-400",
+    dot: "bg-blue-500",
+    trendUp: "text-emerald-600 bg-emerald-50",
+    trendDown: "text-red-500 bg-red-50",
+    trendFlat: "text-slate-500 bg-slate-100",
   },
   green: {
-    bg: "from-emerald-50/50 to-emerald-100/30 dark:from-emerald-900/20 dark:to-transparent",
-    border: "border-emerald-200/50 dark:border-emerald-800/30",
-    icon: "text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/50",
-    trend: "text-emerald-600 dark:text-emerald-400",
-    sparkline: "stroke-emerald-500",
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-600",
+    sparkline: "stroke-emerald-400",
+    dot: "bg-emerald-500",
+    trendUp: "text-emerald-600 bg-emerald-50",
+    trendDown: "text-red-500 bg-red-50",
+    trendFlat: "text-slate-500 bg-slate-100",
   },
   orange: {
-    bg: "from-amber-50/50 to-amber-100/30 dark:from-amber-900/20 dark:to-transparent",
-    border: "border-amber-200/50 dark:border-amber-800/30",
-    icon: "text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50",
-    trend: "text-amber-600 dark:text-amber-400",
-    sparkline: "stroke-amber-500",
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-600",
+    sparkline: "stroke-amber-400",
+    dot: "bg-amber-500",
+    trendUp: "text-emerald-600 bg-emerald-50",
+    trendDown: "text-red-500 bg-red-50",
+    trendFlat: "text-slate-500 bg-slate-100",
   },
   purple: {
-    bg: "from-indigo-50/50 to-indigo-100/30 dark:from-indigo-900/20 dark:to-transparent",
-    border: "border-indigo-200/50 dark:border-indigo-800/30",
-    icon: "text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/50",
-    trend: "text-indigo-600 dark:text-indigo-400",
-    sparkline: "stroke-indigo-500",
+    iconBg: "bg-violet-50",
+    iconText: "text-violet-600",
+    sparkline: "stroke-violet-400",
+    dot: "bg-violet-500",
+    trendUp: "text-emerald-600 bg-emerald-50",
+    trendDown: "text-red-500 bg-red-50",
+    trendFlat: "text-slate-500 bg-slate-100",
   },
 };
 
@@ -58,7 +67,7 @@ function AnimatedNumber({ value }: { value: number }) {
 
   useEffect(() => {
     const controls = animate(motionValue, value, {
-      duration: 1.2,
+      duration: 1.0,
       ease: "easeOut",
     });
     return controls.stop;
@@ -67,25 +76,19 @@ function AnimatedNumber({ value }: { value: number }) {
   return <motion.span>{rounded}</motion.span>;
 }
 
-function Sparkline({
-  data,
-  className,
-}: {
-  data: number[];
-  className?: string;
-}) {
+function Sparkline({ data, className }: { data: number[]; className?: string }) {
   if (data.length < 2) return null;
 
   const max = Math.max(...data);
   const min = Math.min(...data);
   const range = max - min || 1;
-  const width = 80;
-  const height = 32;
-  const padding = 2;
+  const width = 72;
+  const height = 28;
+  const pad = 2;
 
   const points = data.map((v, i) => {
-    const x = padding + (i / (data.length - 1)) * (width - padding * 2);
-    const y = padding + (1 - (v - min) / range) * (height - padding * 2);
+    const x = pad + (i / (data.length - 1)) * (width - pad * 2);
+    const y = pad + (1 - (v - min) / range) * (height - pad * 2);
     return `${x},${y}`;
   });
 
@@ -94,12 +97,12 @@ function Sparkline({
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className={cn("opacity-60", className)}
+      className="opacity-60"
     >
       <polyline
         points={points.join(" ")}
         fill="none"
-        strokeWidth="2"
+        strokeWidth="1.75"
         strokeLinecap="round"
         strokeLinejoin="round"
         className={className}
@@ -108,10 +111,10 @@ function Sparkline({
   );
 }
 
-const trendIcons: Record<"up" | "down" | "flat", string> = {
-  up: "↑",
-  down: "↓",
-  flat: "→",
+const trendIconMap = {
+  up: TrendingUp,
+  down: TrendingDown,
+  flat: Minus,
 };
 
 export function StatCard({
@@ -128,46 +131,54 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border bg-gradient-to-br p-6 shadow-sm transition-all hover:shadow-md",
-        colors.bg,
-        colors.border,
+        "group relative overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 shadow-[var(--shadow-sm)] transition-all hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5",
         className,
       )}
     >
       <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg", colors.icon)}>
-              <Icon className="h-5 w-5" />
+        <div className="flex flex-col gap-3.5 flex-1 min-w-0">
+          <div className="flex items-center gap-2.5">
+            <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", colors.iconBg)}>
+              <Icon className={cn("h-4.5 w-4.5", colors.iconText)} size={18} />
             </div>
-            <span className="text-sm font-medium text-[hsl(var(--muted-foreground))]">
+            <span className="text-sm text-[hsl(var(--muted-foreground))] font-medium truncate">
               {label}
             </span>
           </div>
-          <div className="text-3xl font-bold tracking-tight text-[hsl(var(--foreground))]">
+
+          <div className="text-2xl font-bold tracking-tight text-[hsl(var(--foreground))]">
             <AnimatedNumber value={value} />
           </div>
+
           {trend && (
-            <div className="flex items-center gap-1.5 text-xs font-medium">
-              <span
-                className={cn(
-                  "flex items-center rounded-md px-1.5 py-0.5",
-                  trend.direction === "up" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-                  trend.direction === "down" && "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-                  trend.direction === "flat" && "bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))]",
-                )}
-              >
-                {trendIcons[trend.direction]} {trend.value}
-              </span>
-              <span className="text-[hsl(var(--muted-foreground))]">
-                {trend.text}
-              </span>
+            <div className="flex items-center gap-1.5">
+              {(() => {
+                const TrendIcon = trendIconMap[trend.direction];
+                const colorClass =
+                  trend.direction === "up"
+                    ? colors.trendUp
+                    : trend.direction === "down"
+                    ? colors.trendDown
+                    : colors.trendFlat;
+                return (
+                  <>
+                    <span className={cn("inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold", colorClass)}>
+                      <TrendIcon size={11} />
+                      {trend.value}
+                    </span>
+                    <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                      {trend.text}
+                    </span>
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>
+
         {sparklineData && sparklineData.length > 1 && (
-          <div className="mt-2">
-             <Sparkline data={sparklineData} className={colors.sparkline} />
+          <div className="mt-1 ml-2 shrink-0">
+            <Sparkline data={sparklineData} className={colors.sparkline} />
           </div>
         )}
       </div>

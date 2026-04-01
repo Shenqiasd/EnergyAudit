@@ -137,9 +137,9 @@ const roleLabels: Record<UserRole, string> = {
 };
 
 const roleBadgeColors: Record<UserRole, string> = {
-  enterprise_user: "bg-blue-500/20 text-blue-200 border border-blue-500/30",
-  manager: "bg-emerald-500/20 text-emerald-200 border border-emerald-500/30",
-  reviewer: "bg-indigo-500/20 text-indigo-200 border border-indigo-500/30",
+  enterprise_user: "bg-blue-500/15 text-blue-200 border border-blue-500/25",
+  manager: "bg-emerald-500/15 text-emerald-200 border border-emerald-500/25",
+  reviewer: "bg-indigo-500/15 text-indigo-200 border border-indigo-500/25",
 };
 
 function getAllHrefs(groups: MenuGroup[]): string[] {
@@ -177,7 +177,7 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       initial[group.label] = true;
     });
     setExpandedGroups(initial);
-  }, [role]); 
+  }, [role]);
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -188,23 +188,26 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-transparent bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] transition-all duration-300 shadow-xl",
-        collapsed ? "w-[72px]" : "w-64",
+        "flex h-full flex-col bg-[hsl(var(--sidebar))] text-[hsl(var(--sidebar-foreground))] transition-all duration-300",
+        collapsed ? "w-[60px]" : "w-60",
       )}
     >
       {/* Brand area */}
-      <div className="flex h-16 items-center gap-3 border-b border-white/10 px-4 shrink-0 bg-black/10">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--primary))] shadow-sm">
-          <Zap size={18} className="text-white" />
+      <div className={cn(
+        "flex h-14 items-center gap-3 border-b border-white/8 shrink-0",
+        collapsed ? "px-3 justify-center" : "px-4",
+      )}>
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--primary))]">
+          <Zap size={15} className="text-white" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden flex-1">
-            <div className="truncate text-sm font-bold text-white tracking-wide">
+            <div className="truncate text-sm font-semibold text-white tracking-wide">
               EAP 能源审计
             </div>
             <span
               className={cn(
-                "inline-block rounded px-1.5 py-0.5 text-[10px] font-medium leading-none mt-1",
+                "inline-block rounded-full px-2 py-0.5 text-[9px] font-medium leading-none mt-1",
                 roleBadgeColors[role],
               )}
             >
@@ -215,18 +218,18 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-6 custom-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-2 py-4 custom-scrollbar space-y-1">
         {menus.map((group) => (
-          <div key={group.label} className="mb-6">
+          <div key={group.label} className="mb-3">
             {/* Group header */}
             {!collapsed && (
               <button
                 onClick={() => toggleGroup(group.label)}
-                className="mb-2 flex w-full items-center justify-between px-2 py-1 text-xs font-semibold tracking-widest text-[hsl(var(--sidebar-muted))] hover:text-white transition-colors"
+                className="mb-1 flex w-full items-center justify-between px-2.5 py-1 text-[10px] font-semibold tracking-widest uppercase text-[hsl(var(--sidebar-muted))] hover:text-white/70 transition-colors"
               >
                 <span>{group.label}</span>
                 <ChevronDown
-                  size={14}
+                  size={12}
                   className={cn(
                     "transition-transform duration-200 opacity-50",
                     expandedGroups[group.label] ? "rotate-0" : "-rotate-90",
@@ -240,8 +243,8 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="space-y-1 overflow-hidden"
+                  transition={{ duration: 0.18, ease: "easeInOut" }}
+                  className="space-y-0.5 overflow-hidden"
                 >
                   {group.items.map((item) => {
                     const isActive = isItemActive(pathname, item.href, allHrefs);
@@ -251,16 +254,19 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                         <Link
                           href={item.href}
                           className={cn(
-                            "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 group outline-none",
+                            "relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm transition-all duration-150 group outline-none",
                             isActive
-                              ? "bg-[hsl(var(--primary))] text-white font-medium shadow-md shadow-[hsl(var(--primary))]/20"
-                              : "text-[hsl(var(--sidebar-muted))] hover:bg-white/5 hover:text-white",
-                            collapsed && "justify-center px-2",
+                              ? "bg-white/12 text-white font-medium"
+                              : "text-[hsl(var(--sidebar-muted))] hover:bg-white/6 hover:text-white/90",
+                            collapsed && "justify-center px-0 py-2.5",
                           )}
                           title={collapsed ? item.label : undefined}
                         >
-                          <Icon size={18} className={cn("shrink-0", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100 transition-opacity")} />
-                          {!collapsed && <span>{item.label}</span>}
+                          {isActive && (
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-[hsl(var(--primary))]" />
+                          )}
+                          <Icon size={16} className={cn("shrink-0 transition-opacity", isActive ? "opacity-100 text-white" : "opacity-60 group-hover:opacity-80")} />
+                          {!collapsed && <span className="truncate">{item.label}</span>}
                         </Link>
                       </li>
                     );
@@ -273,31 +279,34 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
       </nav>
 
       {/* Bottom user info */}
-      <div className="border-t border-white/10 p-4 bg-black/20 mt-auto shrink-0">
+      <div className={cn(
+        "border-t border-white/8 bg-black/15 mt-auto shrink-0",
+        collapsed ? "p-2.5" : "p-3",
+      )}>
         {collapsed ? (
           <div className="flex justify-center">
             <button
-               onClick={() => {
+              onClick={() => {
                 logout();
                 router.push("/");
               }}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-[hsl(var(--sidebar-muted))] hover:bg-red-500/20 hover:text-red-400 transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/8 text-[hsl(var(--sidebar-muted))] hover:bg-red-500/20 hover:text-red-400 transition-colors"
               title="退出登录"
             >
-              <LogOut size={16} />
+              <LogOut size={14} />
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[hsl(var(--primary))] to-indigo-600 text-sm font-bold text-white shadow-inner">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[hsl(var(--primary))] to-indigo-500 text-xs font-bold text-white">
               {userInitial}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-white">
+              <div className="truncate text-xs font-medium text-white">
                 {user?.name || "未登录"}
               </div>
-              <div className="truncate text-xs text-[hsl(var(--sidebar-muted))] mt-0.5">
-                {user?.id || "N/A"}
+              <div className="truncate text-[10px] text-[hsl(var(--sidebar-muted))] mt-0.5">
+                {user?.id?.slice(0, 16) || "N/A"}
               </div>
             </div>
             <button
@@ -305,10 +314,10 @@ export function Sidebar({ role, collapsed }: SidebarProps) {
                 logout();
                 router.push("/");
               }}
-              className="rounded-lg p-2 text-[hsl(var(--sidebar-muted))] transition-colors hover:bg-red-500/20 hover:text-red-400"
+              className="rounded-xl p-1.5 text-[hsl(var(--sidebar-muted))] transition-colors hover:bg-red-500/20 hover:text-red-400"
               title="退出登录"
             >
-              <LogOut size={18} />
+              <LogOut size={14} />
             </button>
           </div>
         )}

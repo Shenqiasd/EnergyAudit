@@ -47,6 +47,18 @@ pnpm 10.26.1 (monorepo with Turborepo)
 10. **prerenderEarlyExit false**: Added `experimental.prerenderEarlyExit: false` to `next.config.ts` to allow build to continue when `_global-error` prerender fails (Next.js 16.2.1 + Turbopack internal bug with `LayoutRouterContext` during `_global-error` prerender)
 11. **Next.js worker patch**: `scripts/patch-next.js` runs as `postinstall` hook — patches `next/dist/export/worker.js` to convert uncaught `TypeError` to `ExportPageError` and reset `result = undefined` so `_global-error` prerender failure is silently skipped without blocking the build. Uses Node.js string replacement (no diff/patch command) so it works reliably after fresh `pnpm install`.
 12. **Removed Google font**: Removed `next/font/google` (Inter) from root layout to avoid potential module initialization issues during `_global-error` prerender
+13. **Geist font**: Added `geist` npm package for Geist Sans and Mono fonts (Vercel's design system font), used as CSS variables `--font-geist-sans` and `--font-geist-mono`
+
+## UI Design System (Task #2 - Longcut.ai-inspired)
+
+- **Font**: Geist Sans (geometric, modern) via `geist` npm package
+- **Color palette**: Near-white background `#f8f9fb` (HSL 220 20% 97%), pure white cards, very light borders `#e8e8e8` (HSL 0 0% 91%), neutral dark text `#333` (HSL 0 0% 20%), neutral gray muted `#787878` (HSL 0 0% 47%)
+- **Dark sidebar**: Deep slate `hsl(222 47% 11%)` with active item left-accent pill indicator
+- **Border radius**: `rounded-2xl` (24px) for cards, `rounded-xl` (16px) for buttons/inputs/badges
+- **Shadows**: Custom CSS variables `--shadow-xs/sm/md/lg` for layered depth
+- **Animations**: Framer Motion stagger animations on all dashboard stat cards and list items; page transitions via PageTransition component
+- **Badges**: Pill-shaped (rounded-full) with semantic color variants
+- **StatCard**: Clean white card with colored icon backgrounds, TrendingUp/Down icons, sparklines
 
 ## UI Design
 

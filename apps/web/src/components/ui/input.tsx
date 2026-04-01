@@ -16,7 +16,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={id}
-            className="block text-sm font-semibold text-[hsl(var(--foreground))]"
+            className="block text-sm font-medium text-[hsl(var(--foreground))]"
           >
             {label}
           </label>
@@ -31,7 +31,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={id}
             className={cn(
-              "flex w-full rounded-md border border-[hsl(var(--input))] bg-transparent px-3 py-2 text-sm text-[hsl(var(--foreground))] shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50",
+              "flex w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3 py-2 text-sm text-[hsl(var(--foreground))] shadow-[var(--shadow-xs)] transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[hsl(var(--muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50",
               error && "border-[hsl(var(--danger))] focus-visible:ring-[hsl(var(--danger))]",
               startIcon && "pl-10",
               endIcon && "pr-10",

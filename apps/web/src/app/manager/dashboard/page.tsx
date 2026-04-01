@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Activity
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { StatCard } from "@/components/ui/stat-card";
 import { DashboardSkeleton } from "@/components/skeleton/dashboard-skeleton";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -186,7 +187,12 @@ export default function ManagerDashboardPage() {
       />
 
       {/* KPI StatCards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.div
+        className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+        initial="initial"
+        animate="animate"
+        variants={{ animate: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }}
+      >
         <StatCard
           icon={Building2}
           label="监管企业库"
@@ -219,7 +225,7 @@ export default function ManagerDashboardPage() {
           trend={{ direction: "flat", value: "0%", text: "态势平稳" }}
           sparklineData={[5, 6, 4, 7, 5, 6, 5]}
         />
-      </div>
+      </motion.div>
 
       {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2">

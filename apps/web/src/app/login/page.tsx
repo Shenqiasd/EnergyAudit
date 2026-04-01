@@ -18,6 +18,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -85,77 +86,87 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-[hsl(var(--background))]">
-      {/* Left: Brand Panel (Dark Slate Indigo) - hidden on mobile */}
-      <div className="hidden lg:flex lg:w-[45%] flex-col justify-between bg-[#1e293b] relative overflow-hidden text-white p-16">
-        {/* Background Texture */}
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] mix-blend-overlay"></div>
-        <div className="absolute top-[-20%] left-[-20%] w-[70%] h-[70%] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
-        
+      {/* Left: Brand Panel */}
+      <div className="hidden lg:flex lg:w-[44%] flex-col justify-between bg-[hsl(222_47%_11%)] relative overflow-hidden text-white p-14">
+        <div className="absolute inset-0 opacity-[0.025]" style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+          backgroundSize: "32px 32px",
+        }} />
+        <div className="absolute top-0 right-0 w-3/4 h-1/2 bg-[hsl(var(--primary))/0.12] blur-3xl rounded-full pointer-events-none" />
+
         <div className="relative z-10">
-          {/* Brand Logo */}
-          <div className="flex items-center gap-3 mb-24">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#1e293b] shadow-lg">
-              <Zap size={24} />
+          <div className="flex items-center gap-3 mb-20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[hsl(var(--primary))] shadow-lg">
+              <Zap size={20} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">能源审计平台</h1>
-              <span className="text-xs text-blue-200/80 font-medium tracking-widest uppercase">ENERGY AUDIT PLATFORM</span>
+              <h1 className="text-lg font-bold tracking-tight">能源审计平台</h1>
+              <span className="text-[10px] text-blue-200/60 font-medium tracking-widest uppercase">ENERGY AUDIT PLATFORM</span>
             </div>
           </div>
 
-          {/* Feature highlights */}
-          <div className="space-y-10">
-            {features.map((feature) => (
-              <div key={feature.title} className="flex items-start gap-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                  <feature.icon size={22} className="text-blue-300" />
+          <div className="space-y-8">
+            {features.map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                className="flex items-start gap-4"
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 + i * 0.1 }}
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/6 border border-white/10">
+                  <feature.icon size={18} className="text-blue-300" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold tracking-tight mb-1.5">{feature.title}</h3>
-                  <p className="text-sm text-blue-200/70 leading-relaxed max-w-sm">
+                  <h3 className="text-sm font-semibold mb-1">{feature.title}</h3>
+                  <p className="text-sm text-blue-200/60 leading-relaxed max-w-xs">
                     {feature.description}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Bottom description */}
-        <div className="relative z-10 pt-12 border-t border-white/10 mt-12">
-          <p className="text-sm text-blue-200/50 leading-relaxed max-w-md">
+        <div className="relative z-10 pt-10 border-t border-white/8 mt-10">
+          <p className="text-xs text-blue-200/40 leading-relaxed max-w-sm">
             国家重点用能单位监管支撑系统。通过数字化审计流程，确保工业能耗数据真实、准确、可追溯，助力区域双碳目标达成。
           </p>
         </div>
       </div>
 
       {/* Right: Login Form */}
-      <div className="flex w-full items-center justify-center px-4 lg:w-[55%] relative">
-        <div className="w-full max-w-md">
+      <div className="flex w-full items-center justify-center px-5 lg:w-[56%]">
+        <motion.div
+          className="w-full max-w-[400px]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           {/* Mobile-only logo */}
-          <div className="mb-10 flex flex-col items-center justify-center gap-3 lg:hidden">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[hsl(var(--primary))] text-white shadow-lg">
-              <Zap size={28} />
+          <div className="mb-10 flex flex-col items-center gap-3 lg:hidden">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[hsl(var(--primary))] text-white shadow-lg">
+              <Zap size={24} />
             </div>
-            <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
+            <h1 className="text-xl font-bold text-[hsl(var(--foreground))]">
               能源审计平台
             </h1>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-[hsl(var(--foreground))] tracking-tight mb-2">
-              系统登录
+            <h2 className="text-2xl font-semibold text-[hsl(var(--foreground))] tracking-tight mb-1.5">
+              欢迎登录
             </h2>
-            <p className="text-[hsl(var(--muted-foreground))]">
-              请输入您的政务/企业账号或测试账号
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">
+              请输入您的政务/企业账号或使用快捷入口
             </p>
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-lg bg-[hsl(var(--danger))/10] border border-[hsl(var(--danger))/20] p-4 text-sm text-[hsl(var(--danger))] flex items-center gap-2">
-                <Shield size={16} />
+              <div className="rounded-xl bg-[hsl(var(--danger))/8] border border-[hsl(var(--danger))/20] p-3.5 text-sm text-[hsl(var(--danger))] flex items-center gap-2">
+                <Shield size={15} />
                 {error}
               </div>
             )}
@@ -168,8 +179,8 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="请输入账号"
               required
-              startIcon={<Mail size={18} />}
-              className="h-12 text-base"
+              startIcon={<Mail size={16} />}
+              className="h-11"
             />
 
             <Input
@@ -180,42 +191,42 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              startIcon={<Lock size={18} />}
-              className="h-12 text-base"
+              startIcon={<Lock size={16} />}
+              className="h-11"
             />
 
             <Button
               type="submit"
               loading={isLoading}
-              className="w-full h-12 text-base font-medium mt-2 shadow-md hover:shadow-lg transition-all"
+              className="w-full h-11 font-medium mt-1"
             >
               登录系统
             </Button>
           </form>
 
           {/* Dev mode shortcuts */}
-          <div className="mt-12 pt-8 border-t border-[hsl(var(--border))]">
+          <div className="mt-10 pt-7 border-t border-[hsl(var(--border))]">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-[hsl(var(--foreground))]">开发环境快捷入口</span>
-              <Badge variant="outline" className="text-xs text-[hsl(var(--muted-foreground))]">Auto-login</Badge>
+              <span className="text-xs font-medium text-[hsl(var(--muted-foreground))]">开发环境快捷入口</span>
+              <Badge variant="outline" className="text-[10px] text-[hsl(var(--muted-foreground))]">Dev only</Badge>
             </div>
-            
-            <div className="grid grid-cols-3 gap-3">
+
+            <div className="grid grid-cols-3 gap-2.5">
               {devRoles.map((role) => (
                 <button
                   key={role.label}
                   type="button"
                   onClick={() => router.push(role.href)}
-                  className="group flex flex-col items-center gap-2 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 transition-all hover:-translate-y-1 hover:border-[hsl(var(--primary))] hover:shadow-md cursor-pointer"
+                  className="group flex flex-col items-center gap-2 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 transition-all hover:-translate-y-0.5 hover:border-[hsl(var(--primary))/40] hover:shadow-[var(--shadow-md)] cursor-pointer"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[hsl(var(--muted))] group-hover:bg-[hsl(var(--primary))/10] group-hover:text-[hsl(var(--primary))] text-[hsl(var(--muted-foreground))] transition-colors">
-                    <role.icon size={20} />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[hsl(var(--muted))] group-hover:bg-[hsl(var(--primary))/10] text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
+                    <role.icon size={18} />
                   </div>
                   <div className="text-center">
-                    <div className="text-sm font-medium text-[hsl(var(--foreground))]">
+                    <div className="text-xs font-medium text-[hsl(var(--foreground))]">
                       {role.label}
                     </div>
-                    <div className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 scale-90 origin-top">
+                    <div className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5">
                       {role.description}
                     </div>
                   </div>
@@ -223,7 +234,7 @@ export default function LoginPage() {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
