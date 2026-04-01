@@ -5,7 +5,6 @@ import { Building2, RefreshCw, Users, Clock, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageLoading } from "@/components/ui/loading";
 import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";

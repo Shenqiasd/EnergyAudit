@@ -5,7 +5,6 @@ import { RefreshCw, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageLoading } from "@/components/ui/loading";
 import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import {
   Table,
@@ -90,7 +89,7 @@ export default function ManagerSyncPage() {
         </CardHeader>
 
         {isLoading ? (
-          <PageLoading />
+          <ListPageSkeleton />
         ) : (
           <>
             <Table>

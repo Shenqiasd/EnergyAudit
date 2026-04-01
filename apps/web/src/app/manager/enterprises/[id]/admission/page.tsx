@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PageLoading } from "@/components/ui/loading";
 import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { DetailHeader } from "@/components/detail/detail-header";
 import { InfoGrid } from "@/components/detail/info-grid";

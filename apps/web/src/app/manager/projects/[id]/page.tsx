@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PageLoading } from "@/components/ui/loading";
 import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Select } from "@/components/ui/select";

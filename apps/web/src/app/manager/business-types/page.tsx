@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
-import { PageLoading } from "@/components/ui/loading";
 import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import {
   Table,
@@ -92,7 +91,7 @@ export default function BusinessTypesPage() {
         </CardHeader>
 
         {isLoading ? (
-          <PageLoading />
+          <ListPageSkeleton />
         ) : (
           <Table>
             <TableHeader>
@@ -358,7 +357,7 @@ function ModuleVisibilityModal({
   return (
     <Modal open={true} onClose={onClose} title={`模块可见性配置 - ${businessType}`}>
       {isLoading ? (
-        <PageLoading />
+        <ListPageSkeleton />
       ) : (
         <div className="space-y-4">
           <Table>

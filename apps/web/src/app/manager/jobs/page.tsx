@@ -5,7 +5,6 @@ import { Cpu, RefreshCw, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageLoading } from "@/components/ui/loading";
 import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import { Select } from "@/components/ui/select";
 import {
@@ -116,7 +115,7 @@ export default function ManagerJobsPage() {
         </div>
 
         {isLoading ? (
-          <PageLoading />
+          <ListPageSkeleton />
         ) : (
           <>
             <Table>

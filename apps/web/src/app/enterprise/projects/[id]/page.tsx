@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageLoading } from "@/components/ui/loading";
 import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";
