@@ -60,12 +60,25 @@ const devRoles = [
 ] as const;
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginDev } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [devLoading, setDevLoading] = useState<string | null>(null);
+
+  const handleDevLogin = async (role: typeof devRoles[number]) => {
+    setDevLoading(role.label);
+    try {
+      await loginDev({ id: `dev-${role.href.split("/")[1]}-001`, name: role.description, role: role.href.split("/")[1] === "enterprise" ? "enterprise_user" : role.href.split("/")[1] === "manager" ? "manager" : "reviewer" });
+      router.push(role.href);
+    } catch {
+      router.push(role.href);
+    } finally {
+      setDevLoading(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,21 +219,29 @@ export default function LoginPage() {
 
           {/* Dev mode shortcuts */}
           <div className="mt-10 pt-7 border-t border-[hsl(var(--border))]">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-xs font-medium text-[hsl(var(--muted-foreground))]">开发环境快捷入口</span>
               <Badge variant="outline" className="text-[10px] text-[hsl(var(--muted-foreground))]">Dev only</Badge>
             </div>
+            <p className="text-[10px] text-[hsl(var(--muted-foreground))/60] mb-4">
+              点击后自动创建测试账号并完成登录，无需手动填写凭据
+            </p>
 
             <div className="grid grid-cols-3 gap-2.5">
               {devRoles.map((role) => (
                 <button
                   key={role.label}
                   type="button"
-                  onClick={() => router.push(role.href)}
-                  className="group flex flex-col items-center gap-2 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 transition-all hover:-translate-y-0.5 hover:border-[hsl(var(--primary))/40] hover:shadow-[var(--shadow-md)] cursor-pointer"
+                  disabled={devLoading !== null}
+                  onClick={() => handleDevLogin(role)}
+                  className="group flex flex-col items-center gap-2 rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 transition-all hover:-translate-y-0.5 hover:border-[hsl(var(--primary))/40] hover:shadow-[var(--shadow-md)] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[hsl(var(--muted))] group-hover:bg-[hsl(var(--primary))/10] text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--primary))] transition-colors">
-                    <role.icon size={18} />
+                    {devLoading === role.label ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <role.icon size={18} />
+                    )}
                   </div>
                   <div className="text-center">
                     <div className="text-xs font-medium text-[hsl(var(--foreground))]">

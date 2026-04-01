@@ -69,6 +69,22 @@ The frontend uses a "Deep Slate Indigo" design system (redesigned in v0.2.0):
 - **Components**: Button, Card, Badge, Input, Table, StatCard — all with refined shadows/hover states
 - **Dashboards**: Enterprise workbench and Manager analytics hub both visually upgraded
 
+## Database Setup
+
+- **Auto-migration**: `apps/api/src/main.ts` calls `runMigrations()` on every startup — automatically applies any unapplied SQL migrations from `src/db/migrations/` to the database (tracked via `_migrations` table)
+- **Migration files**: `apps/api/src/db/migrations/*.sql` — 13+ SQL files covering all schema. Copied to `dist/db/migrations/` via nest-cli.json `assets` config
+- **Manual run**: `cd apps/api && pnpm run migrate` if needed
+- **Default dev accounts** (auto-created by `loginDev` on first click of dev shortcuts):
+  - `manager@dev.local` / `dev123456` — Manager role
+  - `reviewer@dev.local` / `dev123456` — Reviewer role
+  - `enterprise_user@dev.local` / `dev123456` — Enterprise user role
+
+## Authentication
+
+- **JWT-based auth**: All API endpoints require a valid JWT Bearer token (except `/auth/login`, `/auth/register`, `/health`)
+- **Login page dev shortcuts**: The three role buttons (`企业端`, `管理端`, `审核端`) automatically call `loginDev` which registers the dev account if needed, logs in, stores JWT, then redirects — no manual credentials needed
+- **Token storage**: `localStorage` — key `energy_audit_token` (access token), `energy_audit_refresh_token`
+
 ## Development Notes
 
 - Shared packages (`config-engine`, `reporting`, `integrations`) must be built before starting the API
