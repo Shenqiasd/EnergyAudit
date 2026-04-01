@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Loading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";
 import { InfoGrid } from "@/components/detail/info-grid";
@@ -58,7 +59,7 @@ export default function ManagerReviewDetailPage() {
   const confirmReview = useConfirmReview(taskId);
   const returnReview = useReturnReview(taskId);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!task) return <div>审核任务不存在</div>;
 
   const actionButtons = (

@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PageLoading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Select } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -110,7 +111,7 @@ export default function ProjectDetailPage() {
   const [memberForm, setMemberForm] = useState({ userId: "", role: "enterprise_contact" });
   const extendDeadline = useExtendProjectDeadline(projectId);
 
-  if (isLoading) return <PageLoading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!project) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">项目不存在</div>;
 
   const handleTransition = async (targetStatus: string) => {

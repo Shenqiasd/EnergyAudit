@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoading } from "@/components/ui/loading";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import { Select } from "@/components/ui/select";
 import {
   Table,

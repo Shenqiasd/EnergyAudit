@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PageLoading } from "@/components/ui/loading";
+import { ListPageSkeleton } from "@/components/skeleton/list-skeleton";
 import { Select } from "@/components/ui/select";
 import {
   Table,

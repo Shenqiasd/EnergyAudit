@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { PageLoading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { DetailHeader } from "@/components/detail/detail-header";
 import { InfoGrid } from "@/components/detail/info-grid";
 import { Timeline } from "@/components/detail/timeline";
@@ -37,7 +38,7 @@ export default function AdmissionReviewPage({
   const [rejectReason, setRejectReason] = useState("");
   const [showConfirmApprove, setShowConfirmApprove] = useState(false);
 
-  if (isLoading) return <PageLoading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!enterprise) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">企业不存在</div>;
 
   const handleApprove = () => {

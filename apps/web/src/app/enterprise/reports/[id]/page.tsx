@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";
 import { InfoGrid } from "@/components/detail/info-grid";
@@ -84,7 +85,7 @@ export default function EnterpriseReportDetailPage() {
   const { data: report, isLoading } = useReport(reportId);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  if (isLoading) return <PageLoading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!report) {
     return (
       <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">

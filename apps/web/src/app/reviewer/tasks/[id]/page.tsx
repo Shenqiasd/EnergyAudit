@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Loading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";
 import {
@@ -84,7 +85,7 @@ export default function ReviewWorkbenchPage() {
   const submitScores = useSubmitScores(taskId);
   const createIssue = useCreateIssue(taskId);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!task) return <div>审核任务不存在</div>;
 
   const handleScoreChange = (index: number, value: string) => {

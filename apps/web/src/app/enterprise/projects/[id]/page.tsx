@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";
 import { InfoGrid } from "@/components/detail/info-grid";
@@ -50,7 +51,7 @@ export default function EnterpriseProjectDetailPage() {
   const { data: project, isLoading } = useAuditProject(projectId);
   const { data: timeline } = useProjectTimeline(projectId);
 
-  if (isLoading) return <PageLoading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!project) {
     return (
       <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">

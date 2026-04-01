@@ -193,38 +193,35 @@ export default function ManagerDashboardPage() {
         animate="animate"
         variants={{ animate: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }}
       >
-        <StatCard
-          icon={Building2}
-          label="监管企业库"
-          value={totalEnterprises}
-          accentColor="blue"
-          trend={{ direction: "up", value: "+12%", text: "较上月增长" }}
-          sparklineData={[20, 25, 30, 28, 35, 40, 45]}
-        />
-        <StatCard
-          icon={Activity}
-          label="活跃项目"
-          value={activeProjects}
-          accentColor="green"
-          trend={{ direction: "up", value: "+8%", text: "环比攀升" }}
-          sparklineData={[10, 15, 12, 18, 20, 22, 25]}
-        />
-        <StatCard
-          icon={ClipboardCheck}
-          label="待评审项"
-          value={summary?.pendingReviewTasks ?? 0}
-          accentColor="purple"
-          trend={{ direction: "down", value: "-5%", text: "积压减轻" }}
-          sparklineData={[15, 12, 18, 14, 10, 8, 6]}
-        />
-        <StatCard
-          icon={AlertTriangle}
-          label="高危预警"
-          value={summary?.overdueAlerts ?? 0}
-          accentColor="orange"
-          trend={{ direction: "flat", value: "0%", text: "态势平稳" }}
-          sparklineData={[5, 6, 4, 7, 5, 6, 5]}
-        />
+        {[
+          {
+            icon: Building2, label: "监管企业库", value: totalEnterprises,
+            accentColor: "blue" as const, trend: { direction: "up" as const, value: "+12%", text: "较上月增长" },
+            sparklineData: [20, 25, 30, 28, 35, 40, 45],
+          },
+          {
+            icon: Activity, label: "活跃项目", value: activeProjects,
+            accentColor: "green" as const, trend: { direction: "up" as const, value: "+8%", text: "环比攀升" },
+            sparklineData: [10, 15, 12, 18, 20, 22, 25],
+          },
+          {
+            icon: ClipboardCheck, label: "待评审项", value: summary?.pendingReviewTasks ?? 0,
+            accentColor: "purple" as const, trend: { direction: "down" as const, value: "-5%", text: "积压减轻" },
+            sparklineData: [15, 12, 18, 14, 10, 8, 6],
+          },
+          {
+            icon: AlertTriangle, label: "高危预警", value: summary?.overdueAlerts ?? 0,
+            accentColor: "orange" as const, trend: { direction: "flat" as const, value: "0%", text: "态势平稳" },
+            sparklineData: [5, 6, 4, 7, 5, 6, 5],
+          },
+        ].map((card) => (
+          <motion.div
+            key={card.label}
+            variants={{ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } }}
+          >
+            <StatCard {...card} />
+          </motion.div>
+        ))}
       </motion.div>
 
       {/* Charts Section */}

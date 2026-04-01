@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageLoading } from "@/components/ui/loading";
+import { DetailSkeleton } from "@/components/skeleton/detail-skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DetailHeader } from "@/components/detail/detail-header";
 import { InfoGrid } from "@/components/detail/info-grid";
@@ -52,7 +53,7 @@ export default function EnterpriseDetailPage({
   const suspendMutation = useUpdateAdmission(id, "suspend");
   const restoreMutation = useUpdateAdmission(id, "restore");
 
-  if (isLoading) return <PageLoading />;
+  if (isLoading) return <DetailSkeleton />;
   if (!enterprise) return <div className="p-8 text-center text-[hsl(var(--muted-foreground))]">企业不存在</div>;
 
   const handleAction = (action: string) => {
